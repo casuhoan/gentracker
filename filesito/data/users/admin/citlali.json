@@ -1,0 +1,36 @@
+{
+    "profile": {
+        "name": "Citlali",
+        "splashart": "uploads\/citlali.webp",
+        "element": "Cryo",
+        "role": [
+            "Support",
+            "Shielder"
+        ],
+        "tracked_stats": [
+            "Energy Recharge (%)",
+            "Elemental Mastery"
+        ],
+        "ideal_stats": {
+            "Energy Recharge (%)": 160,
+            "Elemental Mastery": 1050
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "No",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Energy Recharge (%)": "100",
+                "Elemental Mastery": "993"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}

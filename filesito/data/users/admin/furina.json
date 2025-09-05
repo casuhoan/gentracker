@@ -1,0 +1,56 @@
+{
+    "profile": {
+        "name": "Furina",
+        "splashart": "uploads\/furina.webp",
+        "element": "Hydro",
+        "role": [
+            "Healer",
+            "Support",
+            "Main DPS",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "HP",
+            "Energy Recharge (%)",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "HP": 36000,
+            "Energy Recharge (%)": 160,
+            "Crit Rate (%)": 77,
+            "Crit Damage (%)": 236
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Vicino",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "HP": "40485",
+                "Energy Recharge (%)": "124",
+                "Crit Rate (%)": "57.3",
+                "Crit Damage (%)": "267.2"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Vicino"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "HP": "41200",
+                "Energy Recharge (%)": "173",
+                "Crit Rate (%)": "54",
+                "Crit Damage (%)": "176"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Vicino"
+        }
+    ]
+}

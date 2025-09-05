@@ -1,0 +1,38 @@
+{
+    "profile": {
+        "name": "Skirk",
+        "splashart": "uploads\/skirk.png",
+        "element": "Cryo",
+        "role": [
+            "Main DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2150,
+            "Crit Rate (%)": 75,
+            "Crit Damage (%)": 230
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "1899",
+                "Crit Rate (%)": "62.8",
+                "Crit Damage (%)": "233"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "No"
+        }
+    ]
+}

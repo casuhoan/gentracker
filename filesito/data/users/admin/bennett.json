@@ -1,0 +1,46 @@
+{
+    "profile": {
+        "name": "Bennett",
+        "splashart": "uploads\/bennett.webp",
+        "element": "Pyro",
+        "role": [
+            "Healer",
+            "Support"
+        ],
+        "tracked_stats": [
+            "HP",
+            "Energy Recharge (%)"
+        ],
+        "ideal_stats": {
+            "HP": 26000,
+            "Energy Recharge (%)": 220
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 6,
+        "signature_weapon": "Buona",
+        "talents": "Sì",
+        "rarity": "4-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "HP": "22142",
+                "Energy Recharge (%)": "213.5"
+            },
+            "constellation": 6,
+            "signature_weapon": "Buona",
+            "talents": "Sì"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "HP": "22142",
+                "Energy Recharge (%)": "243"
+            },
+            "constellation": 6,
+            "signature_weapon": "Buona",
+            "talents": "Sì"
+        }
+    ]
+}

@@ -1,0 +1,53 @@
+{
+    "profile": {
+        "name": "Chiori",
+        "splashart": "uploads\/chiori.webp",
+        "element": "Geo",
+        "role": [
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Def",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 1300,
+            "Def": 2500,
+            "Crit Rate (%)": 90,
+            "Crit Damage (%)": 230
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "No",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "1392",
+                "Def": "1645",
+                "Crit Rate (%)": "100.4",
+                "Crit Damage (%)": "154.2"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "Atk": "1426",
+                "Def": "1742",
+                "Crit Rate (%)": "88",
+                "Crit Damage (%)": "147"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "profile": {
+        "name": "Chevreuse",
+        "splashart": "uploads\/chevreuse.webp",
+        "element": "Pyro",
+        "role": [
+            "Healer",
+            "Support"
+        ],
+        "tracked_stats": [
+            "HP",
+            "Energy Recharge (%)"
+        ],
+        "ideal_stats": {
+            "HP": 40000,
+            "Energy Recharge (%)": 150
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 6,
+        "signature_weapon": "Buona",
+        "talents": "Vicino",
+        "rarity": "4-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "HP": "43119",
+                "Energy Recharge (%)": "139.5"
+            },
+            "constellation": 6,
+            "signature_weapon": "Buona",
+            "talents": "Vicino"
+        }
+    ]
+}

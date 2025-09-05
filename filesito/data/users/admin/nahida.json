@@ -1,0 +1,42 @@
+{
+    "profile": {
+        "name": "Nahida",
+        "splashart": "uploads\/nahida.webp",
+        "element": "Dendro",
+        "role": [
+            "Support",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Energy Recharge (%)",
+            "Elemental Mastery",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Energy Recharge (%)": 123,
+            "Elemental Mastery": 800,
+            "Crit Rate (%)": 60,
+            "Crit Damage (%)": 155
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 1,
+        "signature_weapon": "No",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Energy Recharge (%)": "133.7",
+                "Elemental Mastery": "840",
+                "Crit Rate (%)": "47.4",
+                "Crit Damage (%)": "94.3"
+            },
+            "constellation": 1,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}

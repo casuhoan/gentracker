@@ -1,0 +1,42 @@
+{
+    "profile": {
+        "name": "Escoffier",
+        "splashart": "uploads\/escoffier.webp",
+        "element": "Cryo",
+        "role": [
+            "Support",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Energy Recharge (%)",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2350,
+            "Energy Recharge (%)": 150,
+            "Crit Rate (%)": 80,
+            "Crit Damage (%)": 230
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "No",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "1967",
+                "Energy Recharge (%)": "110.4",
+                "Crit Rate (%)": "92.8",
+                "Crit Damage (%)": "147.2"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}

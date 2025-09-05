@@ -1,0 +1,49 @@
+{
+    "profile": {
+        "name": "Navia",
+        "splashart": "uploads\/navia.webp",
+        "element": "Geo",
+        "role": [
+            "Main DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2500,
+            "Crit Rate (%)": 65,
+            "Crit Damage (%)": 240
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 4,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "2636",
+                "Crit Rate (%)": "69",
+                "Crit Damage (%)": "235"
+            },
+            "constellation": 4,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "Atk": "2636",
+                "Crit Rate (%)": "69",
+                "Crit Damage (%)": "235"
+            },
+            "constellation": 1,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        }
+    ]
+}

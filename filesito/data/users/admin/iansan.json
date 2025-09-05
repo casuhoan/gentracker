@@ -1,0 +1,35 @@
+{
+    "profile": {
+        "name": "Iansan",
+        "splashart": "uploads\/iansan.webp",
+        "element": "Electro",
+        "role": [
+            "Support"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Energy Recharge (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2700,
+            "Energy Recharge (%)": 200
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 6,
+        "signature_weapon": "Buona",
+        "talents": "Sì",
+        "rarity": "4-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "2521",
+                "Energy Recharge (%)": "179.8"
+            },
+            "constellation": 6,
+            "signature_weapon": "Buona",
+            "talents": "Sì"
+        }
+    ]
+}

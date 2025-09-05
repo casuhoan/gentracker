@@ -1,0 +1,38 @@
+{
+    "profile": {
+        "name": "Arlecchino",
+        "splashart": "uploads\/arlecchino.webp",
+        "element": "Pyro",
+        "role": [
+            "Main DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2300,
+            "Crit Rate (%)": 80,
+            "Crit Damage (%)": 212
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": 2268,
+                "Crit Rate (%)": 78.8,
+                "Crit Damage (%)": 212.7
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "profile": {
+        "name": "Xilonen",
+        "splashart": "uploads\/xilonen.webp",
+        "element": "Geo",
+        "role": [
+            "Healer",
+            "Support"
+        ],
+        "tracked_stats": [
+            "Def",
+            "Energy Recharge (%)"
+        ],
+        "ideal_stats": {
+            "Def": 3500,
+            "Energy Recharge (%)": 160
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Vicino",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Def": "4077",
+                "Energy Recharge (%)": "144.7"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Vicino"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "Def": "4054",
+                "Energy Recharge (%)": "130"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Vicino"
+        }
+    ]
+}

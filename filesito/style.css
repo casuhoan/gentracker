@@ -1,0 +1,289 @@
+/* Stile per nascondere le sezioni non attive */
+.view {
+    display: none;
+}
+
+/* Stile per mostrare la sezione attiva */
+.view.active {
+    display: block;
+}
+
+/* Stili aggiuntivi per migliorare l'aspetto */
+body {
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+#character-form h5 {
+    margin-top: 1.5rem;
+    color: #0056b3;
+}
+
+.text-orange {
+    color: #fd7e14 !important;
+}
+
+.text-success {
+    color: #28a745 !important; /* Original Bootstrap success green */
+}
+
+/* Override for lighter green */
+.text-success.lighter {
+    color: #2ecc71 !important; /* A lighter shade of green */
+}
+
+/* --- Dark Mode --- */
+:root {
+    --light-bg: #f8f9fa;
+    --light-color: #212529;
+    --light-card-bg: #fff;
+    --light-card-border: rgba(0, 0, 0, 0.175);
+
+    --dark-bg: #212529;
+    --dark-color: #dee2e6;
+    --dark-card-bg: #343a40;
+    --dark-card-border: #495057;
+    --dark-footer-bg: #1c1f23;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-color);
+}
+
+body.dark-mode .card {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+    color: var(--dark-color);
+}
+
+body.dark-mode .list-group-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+    color: var(--dark-color);
+}
+
+body.dark-mode .form-control, 
+body.dark-mode .form-select {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #adb5bd; /* A lighter gray for dark mode placeholders */
+    opacity: 1; /* Ensure it's not transparent */
+}
+
+body.dark-mode .form-control:focus, 
+body.dark-mode .form-select:focus {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+    border-color: #86b7fe;
+}
+
+body.dark-mode #character-form h5 {
+    color: #6ea8fe;
+}
+
+body.dark-mode .navbar-dark {
+    background-color: #1c1f23!important;
+}
+
+body.dark-mode .footer {
+    background-color: var(--dark-footer-bg);
+}
+
+/* Stili per il Modale in Dark Mode */
+body.dark-mode .modal-content {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode .modal-title {
+    color: var(--dark-color);
+}
+
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Stili per la galleria personaggi */
+.gallery-card {
+    position: relative;
+    overflow: hidden; /* Nasconde parti degli overlay che escono dalla card */
+}
+
+.gallery-card .card-body {
+    min-height: 130px; /* Altezza minima per uniformare le card */
+}
+
+.card-constellation {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.card-acquisition-date {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    z-index: 10;
+}
+
+.card-roles {
+    padding: 5px 0;
+}
+
+.role-tag {
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 2px;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-hover-stats {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Aggiunto per far passare i click */
+}
+
+.gallery-card:hover .card-hover-stats {
+    opacity: 1;
+    visibility: visible;
+}
+
+.card-hover-stats h5 {
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    padding-bottom: 5px;
+}
+
+.card-hover-stats ul {
+    padding-left: 0;
+    width: 90%;
+    font-size: 0.9rem;
+}
+
+.card-hover-stats ul li {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+}
+
+.footer {
+    flex-shrink: 0;
+}
+
+.build-separator {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .build-separator {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#build-list-container .list-group-item {
+    margin-bottom: 10px;
+    border-radius: .25rem;
+}
+
+/* Colori Rarità 5 Stelle */
+.rarity-5-c0 { color: #ffc107 !important; } /* Giallo */
+.rarity-5-c1 { color: #ffca2c !important; } /* Giallo Chiaro */
+.rarity-5-c2 { color: #d4edda !important; } /* Verde Chiaro */
+.rarity-5-c3 { color: #0dcaf0 !important; } /* Ciano */
+.rarity-5-c4 { color: #d63384 !important; } /* Magenta */
+.rarity-5-c5 { color: #6f42c1 !important; } /* Viola */
+.rarity-5-c6 { color: #fff !important; text-shadow: 0 0 5px #000; } /* Bianco */
+
+/* Styling for Gallery Controls */
+#gallery-controls {
+    background-color: #f8f9fa; /* A light gray for light mode */
+    border-color: #dee2e6 !important; /* Bootstrap default border color */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.dark-mode #gallery-controls {
+    background-color: #343a40; /* A dark gray for dark mode */
+    border-color: #495057 !important; /* A darker border for dark mode */
+}
+
+/* Ensure labels are visible in dark mode */
+.dark-mode #gallery-controls .form-label,
+.dark-mode #gallery-controls .form-check-label {
+    color: #f8f9fa; /* Light text color for dark backgrounds */
+}
+
+/* Add space between gallery title and controls */
+#gallery-view h2 {
+    margin-bottom: 1.5rem; /* or 24px */
+}
+
+#nav-logout {
+    color: #dc3545 !important; /* Bootstrap's danger red */
+}
+
+/* User Management - Dark Mode Search Input */
+body.dark-mode #user-search {
+    background-color: var(--light-card-bg);
+    color: var(--light-color);
+    border-color: var(--light-card-border);
+}
+
+body.dark-mode #user-search::placeholder {
+    color: #6c757d; /* Darker gray for light placeholder in dark mode */
+}
+
+body.dark-mode #user-search:focus {
+    background-color: var(--light-card-bg);
+    color: var(--light-color);
+    border-color: #86b7fe;
+}

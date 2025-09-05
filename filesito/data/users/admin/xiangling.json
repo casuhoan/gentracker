@@ -1,0 +1,58 @@
+{
+    "profile": {
+        "name": "Xiangling",
+        "splashart": "uploads\/xiangling.webp",
+        "element": "Pyro",
+        "role": [
+            "Support",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Energy Recharge (%)",
+            "Elemental Mastery",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 1350,
+            "Energy Recharge (%)": 210,
+            "Elemental Mastery": 210,
+            "Crit Rate (%)": 60,
+            "Crit Damage (%)": 145
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 5,
+        "signature_weapon": "Buona",
+        "talents": "Vicino",
+        "rarity": "4-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "1371",
+                "Energy Recharge (%)": "155.6",
+                "Elemental Mastery": "393",
+                "Crit Rate (%)": "59.4",
+                "Crit Damage (%)": "133.9"
+            },
+            "constellation": 5,
+            "signature_weapon": "Buona",
+            "talents": "Vicino"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "Atk": "1433",
+                "Energy Recharge (%)": "166",
+                "Elemental Mastery": "391",
+                "Crit Rate (%)": "64",
+                "Crit Damage (%)": "91"
+            },
+            "constellation": 1,
+            "signature_weapon": "Buona",
+            "talents": "Vicino"
+        }
+    ]
+}

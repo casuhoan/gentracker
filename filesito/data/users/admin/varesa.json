@@ -1,0 +1,38 @@
+{
+    "profile": {
+        "name": "Varesa",
+        "splashart": "uploads\/varesa.webp",
+        "element": "Electro",
+        "role": [
+            "Main DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2500,
+            "Crit Rate (%)": 85,
+            "Crit Damage (%)": 215
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Vicino",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "2312",
+                "Crit Rate (%)": "49.5",
+                "Crit Damage (%)": "260.4"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Vicino"
+        }
+    ]
+}

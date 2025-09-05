@@ -1,0 +1,54 @@
+{
+    "profile": {
+        "name": "Raiden Shogun",
+        "splashart": "uploads\/raiden_shogun.webp",
+        "element": "Electro",
+        "role": [
+            "Main DPS",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Energy Recharge (%)",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2350,
+            "Energy Recharge (%)": 270,
+            "Crit Rate (%)": 70,
+            "Crit Damage (%)": 153
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "Buona",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "Atk": "1626",
+                "Energy Recharge (%)": "273",
+                "Crit Rate (%)": "62.8",
+                "Crit Damage (%)": "129"
+            },
+            "constellation": 0,
+            "signature_weapon": "Buona",
+            "talents": "Sì"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "Atk": "2139",
+                "Energy Recharge (%)": "221",
+                "Crit Rate (%)": "63",
+                "Crit Damage (%)": "125"
+            },
+            "constellation": 0,
+            "signature_weapon": "Buona",
+            "talents": "Sì"
+        }
+    ]
+}

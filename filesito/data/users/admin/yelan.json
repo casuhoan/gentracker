@@ -1,0 +1,54 @@
+{
+    "profile": {
+        "name": "Yelan",
+        "splashart": "uploads\/yelan.webp",
+        "element": "Hydro",
+        "role": [
+            "Main DPS",
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "HP",
+            "Energy Recharge (%)",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "HP": 31000,
+            "Energy Recharge (%)": 170,
+            "Crit Rate (%)": 85,
+            "Crit Damage (%)": 240
+        },
+        "acquisition_date": "2025-01-01",
+        "constellation": 0,
+        "signature_weapon": "No",
+        "talents": "No",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-08-20",
+            "stats": {
+                "HP": "31754",
+                "Energy Recharge (%)": "216.2",
+                "Crit Rate (%)": "53.4",
+                "Crit Damage (%)": "196.9"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        },
+        {
+            "date": "2025-02-01",
+            "stats": {
+                "HP": "35473",
+                "Energy Recharge (%)": "225",
+                "Crit Rate (%)": "46",
+                "Crit Damage (%)": "151"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}
