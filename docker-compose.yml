@@ -7,4 +7,5 @@ services:
     ports:
       - "80:80"
     volumes:
-  - /data/compose/1/sitophp/filesito:/var/www/html
+      - /data/compose/1/sitophp/filesito:/var/www/html
+
