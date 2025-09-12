@@ -26,9 +26,9 @@
         {
             "date": "2025-08-20",
             "stats": {
-                "Atk": 2268,
-                "Crit Rate (%)": 78.8,
-                "Crit Damage (%)": 212.7
+                "Atk": "2268",
+                "Crit Rate (%)": "78.8",
+                "Crit Damage (%)": "212.7"
             },
             "constellation": 0,
             "signature_weapon": "Sì",

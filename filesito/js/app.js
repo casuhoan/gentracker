@@ -19,12 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let dataLoaded = false;
     let currentUser = null;
     let isAdmin = false;
+    let isNavigatingToEdit = false; // Flag to handle character edit navigation
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
     const characterForm = document.getElementById('character-form');
     const buildForm = document.getElementById('build-form');
     const editBuildForm = document.getElementById('edit-build-form');
+    const profileEditForm = document.getElementById('profile-edit-form');
     const charSelect = document.getElementById('char-select');
     const manageCharSelect = document.getElementById('manage-char-select');
     const buildListContainer = document.getElementById('build-list-container');
@@ -33,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUsernameSpan = document.getElementById('current-username');
     const navLogoutBtn = document.getElementById('nav-logout');
     const navUserManagementLink = document.getElementById('nav-user-management');
+    const navUserAvatar = document.getElementById('nav-user-avatar');
+    const themeToggle = document.getElementById('theme-toggle-checkbox');
 
     // --- FUNZIONI DI UTILITY ---
     const createSafeId = (str) => {
@@ -66,23 +70,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- USER INTERFACE FUNCTIONS ---
+    // --- USER INTERFACE & THEME FUNCTIONS ---
     const updateLoginUI = () => {
         if (currentUser) {
             navLoginLink.classList.add('d-none');
             navUserMenu.classList.remove('d-none');
             currentUsernameSpan.textContent = currentUser.username;
+            navUserAvatar.src = currentUser.avatar || 'uploads/default_avatar.png';
+            navUserAvatar.style.display = 'inline-block';
+
             if (currentUser.role === 'admin') {
-                navUserManagementLink.classList.remove('d-none');
+                navUserManagementLink.parentElement.style.display = 'block';
             } else {
-                navUserManagementLink.classList.add('d-none');
+                navUserManagementLink.parentElement.style.display = 'none';
             }
         } else {
             navLoginLink.classList.remove('d-none');
             navUserMenu.classList.add('d-none');
-            navUserManagementLink.classList.add('d-none');
         }
     };
+
+    function initTheme() {
+        if (!themeToggle) return;
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+        themeToggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+            const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+        });
+    }
 
     const loadUserManagement = async () => {
         if (!currentUser || currentUser.role !== 'admin') {
@@ -90,11 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
             location.hash = '#'; // Redirect to gallery
             return;
         }
-        // Assuming user-management.js is loaded and provides loadUsers function
         if (typeof loadUsers === 'function') {
             await loadUsers();
         } else {
-            showErrorAlert('Funzionalità di gestione utenti non disponibile. Assicurati che user-management.js sia caricato.');
+            showErrorAlert('Funzionalità di gestione utenti non disponibile.');
         }
     };
 
@@ -130,12 +149,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleRouteChange = async () => {
+        await checkSession();
+        if (!currentUser) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         const hash = window.location.hash || '#';
 
-        // Check session on every route change
-        await checkSession();
-
-        if (!dataLoaded && currentUser) { // Modified: only load data if logged in
+        if (!dataLoaded && currentUser) {
             try {
                 const response = await fetch('php/api.php?action=get_all_characters');
                 sourceCharacterData = await response.json();
@@ -161,15 +183,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 '#new-build': 'build-logger-view',
                 '#manage-builds': 'build-management-view',
                 '#user-management': 'user-management-view',
+                '#edit-profile': 'profile-edit-view',
             };
             const viewId = routeMap[hash] || 'gallery-view';
             showView(viewId);
 
             if (viewId === 'gallery-view') applyFiltersAndSorting();
-            if (viewId === 'character-creation-view') resetCharacterForm();
+            if (viewId === 'character-creation-view') {
+                if (isNavigatingToEdit) {
+                    isNavigatingToEdit = false;
+                } else {
+                    resetCharacterForm();
+                }
+            }
             if (viewId === 'build-logger-view') loadCharactersForBuildLogger();
             if (viewId === 'build-management-view') loadBuildManagement();
             if (viewId === 'user-management-view') loadUserManagement();
+            if (viewId === 'profile-edit-view') loadProfileForEditing();
         }
     };
 
@@ -179,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/api.php?action=check_session');
             const result = await response.json();
             if (result.status === 'success') {
-                currentUser = { username: result.username, role: result.role };
+                currentUser = { username: result.username, role: result.role, avatar: result.avatar };
                 isAdmin = (result.role === 'admin');
             } else {
                 currentUser = null;
@@ -197,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SEZIONE: GALLERIA ---
     const initGalleryControls = () => {
         const elementFiltersContainer = document.getElementById('element-filters');
+        if (!elementFiltersContainer) return;
         elementFiltersContainer.innerHTML = '';
         config.elements.forEach(element => {
             const elId = `filter-${createSafeId(element)}`;
@@ -209,9 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const applyFiltersAndSorting = () => {
         let filteredCharacters = [...sourceCharacterData];
-        const nameFilter = document.getElementById('name-filter').value.toLowerCase();
-        if (nameFilter) {
-            filteredCharacters = filteredCharacters.filter(char => char.profile.name.toLowerCase().includes(nameFilter));
+        const nameFilterInput = document.getElementById('name-filter');
+        if (nameFilterInput) {
+            const nameFilter = nameFilterInput.value.toLowerCase();
+            if (nameFilter) {
+                filteredCharacters = filteredCharacters.filter(char => char.profile.name.toLowerCase().includes(nameFilter));
+            }
         }
         const selectedElements = Array.from(document.querySelectorAll('#element-filters input:checked')).map(cb => cb.value);
         if (selectedElements.length > 0) {
@@ -227,28 +261,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             char.buildScore = (scoredStatsCount > 0) ? (totalRatio / scoredStatsCount) * 100 : 0;
         });
-        const sortValue = document.getElementById('sort-select').value;
-        const sortFunctions = {
-            'nameAsc': (a, b) => a.profile.name.localeCompare(b.profile.name),
-            'nameDesc': (a, b) => b.profile.name.localeCompare(a.profile.name),
-            'constAsc': (a, b) => a.profile.latest_constellation - b.profile.latest_constellation || a.profile.name.localeCompare(b.profile.name),
-            'constDesc': (a, b) => b.profile.latest_constellation - a.profile.latest_constellation || a.profile.name.localeCompare(b.profile.name),
-            'rarityAsc': (a, b) => (a.profile.rarity === '4-star' ? 4 : 5) - (b.profile.rarity === '4-star' ? 4 : 5) || a.profile.name.localeCompare(b.profile.name),
-            'rarityDesc': (a, b) => (b.profile.rarity === '4-star' ? 4 : 5) - (a.profile.rarity === '4-star' ? 4 : 5) || a.profile.name.localeCompare(b.profile.name),
-            'buildAsc': (a, b) => a.buildScore - b.buildScore || a.profile.name.localeCompare(b.profile.name),
-            'buildDesc': (a, b) => b.buildScore - a.buildScore || a.profile.name.localeCompare(b.profile.name),
-        };
-        if (sortFunctions[sortValue]) filteredCharacters.sort(sortFunctions[sortValue]);
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+            const sortValue = sortSelect.value;
+            const sortFunctions = {
+                'nameAsc': (a, b) => a.profile.name.localeCompare(b.profile.name),
+                'nameDesc': (a, b) => b.profile.name.localeCompare(a.profile.name),
+                'constAsc': (a, b) => (a.profile.latest_constellation || 0) - (b.profile.latest_constellation || 0) || a.profile.name.localeCompare(b.profile.name),
+                'constDesc': (a, b) => (b.profile.latest_constellation || 0) - (a.profile.latest_constellation || 0) || a.profile.name.localeCompare(b.profile.name),
+                'rarityAsc': (a, b) => (a.profile.rarity === '4-star' ? 4 : 5) - (b.profile.rarity === '4-star' ? 4 : 5) || a.profile.name.localeCompare(b.profile.name),
+                'rarityDesc': (a, b) => (b.profile.rarity === '4-star' ? 4 : 5) - (a.profile.rarity === '4-star' ? 4 : 5) || a.profile.name.localeCompare(b.profile.name),
+                'buildAsc': (a, b) => a.buildScore - b.buildScore || a.profile.name.localeCompare(b.profile.name),
+                'buildDesc': (a, b) => b.buildScore - a.buildScore || a.profile.name.localeCompare(b.profile.name),
+            };
+            if (sortFunctions[sortValue]) filteredCharacters.sort(sortFunctions[sortValue]);
+        }
         renderGallery(filteredCharacters);
     };
 
     const renderGallery = (characters) => {
         const galleryGrid = document.getElementById('gallery-grid');
+        if (!galleryGrid) return;
         galleryGrid.innerHTML = '';
         if (characters.length === 0) {
             galleryGrid.innerHTML = `
                 <div class="col-12 d-flex flex-column justify-content-center align-items-center" style="min-height: 300px;">
-                    <p class="text-center w-100">Nessun personaggio corrisponde ai criteri di ricerca.</p>
+                    <p class="text-center w-100">Nessun personaggio trovato.</p>
                 </div>
             `;
             return;
@@ -278,8 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="col">
                     <div class="card h-100 text-center gallery-card">
                         ${hoverStatsHtml}
-                        <div class="card-constellation ${constellationColorClass}">C${char.latest_constellation}</div>
-                        <img src="${char.splashart || 'https://via.placeholder.com/150x200'}" class="card-img-top" alt="${char.name}" style="height: 250px; object-fit: contain;">
+                        <div class="card-constellation ${constellationColorClass}">C${char.latest_constellation || 0}</div>
+                        <img src="${char.splashart || 'uploads/default_avatar.png'}" class="card-img-top" alt="${char.name}" style="height: 250px; object-fit: contain;">
                         <div class="card-body"><h5 class="card-title">${char.name}</h5>${rolesHtml}</div>
                         <div class="card-acquisition-date">${formattedDate}</div>
                         <a href="#character/${encodeURIComponent(char.name)}" class="stretched-link"></a>
@@ -291,7 +329,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SEZIONE: DASHBOARD ---
     const loadDashboard = (charData) => {
         currentCharacterData = charData;
-        document.getElementById('dashboard-title').textContent = `Confronto Build: ${charData.profile.name}`;
+        document.getElementById('dashboard-title').textContent = 
+`Confronto Build: ${charData.profile.name}`;
         const buildOptions = charData.builds.map((build, index) => ({ name: `Build del ${build.date} (Build #${charData.builds.length - index})`, value: index }));
         populateSelect('compare-select-1', buildOptions);
         populateSelect('compare-select-2', buildOptions);
@@ -336,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ALTRE SEZIONI (Creazione, Build, Gestione) ---
     const populateCharacterFormForEdit = (charData) => {
+        if (!characterForm) return;
         const profile = charData.profile;
         characterForm.reset();
         document.getElementById('character-form-title').textContent = `Modifica ${profile.name}`;
@@ -368,24 +408,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="number" step="0.1" class="form-control" id="ideal-${statId}" name="ideal_stats[${stat}]" value="${idealValue}">
                 </div>`;
         });
+        characterForm.querySelector('button[type="submit"]').textContent = 'Salva Modifiche';
     };
 
     const resetCharacterForm = () => {
+        if (!characterForm) return;
         characterForm.reset();
         document.getElementById('original_name').value = '';
         document.getElementById('character-form-title').textContent = 'Crea Personaggio';
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
+        characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
     };
 
     const initCharacterCreationForm = () => {
         const statsCheckboxesContainer = document.getElementById('stats-checkboxes');
+        if (!statsCheckboxesContainer) return;
         statsCheckboxesContainer.innerHTML = '';
         config.stats.forEach(stat => {
             const statId = createSafeId(stat);
             statsCheckboxesContainer.innerHTML += `<div class="form-check form-check-inline"><input class="form-check-input" type="checkbox" id="track-${statId}" name="tracked_stats[]" value="${stat}"><label class="form-check-label" for="track-${statId}">${stat}</label></div>`;
         });
         const roleCheckboxesContainer = document.getElementById('role-checkboxes');
+        if (!roleCheckboxesContainer) return;
         roleCheckboxesContainer.innerHTML = '';
         config.roles.forEach(role => {
             const roleId = `role-${createSafeId(role)}`;
@@ -410,65 +455,89 @@ document.addEventListener('DOMContentLoaded', () => {
         buildListContainer.innerHTML = '';
     };
 
+    const loadProfileForEditing = () => {
+        if (!currentUser || !profileEditForm) return;
+        document.getElementById('profile-original-username').value = currentUser.username;
+        document.getElementById('profile-username').value = currentUser.username;
+        document.getElementById('profile-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
+        document.getElementById('profile-password').value = '';
+    };
+
     // --- EVENT LISTENERS ---
-    document.getElementById('back-to-gallery-btn').addEventListener('click', (e) => { e.preventDefault(); location.hash = '#'; });
-    document.getElementById('edit-character-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        if (currentCharacterData) {
-            populateCharacterFormForEdit(currentCharacterData);
-            location.hash = '#new-character';
-        }
-    });
-
-    // Added Logout Event Listener
-    navLogoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('php/api.php?action=logout');
-            const result = await response.json();
-            if (result.status === 'success') {
-                showToast('Logout effettuato con successo.');
-                currentUser = null;
-                isAdmin = false;
-                updateLoginUI();
-                location.hash = '#'; // Redirect to gallery after logout
-            } else {
-                showErrorAlert(result.message);
+    if (document.getElementById('back-to-gallery-btn')) {
+        document.getElementById('back-to-gallery-btn').addEventListener('click', (e) => { e.preventDefault(); location.hash = '#'; });
+    }
+    
+    if (document.getElementById('edit-character-btn')) {
+        document.getElementById('edit-character-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentCharacterData) {
+                isNavigatingToEdit = true; // Set flag before changing hash
+                populateCharacterFormForEdit(currentCharacterData);
+                location.hash = '#new-character';
             }
-        } catch (error) {
-            showErrorAlert('Errore durante il logout.');
-        }
-    });
-
-    // Added User Management Link Event Listener
-    navUserManagementLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        location.hash = '#user-management';
-    });
-
-    charSelect.addEventListener('change', () => {
-        const charName = charSelect.value;
-        const buildStatsInputs = document.getElementById('build-stats-inputs');
-        if (!charName) { buildStatsInputs.innerHTML = ''; return; }
-        const charData = sourceCharacterData.find(c => c.profile.name === charName);
-        if (!charData) return;
-        buildStatsInputs.innerHTML = '';
-        charData.profile.tracked_stats.forEach(stat => {
-            const statId = createSafeId(stat);
-            buildStatsInputs.innerHTML += `<div class="col-md-4 mb-3"><label for="build-${statId}" class="form-label">${stat}</label><input type="number" step="0.1" class="form-control" id="build-${statId}" name="stats[${stat}]"></div>`;
         });
-    });
+    }
 
-    manageCharSelect.addEventListener('change', () => {
-        const charName = manageCharSelect.value;
-        if (!charName) { buildListContainer.innerHTML = ''; return; }
-        currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
-        renderBuildList(currentCharacterData);
-    });
+    if (navLogoutBtn) {
+        navLogoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('php/api.php?action=logout');
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Logout effettuato con successo.');
+                    currentUser = null;
+                    isAdmin = false;
+                    dataLoaded = false;
+                    window.location.href = 'login.html';
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore durante il logout.');
+            }
+        });
+    }
+
+    if (navUserManagementLink) {
+        navUserManagementLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            location.hash = '#user-management';
+        });
+    }
+
+    if (charSelect) {
+        charSelect.addEventListener('change', () => {
+            const charName = charSelect.value;
+            const buildStatsInputs = document.getElementById('build-stats-inputs');
+            if (!charName) { buildStatsInputs.innerHTML = ''; return; }
+            const charData = sourceCharacterData.find(c => c.profile.name === charName);
+            if (!charData) return;
+            buildStatsInputs.innerHTML = '';
+            charData.profile.tracked_stats.forEach(stat => {
+                const statId = createSafeId(stat);
+                buildStatsInputs.innerHTML += `<div class="col-md-4 mb-3"><label for="build-${statId}" class="form-label">${stat}</label><input type="number" step="0.1" class="form-control" id="build-${statId}" name="stats[${stat}]"></div>`;
+            });
+        });
+    }
+
+    if (manageCharSelect) {
+        manageCharSelect.addEventListener('change', () => {
+            const charName = manageCharSelect.value;
+            if (!charName) { buildListContainer.innerHTML = ''; return; }
+            currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
+            renderBuildList(currentCharacterData);
+        });
+    }
 
     const renderBuildList = (charData) => {
+        if (!buildListContainer) return;
         buildListContainer.innerHTML = '';
-        if (charData.builds.length === 0) { buildListContainer.innerHTML = '<p class="text-muted">Nessuna build registrata.</p>'; return; }
+        if (!charData || !charData.builds || charData.builds.length === 0) { 
+            buildListContainer.innerHTML = '<p class="text-muted">Nessuna build registrata.</p>'; 
+            return; 
+        }
         const list = document.createElement('ul');
         list.className = 'list-group';
         charData.builds.forEach((build, index) => {
@@ -480,83 +549,236 @@ document.addEventListener('DOMContentLoaded', () => {
         buildListContainer.appendChild(list);
     };
 
-    characterForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const submitButton = characterForm.querySelector('button[type="submit"]');
-        const originalName = document.getElementById('original_name').value;
-        const isEditing = originalName !== '';
-        submitButton.disabled = true;
-        submitButton.textContent = 'Salvataggio in corso...';
-        try {
-            const formData = new FormData(characterForm);
-            formData.append('action', isEditing ? 'update_character' : 'save_character');
-            const response = await fetch('php/api.php', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error(`Errore del server: ${response.statusText}`);
-            const result = await response.json();
-            if (result.status === 'success') {
-                showToast(result.message);
-                dataLoaded = false; // Forza il ricaricamento dei dati alla prossima navigazione
-                const newName = formData.get('name');
-                location.hash = isEditing ? `#character/${encodeURIComponent(newName)}` : '#';
-            } else { showErrorAlert(result.message); }
-        } catch (error) { showErrorAlert('Impossibile comunicare con il server.');
-        } finally { submitButton.disabled = false; submitButton.textContent = 'Salva Personaggio'; }
-    };
-
-    buildForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const submitButton = buildForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Salvataggio...';
-        try {
-            const formData = new FormData(buildForm);
-            formData.append('action', 'save_build');
-            const response = await fetch('php/api.php', { method: 'POST', body: formData });
-            if (!response.ok) throw new Error(`Errore del server: ${response.statusText}`);
-            const result = await response.json();
-            if (result.status === 'success') {
-                showToast(result.message);
-                dataLoaded = false;
-                location.hash = '#';
-            } else {
-                showErrorAlert(result.message);
+    if (characterForm) {
+        characterForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = characterForm.querySelector('button[type="submit"]');
+            const originalName = document.getElementById('original_name').value;
+            const isEditing = originalName !== '';
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio in corso...';
+            try {
+                const formData = new FormData(characterForm);
+                formData.append('action', isEditing ? 'update_character' : 'save_character');
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error(`Errore del server: ${response.statusText}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    dataLoaded = false;
+                    const newName = formData.get('name');
+                    location.hash = isEditing ? `#character/${encodeURIComponent(newName)}` : '#';
+                } else { 
+                    showErrorAlert(result.message); 
+                }
+            } catch (error) { 
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = isEditing ? 'Salva Modifiche' : 'Salva Personaggio';
             }
-        } catch (error) {
-            showErrorAlert('Impossibile comunicare con il server.');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Salva Build';
-        }
-    };
+        };
+    }
 
-    // ... (Aggiungere qui la logica per editBuildForm.onsubmit e buildListContainer click listener se necessario)
+    if (profileEditForm) {
+        profileEditForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = profileEditForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+            try {
+                const formData = new FormData(profileEditForm);
+                const response = await fetch('php/api.php?action=update_user', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Profilo aggiornato con successo!');
+                    dataLoaded = false;
+                    const newUsername = formData.get('username');
+                    if (currentUser.username !== newUsername) {
+                        await checkSession();
+                    } else {
+                        currentUser.avatar = result.new_avatar_path || currentUser.avatar;
+                    }
+                    updateLoginUI();
+                    location.hash = '#';
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva Modifiche Profilo';
+            }
+        };
+    }
 
-    // --- SEZIONE: TEMA DARK/LIGHT ---
-    function initTheme() {
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const currentTheme = localStorage.getItem('theme') || 'light';
-
-        document.body.classList.toggle('dark-mode', currentTheme === 'dark');
-        updateThemeIcon(currentTheme);
-
-        themeToggleBtn.addEventListener('click', () => {
-            const isDarkMode = document.body.classList.toggle('dark-mode');
-            const newTheme = isDarkMode ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+    const profileAvatarInput = document.getElementById('profile-avatar-input');
+    if (profileAvatarInput) {
+        profileAvatarInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('profile-avatar-preview').src = event.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
         });
     }
 
-    function updateThemeIcon(theme) {
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const icon = themeToggleBtn.querySelector('i');
-        if (theme === 'dark') {
-            icon.classList.remove('bi-moon-stars-fill');
-            icon.classList.add('bi-sun-fill');
-        } else {
-            icon.classList.remove('bi-sun-fill');
-            icon.classList.add('bi-moon-stars-fill');
-        }
+    if (buildForm) {
+        buildForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = buildForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+            try {
+                const formData = new FormData(buildForm);
+                formData.append('action', 'save_build');
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error(`Errore del server: ${response.statusText}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    dataLoaded = false;
+                    location.hash = '#';
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva Build';
+            }
+        };
+    }
+
+    if (buildListContainer) {
+        buildListContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-edit-build')) {
+                const buildIndex = e.target.dataset.buildIndex;
+                populateBuildFormForEdit(buildIndex);
+            }
+            if (e.target.classList.contains('btn-delete-build')) {
+                const buildIndex = e.target.dataset.buildIndex;
+                handleDeleteBuild(buildIndex);
+            }
+        });
+    }
+
+    const populateBuildFormForEdit = (buildIndex) => {
+        if (!currentCharacterData || !currentCharacterData.builds) return;
+        const build = currentCharacterData.builds[buildIndex];
+        if (!build) return;
+
+        document.getElementById('edit-build-index').value = buildIndex;
+        document.getElementById('edit-character-name').value = currentCharacterData.profile.name;
+        document.getElementById('edit-build-date').value = build.date;
+
+        populateSelect('edit-build-signature_weapon', config.signatureOptions);
+        populateSelect('edit-build-talents', config.talentOptions);
+
+        document.getElementById('edit-build-constellation').value = build.constellation;
+        document.getElementById('edit-build-signature_weapon').value = build.signature_weapon;
+        document.getElementById('edit-build-talents').value = build.talents;
+
+        const statsContainer = document.getElementById('edit-build-stats-inputs');
+        statsContainer.innerHTML = '';
+        currentCharacterData.profile.tracked_stats.forEach(stat => {
+            const statId = createSafeId(stat);
+            const value = build.stats[stat] || '';
+            statsContainer.innerHTML += `
+                <div class="col-md-4 mb-3">
+                    <label for="edit-build-${statId}" class="form-label">${stat}</label>
+                    <input type="number" step="0.1" class="form-control" id="edit-build-${statId}" name="stats[${stat}]" value="${value}">
+                </div>`;
+        });
+
+        const modal = new bootstrap.Modal(document.getElementById('edit-build-modal'));
+        modal.show();
+    };
+
+    const handleDeleteBuild = (buildIndex) => {
+        if (!currentCharacterData || !currentCharacterData.builds) return;
+        const build = currentCharacterData.builds[buildIndex];
+        if (!build) return;
+
+        Swal.fire({
+            title: 'Sei sicuro?',
+            text: `Vuoi davvero cancellare la build del ${build.date}? L\'azione è irreversibile.`, 
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, cancella!',
+            cancelButtonText: 'Annulla'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const formData = new FormData();
+                    formData.append('action', 'delete_build');
+                    formData.append('character_name', currentCharacterData.profile.name);
+                    formData.append('build_index', buildIndex);
+
+                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                    const res = await response.json();
+
+                    if (res.status === 'success') {
+                        showToast('Build cancellata con successo.');
+                        dataLoaded = false;
+                        const charName = currentCharacterData.profile.name;
+                        await fetch('php/api.php?action=get_all_characters').then(r => r.json()).then(d => {
+                            sourceCharacterData = d;
+                            currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
+                            renderBuildList(currentCharacterData);
+                        });
+                    } else {
+                        showErrorAlert(res.message);
+                    }
+                } catch (error) {
+                    showErrorAlert('Errore di comunicazione con il server.');
+                }
+            }
+        });
+    };
+
+    if (editBuildForm) {
+        editBuildForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = editBuildForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+
+            try {
+                const formData = new FormData(editBuildForm);
+                formData.append('action', 'update_build');
+
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Build aggiornata con successo!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('edit-build-modal'));
+                    modal.hide();
+                    dataLoaded = false;
+                    const charName = formData.get('character_name');
+                    await fetch('php/api.php?action=get_all_characters').then(r => r.json()).then(d => {
+                        sourceCharacterData = d;
+                        currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
+                        renderBuildList(currentCharacterData);
+                    });
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva Modifiche';
+            }
+        };
     }
 
     // --- INIZIALIZZAZIONE ---

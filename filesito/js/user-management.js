@@ -1,147 +1,190 @@
-let users = []; // Global or accessible scope
-
-// Define loadUsers globally
-async function loadUsers() {
-    try {
-        const response = await fetch('php/api.php?action=get_all_users');
-        users = await response.json();
-        renderUsers(users);
-    } catch (error) {
-        console.error(error);
-        Swal.fire('Errore', 'Impossibile caricare gli utenti', 'error');
-    }
-};
-
 document.addEventListener('DOMContentLoaded', () => {
+    const API_ENDPOINT = 'php/api.php';
+
+    // --- DOM Elements ---
     const userTableBody = document.querySelector('#user-table-body');
     const searchInput = document.getElementById('user-search');
     const selectAllCheckbox = document.getElementById('select-all-users');
     const deleteSelectedBtn = document.getElementById('delete-selected-users');
-    const editUserModal = document.getElementById('edit-user-modal');
-    const editUserForm = document.getElementById('edit-user-form');
-    const addUserBtn = document.getElementById('add-user-btn'); // Assuming this exists
+    const addUserBtn = document.getElementById('add-user-btn');
 
-    // New DOM elements for avatar
+    // Edit Modal Elements
+    const editUserModalEl = document.getElementById('edit-user-modal');
+    const editUserForm = document.getElementById('edit-user-form');
     const editAvatarInput = document.getElementById('edit-avatar');
     const currentAvatarPreview = document.getElementById('current-avatar-preview');
+    const editUserModal = editUserModalEl ? new bootstrap.Modal(editUserModalEl) : null;
 
-    // New DOM elements for Add User Modal
-    const addUserModal = document.getElementById('add-user-modal');
+    // Add Modal Elements
+    const addUserModalEl = document.getElementById('add-user-modal');
     const addUserForm = document.getElementById('add-user-form');
-    const addUsernameInput = document.getElementById('add-username');
-    const addPasswordInput = document.getElementById('add-password');
-    const addRoleSelect = document.getElementById('add-role');
     const addAvatarInput = document.getElementById('add-avatar');
     const addAvatarPreview = document.getElementById('add-avatar-preview');
+    const addUserModal = addUserModalEl ? new bootstrap.Modal(addUserModalEl) : null;
 
+    let users = [];
 
-    const renderUsers = (list) => {
-        if (!userTableBody) return; // Safety check
-        userTableBody.innerHTML = '';
-        if (list.length === 0) {
-            userTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nessun utente trovato.</td></tr>';
-            return;
+    // --- Utility Functions ---
+    const showToast = (title, icon = 'success') => {
+        Swal.fire({ toast: true, position: 'top-end', icon, title, showConfirmButton: false, timer: 3000 });
+    };
+
+    const showErrorAlert = (message) => {
+        Swal.fire({ icon: 'error', title: 'Oops...', text: message });
+    };
+
+    // --- API Communication ---
+    const fetchUsers = async () => {
+        try {
+            const response = await fetch(`${API_ENDPOINT}?action=get_all_users`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            users = await response.json();
+            renderUsers(users);
+        } catch (error) {
+            console.error('Fetch users error:', error);
+            showErrorAlert('Impossibile caricare la lista degli utenti.');
         }
-        list.forEach(user => {
-            userTableBody.innerHTML += `
+    };
+
+    const handleApiRequest = async (action, formData, successMessage) => {
+        try {
+            formData.append('action', action);
+            const response = await fetch(API_ENDPOINT, { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                showToast(successMessage || result.message);
+                fetchUsers(); // Refresh the user list
+                return true;
+            } else {
+                showErrorAlert(result.message);
+                return false;
+            }
+        } catch (error) {
+            console.error(`API request error for action ${action}:`, error);
+            showErrorAlert('Errore di comunicazione con il server.');
+            return false;
+        }
+    };
+
+    // --- Rendering ---
+    const renderUsers = (list) => {
+        if (!userTableBody) return;
+        userTableBody.innerHTML = list.length === 0
+            ? '<tr><td colspan="4" class="text-center">Nessun utente trovato.</td></tr>'
+            : list.map(user => `
                 <tr>
                     <td><input type="checkbox" class="user-checkbox" data-username="${user.username}"></td>
                     <td>${user.username}</td>
                     <td>${user.role}</td>
                     <td class="text-end">
                         <button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>
-                        <button class="btn btn-sm btn-danger btn-delete-single-user" data-username="${user.username}">Elimina</button>
+                        <button class="btn btn-sm btn-danger btn-delete-user" data-username="${user.username}">Elimina</button>
                     </td>
                 </tr>
-            `;
+            `).join('');
+    };
+
+    // --- Event Handlers ---
+    const handleSearch = () => {
+        const term = searchInput.value.toLowerCase();
+        renderUsers(users.filter(u => u.username.toLowerCase().includes(term)));
+    };
+
+    const handleSelectAll = (e) => {
+        document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = e.target.checked);
+    };
+
+    const handleDeleteSelected = () => {
+        const selectedUsernames = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.dataset.username);
+        if (selectedUsernames.length === 0) return;
+
+        Swal.fire({
+            title: `Sei sicuro di eliminare ${selectedUsernames.length} utente/i?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sì, elimina!',
+            cancelButtonText: 'Annulla'
+        }).then(async (result) => {
+            if (!result.isConfirmed) return;
+
+            let successCount = 0;
+            for (const username of selectedUsernames) {
+                const formData = new FormData();
+                formData.append('username', username);
+                if (await handleApiRequest('delete_users', formData)) {
+                    successCount++;
+                }
+            }
+
+            if (successCount > 0) {
+                showToast(`${successCount} utente/i eliminato/i con successo.`);
+            }
+            if (successCount < selectedUsernames.length) {
+                showErrorAlert('Alcuni utenti non sono stati eliminati.');
+            }
         });
     };
 
-    // Event Listeners
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            const term = searchInput.value.toLowerCase();
-            renderUsers(users.filter(u => u.username.toLowerCase().includes(term)));
-        });
-    }
+    const openEditModal = (username) => {
+        const user = users.find(u => u.username === username);
+        if (!user || !editUserForm) return;
 
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', () => {
-            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = selectAllCheckbox.checked);
-        });
-    }
+        editUserForm.reset();
+        editUserForm.querySelector('#original-username').value = user.username;
+        editUserForm.querySelector('#edit-username').value = user.username;
+        editUserForm.querySelector('#edit-role').value = user.role;
 
-    if (userTableBody) {
-        userTableBody.addEventListener('click', async (e) => { // Made async to handle delete
-            if (e.target.classList.contains('btn-edit-user')) {
-                const username = e.target.dataset.username;
-                const user = users.find(u => u.username === username);
-                if (!user) return;
+        if (currentAvatarPreview) {
+            currentAvatarPreview.src = user.avatar ? user.avatar : '';
+            currentAvatarPreview.style.display = user.avatar ? 'block' : 'none';
+        }
 
-                document.getElementById('original-username').value = user.username;
-                document.getElementById('edit-username').value = user.username;
-                document.getElementById('edit-role').value = user.role;
-                document.getElementById('edit-password').value = '';
-                // document.getElementById('edit-avatar').value = ''; // Clear file input
+        editUserModal?.show();
+    };
 
-                // Set avatar preview
-                if (user.avatar) {
-                    currentAvatarPreview.src = user.avatar;
-                    currentAvatarPreview.style.display = 'block';
-                } else {
-                    currentAvatarPreview.src = '';
-                    currentAvatarPreview.style.display = 'none';
-                }
+    const openAddModal = () => {
+        if (!addUserForm) return;
+        addUserForm.reset();
+        if (addAvatarPreview) {
+            addAvatarPreview.src = '';
+            addAvatarPreview.style.display = 'none';
+        }
+        addUserModal?.show();
+    };
 
-                const modal = new bootstrap.Modal(editUserModal);
-                modal.show();
-            } else if (e.target.classList.contains('btn-delete-single-user')) { // Added for single delete
-                const usernameToDelete = e.target.dataset.username;
-                Swal.fire({
-                    title: `Sei sicuro di eliminare l'utente ${usernameToDelete}?`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sì, elimina!',
-                    cancelButtonText: 'Annulla'
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        try {
-                            const formData = new FormData();
-                            formData.append('action', 'delete_users');
-                            formData.append('username', usernameToDelete);
-
-                            const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                            const result = await response.json();
-                            if (result.status === 'success') {
-                                Swal.fire('Fatto', result.message, 'success');
-                                loadUsers(); // Reload users after deletion
-                            } else {
-                                Swal.fire('Errore', result.message, 'error');
-                            }
-                        } catch (error) {
-                            console.error(error);
-                            Swal.fire('Errore', 'Impossibile comunicare con il server', 'error');
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    // Avatar preview on file selection
-    if (editAvatarInput) {
-        editAvatarInput.addEventListener('change', (event) => {
+    const setupAvatarPreview = (input, preview) => {
+        if (!input || !preview) return;
+        input.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    currentAvatarPreview.src = e.target.result;
-                    currentAvatarPreview.style.display = 'block';
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             } else {
-                currentAvatarPreview.src = '';
-                currentAvatarPreview.style.display = 'none';
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+        });
+    };
+
+    // --- Initialization ---
+    if (searchInput) searchInput.addEventListener('input', handleSearch);
+    if (selectAllCheckbox) selectAllCheckbox.addEventListener('change', handleSelectAll);
+    if (deleteSelectedBtn) deleteSelectedBtn.addEventListener('click', handleDeleteSelected);
+    if (addUserBtn) addUserBtn.addEventListener('click', openAddModal);
+
+    if (userTableBody) {
+        userTableBody.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.classList.contains('btn-edit-user')) {
+                openEditModal(target.dataset.username);
+            }
+            if (target.classList.contains('btn-delete-user')) {
+                handleDeleteSelected(); // Can reuse the same logic for single delete
             }
         });
     }
@@ -149,93 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editUserForm) {
         editUserForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(editUserForm);
-            formData.append('action', 'update_user');
-
-            try {
-                const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    Swal.fire('Fatto', result.message, 'success');
-                    loadUsers(); // Reload users after update
-                    bootstrap.Modal.getInstance(editUserModal).hide();
-                } else {
-                    Swal.fire('Errore', result.message, 'error');
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire('Errore', 'Impossibile comunicare con il server', 'error');
-            }
-        });
-    }
-
-    if (deleteSelectedBtn) {
-        deleteSelectedBtn.addEventListener('click', () => {
-            const selected = Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.dataset.username);
-            if (selected.length === 0) return;
-
-            Swal.fire({
-                title: `Sei sicuro di eliminare ${selected.length} utente/i?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sì, elimina!',
-                cancelButtonText: 'Annulla'
-            }).then(async (result) => {
-                if (!result.isConfirmed) return;
-                try {
-                    let allSuccess = true;
-                    for (const username of selected) {
-                        const formData = new FormData();
-                        formData.append('action', 'delete_users');
-                        formData.append('username', username); // Send single username
-
-                        const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                        const result = await response.json();
-                        if (result.status !== 'success') {
-                            allSuccess = false;
-                            showErrorAlert(`Errore durante l'eliminazione di ${username}: ${result.message}`);
-                        }
-                    }
-
-                    if (allSuccess) {
-                        Swal.fire('Fatto', 'Utenti eliminati con successo.', 'success');
-                        loadUsers(); // Reload users after all deletions
-                    } else {
-                        Swal.fire('Attenzione', 'Alcuni utenti non sono stati eliminati.', 'warning');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire('Errore', 'Impossibile comunicare con il server', 'error');
-                }
-            });
-        });
-    }
-
-    // Add User functionality
-    if (addUserBtn) {
-        addUserBtn.addEventListener('click', () => {
-            addUserForm.reset(); // Clear form fields
-            addAvatarPreview.src = '';
-            addAvatarPreview.style.display = 'none';
-            const modal = new bootstrap.Modal(addUserModal);
-            modal.show();
-        });
-    }
-
-    // Avatar preview on file selection for Add User
-    if (addAvatarInput) {
-        addAvatarInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    addAvatarPreview.src = e.target.result;
-                    addAvatarPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                addAvatarPreview.src = '';
-                addAvatarPreview.style.display = 'none';
+            if (await handleApiRequest('update_user', new FormData(editUserForm), 'Utente aggiornato!')) {
+                editUserModal?.hide();
             }
         });
     }
@@ -243,47 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addUserForm) {
         addUserForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(addUserForm);
-            formData.append('action', 'register'); // Use the register action
-
-            try {
-                const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    Swal.fire('Fatto', result.message, 'success');
-                    loadUsers(); // Reload users after adding new user
-                    bootstrap.Modal.getInstance(addUserModal).hide();
-                } else {
-                    Swal.fire('Errore', result.message, 'error');
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire('Errore', 'Impossibile comunicare con il server', 'error');
+            if (await handleApiRequest('register', new FormData(addUserForm), 'Utente aggiunto!')) {
+                addUserModal?.hide();
             }
         });
     }
-});
 
-// Helper function for rendering users (can be global or passed)
-function renderUsers(list) {
-    const userTableBody = document.querySelector('#user-table-body');
-    if (!userTableBody) return; // Safety check
-    userTableBody.innerHTML = '';
-    if (list.length === 0) {
-        userTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nessun utente trovato.</td></tr>';
-        return;
-    }
-    list.forEach(user => {
-        userTableBody.innerHTML += `
-            <tr>
-                <td><input type="checkbox" class="user-checkbox" data-username="${user.username}"></td>
-                <td>${user.username}</td>
-                <td>${user.role}</td>
-                <td class="text-end">
-                    <button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>
-                    <button class="btn btn-sm btn-danger btn-delete-single-user" data-username="${user.username}">Elimina</button>
-                </td>
-            </tr>
-        `;
-    });
-}
+    setupAvatarPreview(editAvatarInput, currentAvatarPreview);
+    setupAvatarPreview(addAvatarInput, addAvatarPreview);
+
+    // Expose loadUsers to be called from app.js
+    window.loadUsers = fetchUsers;
+});

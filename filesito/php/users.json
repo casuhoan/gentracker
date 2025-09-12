@@ -3,12 +3,6 @@
         "username": "admin",
         "passwordHash": "$2y$12$l\/pV6\/WNJ3maQ\/zzSXGQe.h.DSUQO2iUfX8Ay8Afs84ITaOdhYrQy",
         "role": "admin",
-        "profilePicture": ""
-    },
-    {
-        "username": "nonadmin",
-        "passwordHash": "$2y$12$0MCy4CGRlZwN.RO7KafkDu9YDcxbHaOrGrt6.RnOKbXEme1xjE93e",
-        "role": "user",
-        "profilePicture": ""
+        "avatar": ""
     }
 ]

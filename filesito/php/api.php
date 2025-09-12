@@ -15,7 +15,7 @@ function is_admin() {
 }
 
 function get_user_data_dir() {
-    if (!is_logged_in()) return null; // Or handle error appropriately
+    if (!is_logged_in()) return null;
     return __DIR__ . '/../data/users/' . $_SESSION['username'] . '/';
 }
 
@@ -53,10 +53,31 @@ function logout() {
 }
 
 function check_session() {
-    if (is_logged_in()) {
-        echo json_encode(['status' => 'success', 'username' => $_SESSION['username'], 'role' => $_SESSION['role']]);
-    } else {
+    if (!is_logged_in()) {
         echo json_encode(['status' => 'error', 'message' => 'Nessuna sessione attiva.']);
+        return;
+    }
+
+    $users_file = get_users_file();
+    $users = json_decode(file_get_contents($users_file), true);
+    $found_user = null;
+    foreach ($users as $user) {
+        if ($user['username'] === $_SESSION['username']) {
+            $found_user = $user;
+            break;
+        }
+    }
+
+    if ($found_user) {
+        echo json_encode([
+            'status' => 'success',
+            'username' => $found_user['username'],
+            'role' => $found_user['role'],
+            'avatar' => $found_user['avatar'] ?? ''
+        ]);
+    } else {
+        // Should not happen if session is valid, but as a fallback
+        logout();
     }
 }
 
@@ -72,6 +93,9 @@ function get_all_characters() {
     $files = glob($data_dir . '*.json');
     foreach ($files as $file) {
         $content = json_decode(file_get_contents($file), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            continue; // Skip corrupted file
+        }
         if (isset($content['profile'])) {
             if (!isset($content['profile']['rarity'])) {
                 $content['profile']['rarity'] = '5-star';
@@ -91,30 +115,6 @@ function get_all_characters() {
     }
 
     echo json_encode($characters);
-}
-
-function get_character() {
-    $char_name = $_GET['name'] ?? '';
-    if (empty($char_name)) {
-        echo json_encode(['status' => 'error', 'message' => 'Nome personaggio non fornito.']);
-        http_response_code(400);
-        return;
-    }
-    $user_data_dir = get_user_data_dir();
-    $json_file_name = preg_replace('/[^a-zA-Z0-9_\-]/', '_', strtolower($char_name)) . '.json';
-    $file_path = $user_data_dir . $json_file_name;
-
-    if (file_exists($file_path)) {
-        $content = json_decode(file_get_contents($file_path), true);
-        if (!isset($content['profile']['rarity'])) {
-            $content['profile']['rarity'] = '5-star';
-            // No need to write back, just for display
-        }
-        echo json_encode($content);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato.']);
-        http_response_code(404);
-    }
 }
 
 function save_character() {
@@ -188,7 +188,6 @@ function update_character() {
 
     $data = json_decode(file_get_contents($original_file_path), true);
 
-    // aggiorna campi
     $data['profile']['name'] = $new_name;
     $fields = ['element','role','tracked_stats','acquisition_date','signature_weapon','talents','rarity'];
     foreach($fields as $f) {
@@ -251,23 +250,19 @@ function save_build() {
         'talents' => $_POST['talents'] ?? ''
     ];
 
-    // Se la nuova costellazione è maggiore, aggiorna anche il profilo
-    if ($new_build['constellation'] > $data['profile']['constellation']) {
+    if ($new_build['constellation'] > ($data['profile']['constellation'] ?? 0)) {
         $data['profile']['constellation'] = $new_build['constellation'];
     }
 
-    // Definisci la gerarchia per talenti e signature
     $talents_rank = ['No' => 0, 'Vicino' => 1, 'Sì' => 2];
     $signature_rank = ['No' => 0, 'Buona' => 1, 'Sì' => 2];
 
-    // Aggiorna i talenti se il rank è maggiore
     $new_talents_rank = $talents_rank[$new_build['talents']] ?? -1;
     $profile_talents_rank = $talents_rank[$data['profile']['talents']] ?? -1;
     if ($new_talents_rank > $profile_talents_rank) {
         $data['profile']['talents'] = $new_build['talents'];
     }
 
-    // Aggiorna la signature se il rank è maggiore
     $new_signature_rank = $signature_rank[$new_build['signature_weapon']] ?? -1;
     $profile_signature_rank = $signature_rank[$data['profile']['signature_weapon']] ?? -1;
     if ($new_signature_rank > $profile_signature_rank) {
@@ -314,6 +309,10 @@ function delete_build() {
 
     array_splice($data['builds'], $build_index, 1);
 
+    usort($data['builds'], function($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
+
     if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
         echo json_encode(['status' => 'success', 'message' => 'Build cancellata con successo']);
     } else {
@@ -350,7 +349,6 @@ function update_build() {
         return;
     }
 
-    // Crea la build aggiornata con i nuovi dati
     $updated_build = [
         'date' => $_POST['date'] ?? date('Y-m-d'),
         'stats' => $_POST['stats'] ?? [],
@@ -359,8 +357,11 @@ function update_build() {
         'talents' => $_POST['talents'] ?? ''
     ];
 
-    // Sostituisci la vecchia build con quella aggiornata
     $data['builds'][$build_index] = $updated_build;
+
+    usort($data['builds'], function($a, $b) {
+        return strtotime($b['date']) - strtotime($a['date']);
+    });
 
     if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
         echo json_encode(['status' => 'success', 'message' => 'Build aggiornata con successo']);
@@ -370,8 +371,13 @@ function update_build() {
     }
 }
 
-// --- ADMIN FUNCTIONS ---
+// --- USER & ADMIN FUNCTIONS ---
 function get_all_users() {
+    if (!is_admin()) {
+        http_response_code(403); 
+        echo json_encode(['status'=>'error','message'=>'Accesso negato.']); 
+        return;
+    }
     $users_file = get_users_file();
     if (!file_exists($users_file)) {
         echo json_encode([]);
@@ -384,74 +390,103 @@ function update_user() {
     $users_file = get_users_file();
     $users = json_decode(file_get_contents($users_file), true);
 
-    $username_to_update = $_POST['username'] ?? '';
-    $new_role = $_POST['role'] ?? '';
-    $new_password = $_POST['password'] ?? '';
-    $avatar_path = ''; // Initialize avatar path
+    $original_username = $_POST['original_username'] ?? '';
+    $new_username = $_POST['username'] ?? '';
+
+    // Permission Check: Must be admin OR the user modifying their own profile.
+    if (!is_admin() && $_SESSION['username'] !== $original_username) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Permesso negato.']);
+        return;
+    }
+
+    $user_found = false;
+    $new_avatar_path = null;
 
     foreach ($users as &$user) {
-        if ($user['username'] === $username_to_update) {
-            $user['role'] = $new_role;
-            if (!empty($new_password)) {
-                $user['passwordHash'] = password_hash($new_password, PASSWORD_DEFAULT);
+        if ($user['username'] === $original_username) {
+            $user_found = true;
+
+            // Update role only if admin
+            if (is_admin() && isset($_POST['role'])) {
+                $user['role'] = $_POST['role'];
+            }
+
+            // Update password if provided
+            if (!empty($_POST['password'])) {
+                $user['passwordHash'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
 
             // Handle avatar upload
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
                 $upload_dir = __DIR__ . '/../uploads/';
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0777, true);
-                }
-
-                // Delete old avatar if exists
                 if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
                     unlink(__DIR__ . '/../' . $user['avatar']);
                 }
-
                 $file_extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-                $safe_username = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($username_to_update));
+                $safe_username = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_username));
                 $file_name = $safe_username . '_avatar.' . $file_extension;
                 $target_file = $upload_dir . $file_name;
-
                 if (move_uploaded_file($_FILES['avatar']['tmp_name'], $target_file)) {
                     $user['avatar'] = 'uploads/' . $file_name;
+                    $new_avatar_path = $user['avatar'];
                 }
-            } else if (isset($_POST['avatar_removed']) && $_POST['avatar_removed'] === 'true') {
-                // If avatar was explicitly removed from frontend
-                if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
-                    unlink(__DIR__ . '/../' . $user['avatar']);
-                }
-                $user['avatar'] = ''; // Clear avatar path
             }
+            
+            // Finally, update username
+            $user['username'] = $new_username;
+
             break;
         }
     }
-    file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT));
-    echo json_encode(['status' => 'success', 'message' => 'Utente aggiornato con successo.']);
+
+    if (!$user_found) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Utente non trovato.']);
+        return;
+    }
+
+    if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        // If the username was changed, update the session
+        if ($original_username !== $new_username) {
+            $_SESSION['username'] = $new_username;
+        }
+        echo json_encode(['status' => 'success', 'message' => 'Profilo aggiornato con successo.', 'new_avatar_path' => $new_avatar_path]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare i dati utente.']);
+    }
 }
 
 function delete_users() {
+    if (!is_admin()) {
+        http_response_code(403); 
+        echo json_encode(['status'=>'error','message'=>'Accesso negato.']); 
+        return;
+    }
     $users_file = get_users_file();
     $users = json_decode(file_get_contents($users_file), true);
-
     $username_to_delete = $_POST['username'] ?? '';
-
     $users = array_filter($users, function($user) use ($username_to_delete) {
         return $user['username'] !== $username_to_delete;
     });
-
-    file_put_contents($users_file, json_encode(array_values($users), JSON_PRETTY_PRINT)); // re-index array
+    file_put_contents($users_file, json_encode(array_values($users), JSON_PRETTY_PRINT));
     echo json_encode(['status' => 'success', 'message' => 'Utente eliminato con successo.']);
 }
 
 function register() {
+    // For now, only admins can register new users from the user management panel
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Solo gli amministratori possono registrare nuovi utenti.']);
+        return;
+    }
+
     $users_file = get_users_file();
     $users = file_exists($users_file) ? json_decode(file_get_contents($users_file), true) : [];
 
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    $role = $_POST['role'] ?? 'user'; // Default role
-
     if (empty($username) || empty($password)) {
         echo json_encode(['status' => 'error', 'message' => 'Username e password sono obbligatori.']);
         return;
@@ -467,28 +502,37 @@ function register() {
     $users[] = [
         'username' => $username,
         'passwordHash' => password_hash($password, PASSWORD_DEFAULT),
-        'role' => $role
+        'role' => $_POST['role'] ?? 'user',
+        'avatar' => ''
     ];
 
-    file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT));
-    echo json_encode(['status' => 'success', 'message' => 'Registrazione avvenuta con successo.']);
+    file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    echo json_encode(['status' => 'success', 'message' => 'Utente aggiunto con successo.']);
 }
 
 
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
 
-$public_actions = ['login','logout','check_session', 'register']; // Added register to public actions
-$user_actions   = ['get_all_characters','save_character','update_character','get_character','save_build','update_build','delete_build'];
-$admin_actions  = ['get_all_users','update_user','delete_users'];
+$public_actions = ['login', 'logout', 'check_session'];
+$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register'];
 
-if(in_array($action,$public_actions)) {
+if (in_array($action, $public_actions)) {
     $action();
-} elseif(in_array($action,$user_actions)) {
-    if(!is_logged_in()){ http_response_code(401); echo json_encode(['status'=>'error','message'=>'Accesso non effettuato.']); exit; }
+} elseif (in_array($action, $user_actions)) {
+    if (!is_logged_in()) { 
+        http_response_code(401); 
+        echo json_encode(['status'=>'error','message'=>'Accesso non effettuato.']); 
+        exit; 
+    }
     $action();
-} elseif(in_array($action,$admin_actions)) {
-    if(!is_admin()){ http_response_code(403); echo json_encode(['status'=>'error','message'=>'Accesso negato.']); exit; }
+} elseif (in_array($action, $admin_actions)) {
+    if (!is_admin()) { 
+        http_response_code(403); 
+        echo json_encode(['status'=>'error','message'=>'Accesso negato.']); 
+        exit; 
+    }
     $action();
 } else {
     http_response_code(400);
