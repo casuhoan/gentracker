@@ -11,3 +11,6 @@ RUN set -eux; \
 # Copia configurazioni personalizzate
 COPY php/php.ini /usr/local/etc/php/php.ini
 COPY apache/vhost.conf /etc/apache2/sites-available/000-default.conf
+
+# Copia il codice dell'applicazione
+COPY filesito/ /var/www/html/

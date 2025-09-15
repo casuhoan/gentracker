@@ -2,10 +2,10 @@ version: "3.9"
 
 services:
   web:
-    image: php:8.2-apache
-    container_name: sito_php
+    build: .
+    container_name: gentracker
     ports:
       - "80:80"
     volumes:
-      - /data/compose/1/sitophp/filesito:/var/www/html
-
+      - ./filesito/data:/var/www/html/data
+      - ./filesito/uploads:/var/www/html/uploads
