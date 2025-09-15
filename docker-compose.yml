@@ -3,7 +3,7 @@ services:
     build: .
     container_name: gentracker
     ports:
-      - "8080:8080"
+            - "8080:80"
     volumes:
       - ./filesito/data:/var/www/html/data
       - ./filesito/uploads:/var/www/html/uploads
