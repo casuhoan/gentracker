@@ -1,0 +1,38 @@
+# .github/workflows/docker-publish.yml
+name: Build and Push Docker Image
+
+on:
+  # Esegue il workflow quando c'è un push sul branch 'main'
+  push:
+    branches: [ "main" ]
+  # Permette di eseguire questo workflow manualmente dalla tab Actions di GitHub
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    # Aggiunge i permessi necessari per scrivere sul container registry
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          # Il nome utente è il tuo utente o organizzazione GitHub
+          username: ${{ github.repository_owner }}
+          # GITHUB_TOKEN è un token generato automaticamente per l'autenticazione
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Costruisce il tag dell'immagine in formato: ghcr.io/OWNER/REPO:latest
+          tags: ghcr.io/${{ github.repository_owner,, }}/${{ github.event.repository.name,, }}:latest
