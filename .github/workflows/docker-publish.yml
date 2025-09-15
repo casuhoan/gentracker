@@ -25,9 +25,9 @@ jobs:
         with:
           registry: ghcr.io
           # Il nome utente è il tuo utente o organizzazione GitHub
-          username: ${{ github.repository_owner }}
+          username: casuhoan
           # GITHUB_TOKEN è un token generato automaticamente per l'autenticazione
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -35,4 +35,4 @@ jobs:
           context: .
           push: true
           # Costruisce il tag dell'immagine in formato: ghcr.io/OWNER/REPO:latest
-          tags: ghcr.io/${{ github.repository_owner,, }}/${{ github.event.repository.name,, }}:latest
+          tags: ghcr.io/casuhoan/gengtracker:latest
