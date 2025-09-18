@@ -1,11 +1,14 @@
 /* Stile per nascondere le sezioni non attive */
 .view {
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 /* Stile per mostrare la sezione attiva */
 .view.active {
     display: block;
+    opacity: 1;
 }
 
 /* Stili aggiuntivi per migliorare l'aspetto */
@@ -18,6 +21,11 @@ body {
 
 main {
     flex: 1;
+}
+
+/* Transizioni Sincronizzate per Cambio Tema */
+body, .card, .list-group-item, .modal-content, .form-control, .form-select, #gallery-controls, .site-footer, .table {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
 #character-form h5 {
