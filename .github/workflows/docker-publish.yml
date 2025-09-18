@@ -35,4 +35,4 @@ jobs:
           context: .
           push: true
           # Costruisce il tag dell'immagine in formato: ghcr.io/OWNER/REPO:latest
-          tags: ghcr.io/casuhoan/gengtracker:latest
+          tags: ghcr.io/casuhoan/gentracker:latest
