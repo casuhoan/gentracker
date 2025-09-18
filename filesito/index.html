@@ -64,34 +64,68 @@
     </nav>
 
     <main class="container mt-4">
-        <!-- Sezione per la modifica del profilo utente -->
-        <div id="profile-edit-view" class="view">
-            <h2>Modifica Profilo</h2>
-            <div class="card p-4">
-                <form id="profile-edit-form" enctype="multipart/form-data">
-                    <input type="hidden" id="profile-original-username" name="original_username">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label for="profile-username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="profile-username" name="username" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="profile-password" class="form-label">Nuova Password</label>
-                                <input type="password" class="form-control" id="profile-password" name="password" placeholder="Lascia vuoto per non cambiare">
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <label class="form-label avatar-label">Avatar</label>
-                            <img id="profile-avatar-preview" src="uploads/default_avatar.png" alt="Avatar Preview" class="img-thumbnail mb-2" style="width: 150px; height: 150px; object-fit: cover;">
-                            <input type="file" class="form-control" id="profile-avatar-input" name="avatar" accept="image/*">
+        <!-- Sezione Impostazioni -->
+        <div id="settings-view" class="view">
+            <h2>Impostazioni</h2>
+            <form id="settings-form" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Menu Laterale -->
+                    <div class="col-md-3">
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">Modifica Profilo</a>
+                            <a class="nav-link" id="v-pills-auth-tab" data-bs-toggle="pill" href="#v-pills-auth" role="tab" aria-controls="v-pills-auth" aria-selected="false">Autenticazione</a>
+                            <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false">Aspetto</a>
                         </div>
                     </div>
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Salva Modifiche Profilo</button>
+                    <!-- Contenuto delle schede -->
+                    <div class="col-md-9">
+                        <div class="tab-content card card-body" id="v-pills-tabContent">
+                            <!-- Pannello Modifica Profilo -->
+                            <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                                <input type="hidden" id="settings-original-username" name="original_username">
+                                <div class="text-center mb-4">
+                                    <img id="settings-avatar-preview" src="uploads/default_avatar.png" alt="Avatar Preview" class="rounded-circle mb-2">
+                                    <div>
+                                        <label for="settings-avatar-input" class="btn btn-sm btn-outline-primary mt-2">Carica nuova immagine</label>
+                                        <input type="file" class="d-none" id="settings-avatar-input" name="avatar" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="settings-username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="settings-username" name="username" required>
+                                </div>
+                            </div>
+                            <!-- Pannello Autenticazione -->
+                            <div class="tab-pane fade" id="v-pills-auth" role="tabpanel" aria-labelledby="v-pills-auth-tab">
+                                <h4>Aggiornamento Password</h4>
+                                <div class="mb-3">
+                                    <label for="settings-password" class="form-label">Nuova Password</label>
+                                    <input type="password" class="form-control" id="settings-password" name="password" placeholder="Lascia vuoto per non cambiare">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="settings-password-confirm" class="form-label">Conferma Nuova Password</label>
+                                    <input type="password" class="form-control" id="settings-password-confirm" placeholder="Riscrivi la nuova password">
+                                </div>
+                            </div>
+                            <!-- Pannello Aspetto -->
+                            <div class="tab-pane fade" id="v-pills-appearance" role="tabpanel" aria-labelledby="v-pills-appearance-tab">
+                                <h4>Tema</h4>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme-radios" id="theme-light" value="light">
+                                    <label class="form-check-label" for="theme-light">Chiaro</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="theme-radios" id="theme-dark" value="dark">
+                                    <label class="form-check-label" for="theme-dark">Scuro</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-end">
+                            <button type="submit" class="btn btn-primary">Salva Impostazioni</button>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
 
         <!-- Sezione per creare un nuovo personaggio -->
