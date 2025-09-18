@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const characterForm = document.getElementById('character-form');
     const buildForm = document.getElementById('build-form');
     const editBuildForm = document.getElementById('edit-build-form');
-    const profileEditForm = document.getElementById('profile-edit-form');
+    const settingsForm = document.getElementById('settings-form');
     const charSelect = document.getElementById('char-select');
     const manageCharSelect = document.getElementById('manage-char-select');
     const buildListContainer = document.getElementById('build-list-container');
@@ -90,17 +90,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function initTheme() {
-        if (!themeToggle) return;
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
+    function applyTheme(theme) {
+        if (theme === 'dark') {
             document.body.classList.add('dark-mode');
-            themeToggle.checked = true;
+            if(themeToggle) themeToggle.checked = true;
+            const darkThemeRadio = document.getElementById('theme-dark');
+            if(darkThemeRadio) darkThemeRadio.checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            if(themeToggle) themeToggle.checked = false;
+            const lightThemeRadio = document.getElementById('theme-light');
+            if(lightThemeRadio) lightThemeRadio.checked = true;
         }
-        themeToggle.addEventListener('change', () => {
-            document.body.classList.toggle('dark-mode');
-            const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-            localStorage.setItem('theme', newTheme);
+    }
+
+    function initTheme() {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(currentTheme);
+
+        if (themeToggle) {
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+        }
+
+        const themeRadios = document.querySelectorAll('input[name="theme-radios"]');
+        themeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const newTheme = e.target.value;
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
         });
     }
 
@@ -183,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 '#new-build': 'build-logger-view',
                 '#manage-builds': 'build-management-view',
                 '#user-management': 'user-management-view',
-                '#edit-profile': 'profile-edit-view',
+                '#settings': 'settings-view',
             };
             const viewId = routeMap[hash] || 'gallery-view';
             showView(viewId);
@@ -199,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (viewId === 'build-logger-view') loadCharactersForBuildLogger();
             if (viewId === 'build-management-view') loadBuildManagement();
             if (viewId === 'user-management-view') loadUserManagement();
-            if (viewId === 'profile-edit-view') loadProfileForEditing();
+            if (viewId === 'settings-view') loadSettingsPage();
         }
     };
 
@@ -455,12 +477,17 @@ document.addEventListener('DOMContentLoaded', () => {
         buildListContainer.innerHTML = '';
     };
 
-    const loadProfileForEditing = () => {
-        if (!currentUser || !profileEditForm) return;
-        document.getElementById('profile-original-username').value = currentUser.username;
-        document.getElementById('profile-username').value = currentUser.username;
-        document.getElementById('profile-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
-        document.getElementById('profile-password').value = '';
+    const loadSettingsPage = () => {
+        if (!currentUser || !settingsForm) return;
+        document.getElementById('settings-original-username').value = currentUser.username;
+        document.getElementById('settings-username').value = currentUser.username;
+        document.getElementById('settings-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
+        document.getElementById('settings-password').value = '';
+        document.getElementById('settings-password-confirm').value = '';
+        
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const themeRadio = document.getElementById(`theme-${currentTheme}`);
+        if(themeRadio) themeRadio.checked = true;
     };
 
     // --- EVENT LISTENERS ---
@@ -580,22 +607,34 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    if (profileEditForm) {
-        profileEditForm.onsubmit = async (e) => {
+    if (settingsForm) {
+        settingsForm.onsubmit = async (e) => {
             e.preventDefault();
-            const submitButton = profileEditForm.querySelector('button[type="submit"]');
+
+            const password = document.getElementById('settings-password').value;
+            const passwordConfirm = document.getElementById('settings-password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                showErrorAlert('Le password non coincidono.');
+                return;
+            }
+
+            const submitButton = settingsForm.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.textContent = 'Salvataggio...';
             try {
-                const formData = new FormData(profileEditForm);
-                const response = await fetch('php/api.php?action=update_user', { method: 'POST', body: formData });
+                const formData = new FormData(settingsForm);
+                formData.append('action', 'update_user');
+
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
                 const result = await response.json();
+
                 if (result.status === 'success') {
-                    showToast('Profilo aggiornato con successo!');
+                    showToast('Impostazioni aggiornate con successo!');
                     dataLoaded = false;
                     const newUsername = formData.get('username');
                     if (currentUser.username !== newUsername) {
-                        await checkSession();
+                        await checkSession(); // Re-check session to get new username
                     } else {
                         currentUser.avatar = result.new_avatar_path || currentUser.avatar;
                     }
@@ -608,19 +647,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 showErrorAlert('Impossibile comunicare con il server.');
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Salva Modifiche Profilo';
+                submitButton.textContent = 'Salva Impostazioni';
             }
         };
     }
 
-    const profileAvatarInput = document.getElementById('profile-avatar-input');
-    if (profileAvatarInput) {
-        profileAvatarInput.addEventListener('change', (e) => {
+    const settingsAvatarInput = document.getElementById('settings-avatar-input');
+    if (settingsAvatarInput) {
+        settingsAvatarInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    document.getElementById('profile-avatar-preview').src = event.target.result;
+                    document.getElementById('settings-avatar-preview').src = event.target.result;
                 }
                 reader.readAsDataURL(file);
             }
@@ -707,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Swal.fire({
             title: 'Sei sicuro?',
-            text: `Vuoi davvero cancellare la build del ${build.date}? L\'azione è irreversibile.`, 
+            text: `Vuoi davvero cancellare la build del ${build.date}? L\'azione è irreversibile.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',

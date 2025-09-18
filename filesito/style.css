@@ -439,3 +439,57 @@ body.dark-mode .table td {
   body.dark-mode .site-footer a:hover {
       color: #fff;
   }
+
+  /* Stili per il link "Torna su" */
+  #back-to-top {
+    display: block;
+    text-align: center;
+    margin-top: 15px; /* Aggiunge spazio sopra il link */
+    border: none !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    text-decoration: none; /* Rimuove la sottolineatura se presente */
+  }
+
+  #back-to-top:hover {
+      text-decoration: underline !important; /* Aggiunge sottolineatura al passaggio del mouse */
+  }
+
+  /* Spaziatura per la galleria */
+  #gallery-view {
+      margin-bottom: 3rem; /* Aggiunge spazio sotto la galleria */
+  }
+
+  /* --- Stili Pagina Impostazioni -- */
+  #settings-view .nav-pills .nav-link {
+    color: #495057;
+  }
+
+  #settings-view .nav-pills .nav-link.active {
+      color: #fff;
+      background-color: #0d6efd;
+  }
+
+  #settings-view .tab-content {
+      border-left: 1px solid #dee2e6;
+      padding-left: 2rem;
+  }
+
+  .dark-mode #settings-view .nav-pills .nav-link {
+      color: #dee2e6;
+  }
+
+  .dark-mode #settings-view .nav-pills .nav-link.active {
+      color: #fff;
+      background-color: #0d6efd;
+  }
+
+  .dark-mode #settings-view .tab-content {
+      border-left: 1px solid #495057;
+  }
+
+  #settings-avatar-preview {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+  }
