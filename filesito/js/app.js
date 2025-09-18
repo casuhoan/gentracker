@@ -791,5 +791,32 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLoginUI();
     };
 
+    const statsCheckboxesContainer = document.getElementById('stats-checkboxes');
+    if (statsCheckboxesContainer) {
+        statsCheckboxesContainer.addEventListener('change', (e) => {
+            if (e.target.type !== 'checkbox') return;
+
+            const stat = e.target.value;
+            const statId = createSafeId(stat);
+            const idealStatsContainer = document.getElementById('ideal-stats-inputs');
+            const existingInputContainer = document.getElementById(`ideal-input-container-${statId}`);
+
+            if (e.target.checked && !existingInputContainer) {
+                // Aggiunge il campo di input
+                const inputDiv = document.createElement('div');
+                inputDiv.className = 'col-md-4 mb-3';
+                inputDiv.id = `ideal-input-container-${statId}`; // ID per una facile rimozione
+                inputDiv.innerHTML = `
+                    <label for="ideal-${statId}" class="form-label">Ideal ${stat}</label>
+                    <input type="number" step="0.1" class="form-control" id="ideal-${statId}" name="ideal_stats[${stat}]" placeholder="${stat}">
+                `;
+                idealStatsContainer.appendChild(inputDiv);
+            } else if (!e.target.checked && existingInputContainer) {
+                // Rimuove il campo di input
+                existingInputContainer.remove();
+            }
+        });
+    }
+
     init();
 });
