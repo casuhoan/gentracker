@@ -20,7 +20,7 @@ function get_user_data_dir() {
 }
 
 function get_users_file() {
-    return __DIR__ . '/users.json';
+    return __DIR__ . '/../data/users.json';
 }
 
 // --- AUTHENTICATION FUNCTIONS ---
