@@ -786,7 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editBuildForm) {
         editBuildForm.onsubmit = async (e) => {
             e.preventDefault();
-            const submitButton = editBuildForm.querySelector('button[type="submit"]');
+            const submitButton = document.querySelector('button[form="edit-build-form"]');
             submitButton.disabled = true;
             submitButton.textContent = 'Salvataggio...';
 
