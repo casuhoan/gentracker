@@ -451,13 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
-        // Reset new fields
-        if(splashartPreview) {
-            splashartPreview.src = '';
-            splashartPreview.style.display = 'none';
-        }
-        if(defaultImageUrlInput) defaultImageUrlInput.value = '';
-        if(apiCharacterNameInput) apiCharacterNameInput.value = '';
     };
 
     const initCharacterCreationForm = () => {
@@ -505,48 +498,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTheme = localStorage.getItem('theme') || 'light';
         const themeRadio = document.getElementById(`theme-${currentTheme}`);
         if(themeRadio) themeRadio.checked = true;
-    };
-
-    // --- NUOVA LOGICA API ---
-    const loadApiCharacters = async () => {
-        try {
-            const response = await fetch('https://api.genshin.dev/characters');
-            if (!response.ok) throw new Error('Network response was not ok');
-            apiCharacters = await response.json();
-            if (datalistOptions) {
-                datalistOptions.innerHTML = '';
-                apiCharacters.forEach(charName => {
-                    const option = document.createElement('option');
-                    option.value = charName;
-                    datalistOptions.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error("Impossibile caricare l'elenco dei personaggi dall'API:", error);
-            showToast("Impossibile caricare l'elenco dei personaggi", 'error');
-        }
-    };
-
-    const handleApiCharacterSelection = async () => {
-        const selectedCharName = apiCharacterNameInput.value;
-        if (apiCharacters.includes(selectedCharName)) {
-            try {
-                const response = await fetch(`https://api.genshin.dev/characters/${selectedCharName}`);
-                if (!response.ok) throw new Error('Character data not found');
-                const charData = await response.json();
-
-                // Pre-compila i campi
-                if (nameInput.value === '' || apiCharacters.includes(nameInput.value.toLowerCase())) {
-                    nameInput.value = charData.name;
-                }
-                document.getElementById('element').value = charData.vision;
-                const rarityRadio = document.querySelector(`input[name="rarity"][value="${charData.rarity}-star"]`);
-                if (rarityRadio) rarityRadio.checked = true;
-
-            } catch (error) {
-                console.error('Errore nel recuperare i dati del personaggio:', error);
-            }
-        }
     };
 
     // --- EVENT LISTENERS ---
@@ -879,61 +830,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- LISTENER PER NUOVI ELEMENTI DEL FORM ---
-    if (apiCharacterNameInput) {
-        apiCharacterNameInput.addEventListener('change', handleApiCharacterSelection);
-    }
-
-    if (loadDefaultImageBtn) {
-        loadDefaultImageBtn.addEventListener('click', () => {
-            const selectedCharName = apiCharacterNameInput.value;
-            if (apiCharacters.includes(selectedCharName)) {
-                // Prova diversi tipi di immagine in ordine di preferenza
-                const imageTypes = ['gacha-splash', 'portrait', 'card', 'icon-big'];
-                let imageUrl = '';
-                for (const type of imageTypes) {
-                    // Questo è un controllo sincrono, l'esistenza effettiva dell'URL non è garantita
-                    // ma genshin.dev è abbastanza consistente.
-                    imageUrl = `https://api.genshin.dev/characters/${selectedCharName}/${type}.png`;
-                    break; 
-                }
-
-                if (imageUrl) {
-                    splashartPreview.src = imageUrl;
-                    splashartPreview.style.display = 'block';
-                    defaultImageUrlInput.value = imageUrl;
-                    splashartInput.value = ''; // Resetta l'input file se si sceglie l'immagine default
-                    showToast('Immagine di default caricata');
-                }
-            } else {
-                showErrorAlert('Seleziona un personaggio valido dalla lista per caricare l'immagine.');
-            }
-        });
-    }
-    
-    if (splashartInput) {
-        splashartInput.addEventListener('change', () => {
-            // Se l'utente sceglie un file custom, resetta l'URL dell'immagine di default
-            defaultImageUrlInput.value = '';
-            const file = splashartInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    splashartPreview.src = e.target.result;
-                    splashartPreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-
     // --- INIZIALIZZAZIONE ---
     const init = async () => {
         initCharacterCreationForm();
         initGalleryControls();
         initTheme();
-        await loadApiCharacters(); // Carica i personaggi dall'API
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
         updateLoginUI();
