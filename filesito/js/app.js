@@ -15,12 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- STATO APPLICAZIONE ---
     let sourceCharacterData = [];
-    let apiCharacters = []; // Lista dei personaggi dall'API
     let currentCharacterData = null;
     let dataLoaded = false;
     let currentUser = null;
     let isAdmin = false;
-    let isNavigatingToEdit = false;
+    let isNavigatingToEdit = false; // Flag to handle character edit navigation
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
@@ -38,17 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserManagementLink = document.getElementById('nav-user-management');
     const navUserAvatar = document.getElementById('nav-user-avatar');
     const themeToggle = document.getElementById('theme-toggle-checkbox');
-    const deleteCharacterBtn = document.getElementById('delete-character-btn');
-
-    // Elementi per la nuova ricerca
-    const apiCharacterNameInput = document.getElementById('api_character_name');
-    const datalistOptions = document.getElementById('datalistOptions');
-    const loadDefaultImageBtn = document.getElementById('load-default-image-btn');
-    const defaultImageUrlInput = document.getElementById('default_image_url');
-    const splashartPreview = document.getElementById('splashart-preview');
-    const splashartInput = document.getElementById('splashart');
-    const nameInput = document.getElementById('name');
-
 
     // --- FUNZIONI DI UTILITY ---
     const createSafeId = (str) => {
@@ -443,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         });
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Modifiche';
-        if (deleteCharacterBtn) deleteCharacterBtn.classList.remove('d-none');
     };
 
     const resetCharacterForm = () => {
@@ -454,7 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
-        if (deleteCharacterBtn) deleteCharacterBtn.classList.add('d-none');
     };
 
     const initCharacterCreationForm = () => {
@@ -504,93 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(themeRadio) themeRadio.checked = true;
     };
 
-    // --- NUOVA LOGICA API ---
-    const loadApiCharacters = async () => {
-        try {
-            const response = await fetch('https://api.genshin.dev/characters');
-            if (!response.ok) throw new Error('Network response was not ok');
-            apiCharacters = await response.json();
-            if (datalistOptions) {
-                datalistOptions.innerHTML = '';
-                apiCharacters.forEach(charName => {
-                    const option = document.createElement('option');
-                    option.value = charName;
-                    datalistOptions.appendChild(option);
-                });
-            }
-        } catch (error) {
-            console.error("Impossibile caricare l'elenco dei personaggi dall'API:", error);
-            showToast("Impossibile caricare l'elenco dei personaggi", 'error');
-        }
-    };
-
-    const handleApiCharacterSelection = async () => {
-        const selectedCharName = apiCharacterNameInput.value;
-        if (apiCharacters.includes(selectedCharName)) {
-            try {
-                const response = await fetch(`https://api.genshin.dev/characters/${selectedCharName}`);
-                if (!response.ok) throw new Error('Character data not found');
-                const charData = await response.json();
-
-                // Pre-compila i campi
-                if (nameInput.value === '' || apiCharacters.includes(nameInput.value.toLowerCase())) {
-                    nameInput.value = charData.name;
-                }
-                document.getElementById('element').value = charData.vision;
-                const rarityRadio = document.querySelector(`input[name="rarity"][value="${charData.rarity}-star"]`);
-                if (rarityRadio) rarityRadio.checked = true;
-
-                // Carica l'immagine di default automaticamente
-                loadDefaultImageBtn.click();
-
-            } catch (error) {
-                console.error('Errore nel recuperare i dati del personaggio:', error);
-            }
-        }
-    };
-
-    const handleDeleteCharacter = async () => {
-        const charName = document.getElementById('original_name').value;
-        if (!charName) return;
-
-        Swal.fire({
-            title: 'Sei sicuro?',
-            text: `Vuoi davvero eliminare ${charName}? L'azione è irreversibile.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sì, elimina!',
-            cancelButtonText: 'Annulla'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const formData = new FormData();
-                    formData.append('action', 'delete_character');
-                    formData.append('character_name', charName);
-
-                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                    const res = await response.json();
-
-                    if (res.status === 'success') {
-                        showToast('Personaggio eliminato con successo.');
-                        dataLoaded = false;
-                        location.hash = '#';
-                    } else {
-                        showErrorAlert(res.message);
-                    }
-                } catch (error) {
-                    showErrorAlert('Errore di comunicazione con il server.');
-                }
-            }
-        });
-    };
-
     // --- EVENT LISTENERS ---
-    if (deleteCharacterBtn) {
-        deleteCharacterBtn.addEventListener('click', handleDeleteCharacter);
-    }
-
     if (document.getElementById('back-to-gallery-btn')) {
         document.getElementById('back-to-gallery-btn').addEventListener('click', (e) => { e.preventDefault(); location.hash = '#'; });
     }
@@ -846,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Swal.fire({
             title: 'Sei sicuro?',
-            text: `Vuoi davvero cancellare la build del ${build.date}? L'azione è irreversibile.`,
+            text: `Vuoi davvero cancellare la build del ${build.date}? L\'azione è irreversibile.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -925,7 +825,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initCharacterCreationForm();
         initGalleryControls();
         initTheme();
-        await loadApiCharacters(); // Carica i personaggi dall'API
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
         updateLoginUI();

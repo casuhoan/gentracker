@@ -21,7 +21,6 @@ body {
 
 main {
     flex: 1;
-    margin-bottom: 3rem; /* Aggiunge spazio prima del footer */
 }
 
 /* Transizioni Sincronizzate per Cambio Tema */

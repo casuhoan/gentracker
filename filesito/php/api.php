@@ -122,23 +122,7 @@ function save_character() {
     if (!is_dir($user_data_dir)) mkdir($user_data_dir, 0777, true);
 
     $splashart_path = '';
-    $default_image_url = $_POST['default_image_url'] ?? '';
-
-    if (!empty($default_image_url) && filter_var($default_image_url, FILTER_VALIDATE_URL)) {
-        $image_data = @file_get_contents($default_image_url);
-        if ($image_data !== false) {
-            $upload_dir = __DIR__ . '/../uploads/';
-            $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($_POST['name']));
-            // Estrai l'estensione dall'URL, fallback a png
-            $url_path = parse_url($default_image_url, PHP_URL_PATH);
-            $file_extension = pathinfo($url_path, PATHINFO_EXTENSION) ?: 'png';
-            $file_name = $_SESSION['username'] . '_' . $safe_char_name . '_' . time() . '.' . $file_extension;
-            $target_file = $upload_dir . $file_name;
-            if (file_put_contents($target_file, $image_data)) {
-                $splashart_path = 'uploads/' . $file_name;
-            }
-        }
-    } elseif (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
         $upload_dir = __DIR__ . '/../uploads/';
         $file_extension = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($_POST['name']));
@@ -234,41 +218,6 @@ function update_character() {
         echo json_encode(['status' => 'success','message'=>'Personaggio aggiornato con successo']);
     } else {
         echo json_encode(['status' => 'error','message'=>'Errore salvataggio personaggio.']);
-    }
-}
-
-function delete_character() {
-    $char_name = $_POST['character_name'] ?? '';
-    if (empty($char_name)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Nome del personaggio non fornito.']);
-        return;
-    }
-
-    $user_data_dir = get_user_data_dir();
-    $json_file_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name)) . '.json';
-    $file_path = $user_data_dir . $json_file_name;
-
-    if (!file_exists($file_path)) {
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato.']);
-        return;
-    }
-
-    $data = json_decode(file_get_contents($file_path), true);
-    $splashart_path = $data['profile']['splashart'] ?? '';
-
-    // Elimina l'immagine se esiste
-    if (!empty($splashart_path) && file_exists(__DIR__ . '/../' . $splashart_path)) {
-        unlink(__DIR__ . '/../' . $splashart_path);
-    }
-
-    // Elimina il file JSON
-    if (unlink($file_path)) {
-        echo json_encode(['status' => 'success', 'message' => 'Personaggio eliminato con successo.']);
-    } else {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Impossibile eliminare il file del personaggio.']);
     }
 }
 
@@ -572,7 +521,7 @@ function register() {
 $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session'];
-$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'delete_character', 'save_build', 'update_build', 'delete_build', 'update_user'];
+$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user'];
 $admin_actions  = ['get_all_users', 'delete_users', 'register'];
 
 if (in_array($action, $public_actions)) {
