@@ -20,7 +20,7 @@ function get_user_data_dir() {
 }
 
 function get_users_file() {
-    return __DIR__ . '/users.json';
+    return __DIR__ . '/../data/users.json';
 }
 
 // --- AUTHENTICATION FUNCTIONS ---
@@ -358,6 +358,12 @@ function update_build() {
     }
 
     $data = json_decode(file_get_contents($file_path), true);
+
+    if (!empty($data['builds'])) {
+        usort($data['builds'], function($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+    }
 
     if (!isset($data['builds'][$build_index])) {
         echo json_encode(['status' => 'error', 'message' => 'Build non trovata.']);
