@@ -38,13 +38,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserManagementLink = document.getElementById('nav-user-management');
     const navUserAvatar = document.getElementById('nav-user-avatar');
     const themeToggle = document.getElementById('theme-toggle-checkbox');
+    const deleteCharacterBtn = document.getElementById('delete-character-btn');
+
     // Elementi per la nuova ricerca
     const apiCharacterNameInput = document.getElementById('api_character_name');
     const datalistOptions = document.getElementById('datalistOptions');
     const loadDefaultImageBtn = document.getElementById('load-default-image-btn');
     const defaultImageUrlInput = document.getElementById('default_image_url');
     const splashartPreview = document.getElementById('splashart-preview');
-    const splashartInput = document.getElementById('splashart');
+    const splashartInput = document('splashart');
     const nameInput = document.getElementById('name');
 
 
