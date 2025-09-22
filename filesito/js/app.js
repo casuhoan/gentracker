@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadDefaultImageBtn = document.getElementById('load-default-image-btn');
     const defaultImageUrlInput = document.getElementById('default_image_url');
     const splashartPreview = document.getElementById('splashart-preview');
-    const splashartInput = document('splashart');
+    const splashartInput = document.getElementById('splashart');
     const nameInput = document.getElementById('name');
 
 
