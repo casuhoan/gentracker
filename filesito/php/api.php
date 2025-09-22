@@ -122,7 +122,23 @@ function save_character() {
     if (!is_dir($user_data_dir)) mkdir($user_data_dir, 0777, true);
 
     $splashart_path = '';
-    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+    $default_image_url = $_POST['default_image_url'] ?? '';
+
+    if (!empty($default_image_url) && filter_var($default_image_url, FILTER_VALIDATE_URL)) {
+        $image_data = @file_get_contents($default_image_url);
+        if ($image_data !== false) {
+            $upload_dir = __DIR__ . '/../uploads/';
+            $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($_POST['name']));
+            // Estrai l'estensione dall'URL, fallback a png
+            $url_path = parse_url($default_image_url, PHP_URL_PATH);
+            $file_extension = pathinfo($url_path, PATHINFO_EXTENSION) ?: 'png';
+            $file_name = $_SESSION['username'] . '_' . $safe_char_name . '_' . time() . '.' . $file_extension;
+            $target_file = $upload_dir . $file_name;
+            if (file_put_contents($target_file, $image_data)) {
+                $splashart_path = 'uploads/' . $file_name;
+            }
+        }
+    } elseif (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
         $upload_dir = __DIR__ . '/../uploads/';
         $file_extension = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($_POST['name']));
