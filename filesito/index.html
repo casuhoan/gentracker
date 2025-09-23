@@ -63,7 +63,7 @@
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main class="container mt-4 mb-5">
         <!-- Sezione Impostazioni -->
         <div id="settings-view" class="view">
             <h2>Impostazioni</h2>
@@ -194,7 +194,10 @@
                         <select class="form-select" id="talents" name="talents"></select>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Salva Personaggio</button>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Salva Personaggio</button>
+                    <button type="button" class="btn btn-danger" id="delete-character-btn" style="display: none;">Cancella Personaggio</button>
+                </div>
             </form>
         </div>
 

@@ -221,6 +221,40 @@ function update_character() {
     }
 }
 
+function delete_character() {
+    $char_name = $_POST['character_name'] ?? '';
+    if (empty($char_name)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Nome del personaggio non fornito.']);
+        return;
+    }
+
+    $user_data_dir = get_user_data_dir();
+    $json_file_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name)) . '.json';
+    $file_path = $user_data_dir . $json_file_name;
+
+    if (!file_exists($file_path)) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato.']);
+        return;
+    }
+
+    $data = json_decode(file_get_contents($file_path), true);
+
+    // Delete splashart if it exists
+    if (!empty($data['profile']['splashart']) && file_exists(__DIR__.'/../'.$data['profile']['splashart'])) {
+        unlink(__DIR__.'/../'.$data['profile']['splashart']);
+    }
+
+    // Delete the character JSON file
+    if (unlink($file_path)) {
+        echo json_encode(['status' => 'success', 'message' => 'Personaggio eliminato con successo.']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile eliminare il file del personaggio.']);
+    }
+}
+
 // --- BUILD FUNCTIONS ---
 function save_build() {
     $char_name = $_POST['character_name'] ?? '';
@@ -521,7 +555,7 @@ function register() {
 $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session'];
-$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user'];
+$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character'];
 $admin_actions  = ['get_all_users', 'delete_users', 'register'];
 
 if (in_array($action, $public_actions)) {

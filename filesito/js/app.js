@@ -431,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         });
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Modifiche';
+        document.getElementById('delete-character-btn').style.display = 'inline-block';
     };
 
     const resetCharacterForm = () => {
@@ -441,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
+        document.getElementById('delete-character-btn').style.display = 'none';
     };
 
     const initCharacterCreationForm = () => {
@@ -502,6 +504,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 isNavigatingToEdit = true; // Set flag before changing hash
                 populateCharacterFormForEdit(currentCharacterData);
                 location.hash = '#new-character';
+            }
+        });
+    }
+
+    if (document.getElementById('delete-character-btn')) {
+        document.getElementById('delete-character-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const characterName = document.getElementById('original_name').value;
+            if (characterName) {
+                handleDeleteCharacter(characterName);
             }
         });
     }
@@ -773,6 +785,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
                             renderBuildList(currentCharacterData);
                         });
+                    } else {
+                        showErrorAlert(res.message);
+                    }
+                } catch (error) {
+                    showErrorAlert('Errore di comunicazione con il server.');
+                }
+            }
+        });
+    };
+
+    const handleDeleteCharacter = (characterName) => {
+        Swal.fire({
+            title: 'Sei sicuro?',
+            text: `Vuoi davvero cancellare ${characterName}? L\'azione è irreversibile e cancellerà anche tutte le build associate.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, cancella!',
+            cancelButtonText: 'Annulla'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const formData = new FormData();
+                    formData.append('action', 'delete_character');
+                    formData.append('character_name', characterName);
+
+                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                    const res = await response.json();
+
+                    if (res.status === 'success') {
+                        showToast('Personaggio cancellato con successo.');
+                        dataLoaded = false;
+                        location.hash = '#';
                     } else {
                         showErrorAlert(res.message);
                     }
