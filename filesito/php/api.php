@@ -43,6 +43,11 @@ function login() {
     }
 
     foreach ($users as $user) {
+        // Aggiunto controllo per voci di utenti non valide
+        if (!is_array($user) || !isset($user['username']) || !isset($user['passwordHash'])) {
+            continue; // Salta l'utente corrotto e passa al successivo
+        }
+
         if ($user['username'] === $username && password_verify($password, $user['passwordHash'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
