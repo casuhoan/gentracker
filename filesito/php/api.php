@@ -35,6 +35,13 @@ function login() {
     $password = $_POST['password'] ?? '';
 
     $users = json_decode(file_get_contents($users_file), true);
+
+    // Aggiunto controllo per JSON vuoto o corrotto
+    if (!is_array($users)) {
+        echo json_encode(['status' => 'error', 'message' => 'Credenziali non valide.']);
+        return;
+    }
+
     foreach ($users as $user) {
         if ($user['username'] === $username && password_verify($password, $user['passwordHash'])) {
             $_SESSION['username'] = $user['username'];
