@@ -647,8 +647,19 @@ function add_character_to_library() {
         return;
     }
 
-    $library_file = __DIR__ . '/../librarydata/characters_list.json';
-    $library = json_decode(file_get_contents($library_file), true);
+    $library_file = __DIR__ . '/../data/characters_list.json';
+    if (file_exists($library_file)) {
+        $library_content = file_get_contents($library_file);
+        $library = json_decode($library_content, true);
+    } else {
+        $library = [];
+    }
+
+
+    // Se il file è vuoto o corrotto, inizializza la libreria come un array vuoto
+    if (!is_array($library)) {
+        $library = [];
+    }
 
     // Controlla duplicati
     foreach ($library as $char) {
@@ -660,7 +671,7 @@ function add_character_to_library() {
     }
 
     if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
-        $upload_dir = __DIR__ . '/../librarydata/';
+        $upload_dir = __DIR__ . '/../data/';
         $safe_char_name = str_replace(' ', '_', $char_name);
         $file_name = 'Character_' . $safe_char_name . '_Full_Wish.webp';
         $target_file = $upload_dir . $file_name;
@@ -674,7 +685,7 @@ function add_character_to_library() {
 
             // Ordina la libreria alfabeticamente
             usort($library, function($a, $b) {
-                return strcasecmp($a['nome'], $b['nome']);
+                return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
             });
 
             if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
@@ -685,7 +696,7 @@ function add_character_to_library() {
             }
         } else {
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine.']);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine. Impossibile spostare il file in: ' . $target_file]);
         }
     } else {
         http_response_code(400);
