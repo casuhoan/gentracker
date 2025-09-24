@@ -213,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 '#manage-builds': 'build-management-view',
                 '#user-management': 'user-management-view',
                 '#settings': 'settings-view',
+                '#add-library-character': 'library-character-creation-view',
             };
             const viewId = routeMap[hash] || 'gallery-view';
             showView(viewId);
@@ -410,6 +411,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('character-form-title').textContent = `Modifica ${profile.name}`;
         document.getElementById('original_name').value = profile.name;
         document.getElementById('name').value = profile.name;
+
+        // Mostra l'anteprima dell'immagine corrente
+        const previewContainer = document.getElementById('character-preview-container');
+        const previewImage = document.getElementById('character-preview-image');
+        if (profile.splashart) {
+            previewImage.src = profile.splashart;
+            previewContainer.style.display = 'block';
+        } else {
+            previewImage.src = 'uploads/default_avatar.png'; // Fallback
+            previewContainer.style.display = 'block';
+        }
         
         // Disabilita la selezione dalla libreria durante la modifica
         if (characterLibrarySelect) {
@@ -517,8 +529,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const themeRadio = document.getElementById(`theme-${currentTheme}`);
         if(themeRadio) themeRadio.checked = true;
 
-        if (isAdmin && syncLibraryBtn) {
-            syncLibraryBtn.classList.remove('d-none');
+        if (isAdmin) {
+            if(syncLibraryBtn) syncLibraryBtn.classList.remove('d-none');
+            const addLibCharBtn = document.getElementById('v-pills-add-lib-char-tab');
+            if(addLibCharBtn) addLibCharBtn.classList.remove('d-none');
         }
     };
 
@@ -723,6 +737,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         buildListContainer.appendChild(list);
     };
+
+    const libraryCharacterForm = document.getElementById('library-character-form');
+    if (libraryCharacterForm) {
+        libraryCharacterForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = libraryCharacterForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio in corso...';
+
+            try {
+                const formData = new FormData(libraryCharacterForm);
+                formData.append('action', 'add_character_to_library');
+
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    libraryCharacterForm.reset();
+                    location.hash = '#settings';
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Aggiungi alla Libreria';
+            }
+        };
+    }
 
     if (characterForm) {
         characterForm.onsubmit = async (e) => {

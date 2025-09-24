@@ -627,13 +627,67 @@ function sync_library() {
     }
 }
 
+function add_character_to_library() {
+    $char_name = $_POST['name'] ?? '';
+    if (empty($char_name)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Il nome del personaggio è obbligatorio.']);
+        return;
+    }
+
+    $library_file = __DIR__ . '/../librarydata/characters_list.json';
+    $library = json_decode(file_get_contents($library_file), true);
+
+    // Controlla duplicati
+    foreach ($library as $char) {
+        if (strtolower($char['nome']) === strtolower($char_name)) {
+            http_response_code(409); // Conflict
+            echo json_encode(['status' => 'error', 'message' => 'Un personaggio con questo nome esiste già nella libreria.']);
+            return;
+        }
+    }
+
+    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        $upload_dir = __DIR__ . '/../librarydata/';
+        $safe_char_name = str_replace(' ', '_', $char_name);
+        $file_name = 'Character_' . $safe_char_name . '_Full_Wish.webp';
+        $target_file = $upload_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
+            $new_char = [
+                'nome' => $char_name,
+                'immagine' => $file_name
+            ];
+            $library[] = $new_char;
+
+            // Ordina la libreria alfabeticamente
+            usort($library, function($a, $b) {
+                return strcasecmp($a['nome'], $b['nome']);
+            });
+
+            if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+                echo json_encode(['status' => 'success', 'message' => 'Personaggio \'' . $char_name . '\' aggiunto alla libreria!']);
+            } else {
+                http_response_code(500);
+                echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
+            }
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine.']);
+        }
+    } else {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'L\'immagine dello splashart è obbligatoria.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library'];
 
 if (in_array($action, $public_actions)) {
     $action();
