@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- STATO APPLICAZIONE ---
     let sourceCharacterData = [];
+    let characterLibrary = [];
     let currentCharacterData = null;
     let dataLoaded = false;
     let currentUser = null;
@@ -37,6 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserManagementLink = document.getElementById('nav-user-management');
     const navUserAvatar = document.getElementById('nav-user-avatar');
     const themeToggle = document.getElementById('theme-toggle-checkbox');
+    // Nuovi elementi
+    const characterLibrarySelect = document.getElementById('character-library-select');
+    const useDefaultImageBtn = document.getElementById('use-default-image-btn');
+    const defaultImagePathInput = document.getElementById('default_image_path');
+    const syncLibraryBtn = document.getElementById('v-pills-sync-tab');
+
 
     // --- FUNZIONI DI UTILITY ---
     const createSafeId = (str) => {
@@ -403,6 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('character-form-title').textContent = `Modifica ${profile.name}`;
         document.getElementById('original_name').value = profile.name;
         document.getElementById('name').value = profile.name;
+        
+        // Disabilita la selezione dalla libreria durante la modifica
+        if (characterLibrarySelect) {
+            characterLibrarySelect.disabled = true;
+        }
+
         document.getElementById('element').value = profile.element;
         document.getElementById('acquisition_date').value = profile.acquisition_date;
         document.getElementById('constellation').value = profile.constellation;
@@ -443,6 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
         document.getElementById('delete-character-btn').style.display = 'none';
+        if (characterLibrarySelect) {
+            characterLibrarySelect.disabled = false;
+            characterLibrarySelect.selectedIndex = 0;
+        }
+        if (defaultImagePathInput) {
+            defaultImagePathInput.value = '';
+        }
     };
 
     const initCharacterCreationForm = () => {
@@ -463,6 +483,12 @@ document.addEventListener('DOMContentLoaded', () => {
         populateSelect('element', config.elements);
         populateSelect('signature_weapon', config.signatureOptions);
         populateSelect('talents', config.talentOptions);
+    };
+
+    const initCharacterLibrarySelect = () => {
+        if (!characterLibrarySelect || characterLibrary.length === 0) return;
+        const options = characterLibrary.map(char => ({ name: char.nome, value: char.nome }));
+        populateSelect('character-library-select', options, 'Scegli un personaggio...');
     };
 
     const loadCharactersForBuildLogger = () => {
@@ -490,6 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTheme = localStorage.getItem('theme') || 'light';
         const themeRadio = document.getElementById(`theme-${currentTheme}`);
         if(themeRadio) themeRadio.checked = true;
+
+        if (isAdmin && syncLibraryBtn) {
+            syncLibraryBtn.classList.remove('d-none');
+        }
     };
 
     // --- EVENT LISTENERS ---
@@ -570,6 +600,113 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (characterLibrarySelect) {
+        characterLibrarySelect.addEventListener('change', () => {
+            const selectedCharName = characterLibrarySelect.value;
+            const nameInput = document.getElementById('name');
+            const nameInput = document.getElementById('name');
+            const previewContainer = document.getElementById('character-preview-container');
+            const previewImage = document.getElementById('character-preview-image');
+
+            if (selectedCharName) {
+                const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
+                if (characterFromLibrary) {
+                    const imagePath = `librarydata/${characterFromLibrary.immagine}`;
+                    if (nameInput) nameInput.value = selectedCharName;
+                    if (previewImage) previewImage.src = imagePath;
+                    if (previewContainer) previewContainer.style.display = 'block';
+                    
+                    // Imposta anche il percorso dell'immagine di default per il salvataggio
+                    if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
+                }
+            } else {
+                // Nascondi l'anteprima se nessun personaggio è selezionato
+                if (nameInput) nameInput.value = '';
+                if (previewContainer) previewContainer.style.display = 'none';
+                if (previewImage) previewImage.src = '';
+                if (defaultImagePathInput) defaultImagePathInput.value = '';
+            }
+        });
+    }
+
+    if (useDefaultImageBtn) {
+        useDefaultImageBtn.addEventListener('click', () => {
+            const selectedCharName = characterLibrarySelect.value;
+            if (!selectedCharName) {
+                showErrorAlert('Seleziona prima un personaggio dalla libreria.');
+                return;
+            }
+            const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
+            if (characterFromLibrary) {
+                const imagePath = `librarydata/${characterFromLibrary.immagine}`;
+                if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
+                
+                const previewImage = document.getElementById('character-preview-image');
+                const previewContainer = document.getElementById('character-preview-container');
+                if (previewImage) previewImage.src = imagePath;
+                if (previewContainer) previewContainer.style.display = 'block';
+
+                showToast(`Immagine di default per ${selectedCharName} selezionata.`);
+                
+                // Pulisce l'input file per evitare conflitti
+                const splashartInput = document.getElementById('splashart');
+                if(splashartInput) splashartInput.value = '';
+            }
+        });
+    }
+
+    const splashartInput = document.getElementById('splashart');
+    if (splashartInput) {
+        splashartInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const previewImage = document.getElementById('character-preview-image');
+                    const previewContainer = document.getElementById('character-preview-container');
+                    if (previewImage) previewImage.src = event.target.result;
+                    if (previewContainer) previewContainer.style.display = 'block';
+                    
+                    // Pulisce il valore dell'immagine di default se si carica un file
+                    if (defaultImagePathInput) defaultImagePathInput.value = '';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    if (syncLibraryBtn) {
+        syncLibraryBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Sincronizzare la libreria?',
+                text: "Questa azione copierà i file dalla cartella 'librarydata' alla cartella 'data' sul server. Sei sicuro?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sì, sincronizza!',
+                cancelButtonText: 'Annulla'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('action', 'sync_library');
+                        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                        const res = await response.json();
+                        if (res.status === 'success') {
+                            showToast('Sincronizzazione completata con successo.');
+                        } else {
+                            showErrorAlert(res.message || 'Errore durante la sincronizzazione.');
+                        }
+                    } catch (error) {
+                        showErrorAlert('Errore di comunicazione con il server.');
+                    }
+                }
+            });
+        });
+    }
+
     const renderBuildList = (charData) => {
         if (!buildListContainer) return;
         buildListContainer.innerHTML = '';
@@ -591,11 +728,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (characterForm) {
         characterForm.onsubmit = async (e) => {
             e.preventDefault();
+
             const submitButton = characterForm.querySelector('button[type="submit"]');
             const originalName = document.getElementById('original_name').value;
             const isEditing = originalName !== '';
+
+            // Logica soprannome obbligatorio
+            if (!isEditing) {
+                const baseName = characterLibrarySelect.value;
+                const customName = document.getElementById('name').value;
+                const characterExists = sourceCharacterData.some(char => char.profile.name === baseName);
+
+                if (characterExists && baseName === customName) {
+                    showErrorAlert('Esiste già un personaggio con questo nome. Fornisci un soprannome unico nel campo "Nome Personalizzato".');
+                    return; // Interrompe il salvataggio
+                }
+            }
+
             submitButton.disabled = true;
             submitButton.textContent = 'Salvataggio in corso...';
+
             try {
                 const formData = new FormData(characterForm);
                 formData.append('action', isEditing ? 'update_character' : 'save_character');
@@ -868,6 +1020,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INIZIALIZZAZIONE ---
     const init = async () => {
+        try {
+            const response = await fetch('data/characters_list.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            characterLibrary = await response.json();
+            initCharacterLibrarySelect();
+        } catch (error) {
+            console.error('Impossibile caricare la libreria dei personaggi:', error);
+            showErrorAlert('Impossibile caricare la libreria dei personaggi. Alcune funzionalità potrebbero non essere disponibili.');
+        }
+
         initCharacterCreationForm();
         initGalleryControls();
         initTheme();

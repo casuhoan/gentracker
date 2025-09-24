@@ -75,6 +75,7 @@
                             <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">Modifica Profilo</a>
                             <a class="nav-link" id="v-pills-auth-tab" data-bs-toggle="pill" href="#v-pills-auth" role="tab" aria-controls="v-pills-auth" aria-selected="false">Autenticazione</a>
                             <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false">Aspetto</a>
+                            <a class="nav-link d-none" id="v-pills-sync-tab" href="#"><i class="bi bi-arrow-repeat me-2"></i>Sincronizza Libreria</a>
                         </div>
                     </div>
                     <!-- Contenuto delle schede -->
@@ -133,13 +134,26 @@
             <h2 id="character-form-title">Crea Personaggio</h2>
             <form id="character-form" enctype="multipart/form-data">
                 <input type="hidden" name="original_name" id="original_name">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nome Personaggio</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                <input type="hidden" name="default_image_path" id="default_image_path">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="character-library-select" class="form-label">Seleziona Personaggio dalla Libreria</label>
+                        <select class="form-select" id="character-library-select"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Nome Personalizzato (o lascia default)</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                </div>
+                <div id="character-preview-container" class="text-center mb-3" style="display: none;">
+                    <img id="character-preview-image" src="" alt="Character Preview" class="rounded" style="max-height: 150px;">
                 </div>
                 <div class="mb-3">
                     <label for="splashart" class="form-label">Splashart (Immagine)</label>
-                    <input type="file" class="form-control" id="splashart" name="splashart" accept="image/*">
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="splashart" name="splashart" accept="image/*">
+                        <button class="btn btn-outline-secondary" type="button" id="use-default-image-btn">Usa Default</button>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4 mb-3">
