@@ -624,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedCharName) {
                 const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
                 if (characterFromLibrary) {
-                    const imagePath = `librarydata/${characterFromLibrary.immagine}`;
+                    const imagePath = `data/${characterFromLibrary.immagine}`;
                     if (nameInput) nameInput.value = selectedCharName;
                     if (previewImage) previewImage.src = imagePath;
                     if (previewContainer) previewContainer.style.display = 'block';
