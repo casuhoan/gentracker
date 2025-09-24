@@ -604,7 +604,6 @@ document.addEventListener('DOMContentLoaded', () => {
         characterLibrarySelect.addEventListener('change', () => {
             const selectedCharName = characterLibrarySelect.value;
             const nameInput = document.getElementById('name');
-            const nameInput = document.getElementById('name');
             const previewContainer = document.getElementById('character-preview-container');
             const previewImage = document.getElementById('character-preview-image');
 
