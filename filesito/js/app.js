@@ -176,10 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeView = document.getElementById(viewId);
         if (activeView) {
             activeView.classList.add('active');
-            // Se la vista è quella di creazione personaggio, aggiusta il quadrato
-            if (viewId === 'character-creation-view') {
-                adjustPreviewSquare();
-            }
         }
     };
 
@@ -1086,20 +1082,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
         updateLoginUI();
-
-        // Funzione per aggiustare il quadrato di anteprima
-        const adjustPreviewSquare = () => {
-            const leftCol = document.getElementById('character-form-left-col');
-            const previewContainer = document.getElementById('character-preview-container');
-            if (leftCol && previewContainer) {
-                const height = leftCol.offsetHeight;
-                previewContainer.style.height = `${height}px`;
-                previewContainer.style.width = `${height}px`;
-            }
-        };
-
-        // Aggiusta al resize
-        window.addEventListener('resize', adjustPreviewSquare);
     };
 
     const statsCheckboxesContainer = document.getElementById('stats-checkboxes');

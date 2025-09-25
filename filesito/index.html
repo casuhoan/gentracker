@@ -13,13 +13,15 @@
         .preview-placeholder {
             border: 2px dashed #ccc;
             border-radius: .375rem;
+            height: 180px; /* Dimensione fissa */
+            width: 180px;  /* Dimensione fissa */
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: #f8f9fa;
             color: #6c757d;
             transition: background-color 0.2s, border-color 0.2s;
-            overflow: hidden; /* Nasconde le parti dell'immagine che escono dal quadrato */
+            overflow: hidden; 
         }
         .preview-placeholder.empty::before {
             content: 'Anteprima Immagine';
@@ -28,12 +30,15 @@
         .preview-placeholder img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ritaglia l'immagine per riempire lo spazio */
+            object-fit: cover; 
         }
         body.dark-mode .preview-placeholder {
             background-color: #343a40;
             border-color: #6c757d;
             color: #adb5bd;
+        }
+        body.dark-mode .text-muted {
+            color: #adb5bd !important;
         }
     </style>
 </head>
