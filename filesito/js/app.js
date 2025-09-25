@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const previewContainer = document.getElementById('character-preview-container');
         const previewImage = document.getElementById('character-preview-image');
         previewImage.src = '';
-        previewContainer.classList.add('empty');
+        if (previewContainer) previewContainer.classList.add('empty');
 
         document.getElementById('original_name').value = '';
         document.getElementById('character-form-title').textContent = 'Crea Personaggio';
@@ -1080,6 +1080,21 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
         updateLoginUI();
+
+        // Funzione per aggiustare il quadrato di anteprima
+        const adjustPreviewSquare = () => {
+            const leftCol = document.getElementById('character-form-left-col');
+            const previewContainer = document.getElementById('character-preview-container');
+            if (leftCol && previewContainer) {
+                const height = leftCol.offsetHeight;
+                previewContainer.style.height = `${height}px`;
+                previewContainer.style.width = `${height}px`;
+            }
+        };
+
+        // Aggiusta al caricamento e al resize
+        adjustPreviewSquare();
+        window.addEventListener('resize', adjustPreviewSquare);
     };
 
     const statsCheckboxesContainer = document.getElementById('stats-checkboxes');

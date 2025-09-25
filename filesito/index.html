@@ -13,23 +13,22 @@
         .preview-placeholder {
             border: 2px dashed #ccc;
             border-radius: .375rem;
-            min-height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: #f8f9fa;
             color: #6c757d;
-            width: 100%;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, border-color 0.2s;
+            overflow: hidden; /* Nasconde le parti dell'immagine che escono dal quadrato */
         }
         .preview-placeholder.empty::before {
             content: 'Anteprima Immagine';
             font-style: italic;
         }
         .preview-placeholder img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ritaglia l'immagine per riempire lo spazio */
         }
         body.dark-mode .preview-placeholder {
             background-color: #343a40;
@@ -183,8 +182,8 @@
                 
                 <div class="row mb-3">
                     <!-- Colonna sinistra per input e descrizione -->
-                    <div class="col-md-7">
-                        <p class="text-muted">Seleziona un personaggio dalla libreria per iniziare, o inserisci manualmente i dati per un nuovo personaggio non presente nell'elenco.</p>
+                    <div class="col-md-7" id="character-form-left-col">
+                        <p class="text-muted small">Seleziona un personaggio dalla libreria per iniziare, o inserisci manualmente i dati per un nuovo personaggio non presente nell'elenco.</p>
                         <div class="mb-3">
                             <label for="character-library-select" class="form-label">Seleziona Personaggio dalla Libreria</label>
                             <select class="form-select" id="character-library-select"></select>
@@ -195,8 +194,8 @@
                         </div>
                     </div>
                     <!-- Colonna destra per anteprima -->
-                    <div class="col-md-5 d-flex">
-                        <div id="character-preview-container" class="preview-placeholder empty w-100">
+                    <div class="col-md-5">
+                        <div id="character-preview-container" class="preview-placeholder empty">
                             <img id="character-preview-image" src="" alt="Character Preview">
                         </div>
                     </div>
