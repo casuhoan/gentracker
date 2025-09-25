@@ -1092,8 +1092,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Aggiusta al caricamento e al resize
-        adjustPreviewSquare();
+        // Aggiusta al caricamento (con un breve ritardo per permettere il rendering) e al resize
+        setTimeout(adjustPreviewSquare, 50);
         window.addEventListener('resize', adjustPreviewSquare);
     };
 
