@@ -176,14 +176,15 @@
         <!-- Sezione per creare un nuovo personaggio -->
         <div id="character-creation-view" class="view">
             <h2 id="character-form-title">Crea Personaggio</h2>
+            <p class="text-muted small">Usa questo modulo per aggiungere un nuovo personaggio al tuo roster o per modificare i dati di uno esistente. Seleziona un personaggio dalla libreria per compilare automaticamente i dati di base.</p>
             <form id="character-form" enctype="multipart/form-data">
                 <input type="hidden" name="original_name" id="original_name">
                 <input type="hidden" name="default_image_path" id="default_image_path">
                 
                 <div class="row mb-3">
                     <!-- Colonna sinistra per input e descrizione -->
-                    <div class="col-md-7" id="character-form-left-col">
-                        <p class="text-muted small">Seleziona un personaggio dalla libreria per iniziare, o inserisci manualmente i dati per un nuovo personaggio non presente nell'elenco.</p>
+                    <div class="col-md-8" id="character-form-left-col">
+                        <p class="text-muted small">Usa questo modulo per aggiungere un nuovo personaggio al tuo roster o per modificare i dati di uno esistente. Seleziona un personaggio dalla libreria per compilare automaticamente i dati di base.</p>
                         <div class="mb-3">
                             <label for="character-library-select" class="form-label">Seleziona Personaggio dalla Libreria</label>
                             <select class="form-select" id="character-library-select"></select>
@@ -194,8 +195,8 @@
                         </div>
                     </div>
                     <!-- Colonna destra per anteprima -->
-                    <div class="col-md-5">
-                        <div id="character-preview-container" class="preview-placeholder empty">
+                    <div class="col-md-4">
+                        <div id="character-preview-container" class="preview-placeholder empty w-100">
                             <img id="character-preview-image" src="" alt="Character Preview">
                         </div>
                     </div>
@@ -271,6 +272,7 @@
         <!-- Sezione per registrare una nuova build -->
         <div id="build-logger-view" class="view">
             <h2>Registra Nuova Build</h2>
+            <p class="text-muted small">Registra i progressi dei tuoi personaggi. Seleziona un personaggio e inserisci le sue statistiche attuali per salvarle come una nuova build.</p>
             <form id="build-form">
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -308,6 +310,7 @@
         <!-- Sezione per la galleria personaggi -->
         <div id="gallery-view" class="view">
             <h2>Galleria Personaggi</h2>
+            <p class="text-muted small">Esplora la tua collezione di personaggi. Usa i filtri per cercare e l'ordinamento per confrontare le loro performance.</p>
 
             <div id="gallery-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
                 <div class="col-lg-4 col-md-6">
@@ -384,6 +387,7 @@
         <!-- Sezione per la gestione delle build -->
         <div id="build-management-view" class="view">
             <h2>Gestisci Build Esistenti</h2>
+            <p class="text-muted small">Visualizza, modifica o elimina le build salvate per ogni personaggio. Seleziona un personaggio per vedere il suo storico.</p>
             <div class="col-md-6 mb-3">
                 <label for="manage-char-select" class="form-label">Seleziona Personaggio</label>
                 <select id="manage-char-select" class="form-select"></select>
