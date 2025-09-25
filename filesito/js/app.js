@@ -412,18 +412,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('original_name').value = profile.name;
         document.getElementById('name').value = profile.name;
 
-        // Mostra l'anteprima dell'immagine corrente
         const previewContainer = document.getElementById('character-preview-container');
         const previewImage = document.getElementById('character-preview-image');
-        if (profile.splashart) {
+        if (profile.splashart && profile.splashart !== '') {
             previewImage.src = profile.splashart;
-            previewContainer.style.display = 'block';
+            previewContainer.classList.remove('empty');
         } else {
-            previewImage.src = 'uploads/default_avatar.png'; // Fallback
-            previewContainer.style.display = 'block';
+            previewImage.src = '';
+            previewContainer.classList.add('empty');
         }
         
-        // Disabilita la selezione dalla libreria durante la modifica
         if (characterLibrarySelect) {
             characterLibrarySelect.disabled = true;
         }
@@ -462,6 +460,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetCharacterForm = () => {
         if (!characterForm) return;
         characterForm.reset();
+
+        const previewContainer = document.getElementById('character-preview-container');
+        const previewImage = document.getElementById('character-preview-image');
+        previewImage.src = '';
+        previewContainer.classList.add('empty');
+
         document.getElementById('original_name').value = '';
         document.getElementById('character-form-title').textContent = 'Crea Personaggio';
         document.getElementById('ideal-stats-inputs').innerHTML = '';
@@ -627,16 +631,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const imagePath = `data/${characterFromLibrary.immagine}`;
                     if (nameInput) nameInput.value = selectedCharName;
                     if (previewImage) previewImage.src = imagePath;
-                    if (previewContainer) previewContainer.style.display = 'block';
+                    if (previewContainer) previewContainer.classList.remove('empty');
                     
-                    // Imposta anche il percorso dell'immagine di default per il salvataggio
                     if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
                 }
             } else {
-                // Nascondi l'anteprima se nessun personaggio è selezionato
                 if (nameInput) nameInput.value = '';
-                if (previewContainer) previewContainer.style.display = 'none';
                 if (previewImage) previewImage.src = '';
+                if (previewContainer) previewContainer.classList.add('empty');
                 if (defaultImagePathInput) defaultImagePathInput.value = '';
             }
         });
@@ -651,17 +653,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
             if (characterFromLibrary) {
-                const imagePath = `librarydata/${characterFromLibrary.immagine}`;
+                const imagePath = `data/${characterFromLibrary.immagine}`;
                 if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
                 
                 const previewImage = document.getElementById('character-preview-image');
                 const previewContainer = document.getElementById('character-preview-container');
                 if (previewImage) previewImage.src = imagePath;
-                if (previewContainer) previewContainer.style.display = 'block';
+                if (previewContainer) previewContainer.classList.remove('empty');
 
                 showToast(`Immagine di default per ${selectedCharName} selezionata.`);
                 
-                // Pulisce l'input file per evitare conflitti
                 const splashartInput = document.getElementById('splashart');
                 if(splashartInput) splashartInput.value = '';
             }
@@ -678,9 +679,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const previewImage = document.getElementById('character-preview-image');
                     const previewContainer = document.getElementById('character-preview-container');
                     if (previewImage) previewImage.src = event.target.result;
-                    if (previewContainer) previewContainer.style.display = 'block';
+                    if (previewContainer) previewContainer.classList.remove('empty');
                     
-                    // Pulisce il valore dell'immagine di default se si carica un file
                     if (defaultImagePathInput) defaultImagePathInput.value = '';
                 }
                 reader.readAsDataURL(file);

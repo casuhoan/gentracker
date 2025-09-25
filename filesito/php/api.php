@@ -603,40 +603,62 @@ function register() {
 }
 
 function sync_library() {
-    $src = __DIR__ . '/../librarydata';
-    $dst = __DIR__ . '/../data';
+    $src_dir = __DIR__ . '/../librarydata';
+    $dst_dir = __DIR__ . '/../data';
 
-    if (!is_dir($src)) {
+    if (!is_dir($src_dir)) {
         echo json_encode(['status' => 'error', 'message' => 'La cartella di origine (librarydata) non esiste.']);
         return;
     }
+    if (!is_dir($dst_dir)) mkdir($dst_dir, 0777, true);
 
-    if (!is_dir($dst)) {
-        mkdir($dst, 0777, true);
+    // 1. Unione intelligente del file characters_list.json
+    $src_json_file = $src_dir . '/characters_list.json';
+    $dst_json_file = $dst_dir . '/characters_list.json';
+
+    $src_list = file_exists($src_json_file) ? json_decode(file_get_contents($src_json_file), true) : [];
+    $dst_list = file_exists($dst_json_file) ? json_decode(file_get_contents($dst_json_file), true) : [];
+
+    if (!is_array($src_list)) $src_list = [];
+    if (!is_array($dst_list)) $dst_list = [];
+
+    $merged_chars = [];
+    foreach (array_merge($dst_list, $src_list) as $char) {
+        if (isset($char['nome'])) {
+            $merged_chars[$char['nome']] = $char; // Usa il nome come chiave per eliminare duplicati
+        }
     }
 
-    function recursive_copy($src, $dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                if ( is_dir($src . '/' . $file) ) {
-                    recursive_copy($src . '/' . $file,$dst . '/' . $file);
-                } else {
-                    copy($src . '/' . $file, $dst . '/' . $file);
-                } 
+    $final_list = array_values($merged_chars); // Riconverte in un array indicizzato
+    usort($final_list, function($a, $b) {
+        return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
+    });
+
+    // Salva la lista unificata in entrambe le posizioni per mantenerle allineate
+    file_put_contents($dst_json_file, json_encode($final_list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    file_put_contents($src_json_file, json_encode($final_list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // 2. Copia incrementale dei file immagine
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($src_dir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    foreach ($iterator as $item) {
+        $dest_item_path = $dst_dir . '/' . $iterator->getSubPathName();
+        if ($item->isDir()) {
+            if (!is_dir($dest_item_path)) {
+                mkdir($dest_item_path, 0777, true);
+            }
+        } else {
+            // Copia solo se il file non è il JSON che abbiamo già gestito
+            if ($item->getFilename() !== 'characters_list.json') {
+                copy($item, $dest_item_path);
             }
         }
-        closedir($dir);
     }
 
-    try {
-        recursive_copy($src, $dst);
-        echo json_encode(['status' => 'success', 'message' => 'Sincronizzazione completata con successo.']);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Errore durante la sincronizzazione: ' . $e->getMessage()]);
-    }
+    echo json_encode(['status' => 'success', 'message' => 'Sincronizzazione incrementale completata con successo.']);
 }
 
 function add_character_to_library() {
