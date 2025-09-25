@@ -174,7 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const showView = (viewId) => {
         views.forEach(view => view.classList.remove('active'));
         const activeView = document.getElementById(viewId);
-        if (activeView) activeView.classList.add('active');
+        if (activeView) {
+            activeView.classList.add('active');
+            // Se la vista è quella di creazione personaggio, aggiusta il quadrato
+            if (viewId === 'character-creation-view') {
+                adjustPreviewSquare();
+            }
+        }
     };
 
     const handleRouteChange = async () => {
@@ -1092,8 +1098,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Aggiusta al caricamento (con un breve ritardo per permettere il rendering) e al resize
-        setTimeout(adjustPreviewSquare, 50);
+        // Aggiusta al resize
         window.addEventListener('resize', adjustPreviewSquare);
     };
 
