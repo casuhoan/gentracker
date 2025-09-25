@@ -177,13 +177,14 @@
         <!-- Sezione per creare un nuovo personaggio -->
         <div id="character-creation-view" class="view">
             <h2 id="character-form-title">Crea Personaggio</h2>
-            <p class="text-muted">Crea una nuova scheda personaggio o modifica una esistente selezionandola dalla galleria.</p>
             <form id="character-form" enctype="multipart/form-data">
                 <input type="hidden" name="original_name" id="original_name">
                 <input type="hidden" name="default_image_path" id="default_image_path">
-                <div class="row">
-                    <!-- Colonna sinistra per input -->
+                
+                <div class="row mb-3">
+                    <!-- Colonna sinistra per input e descrizione -->
                     <div class="col-md-7">
+                        <p class="text-muted">Seleziona un personaggio dalla libreria per iniziare, o inserisci manualmente i dati per un nuovo personaggio non presente nell'elenco.</p>
                         <div class="mb-3">
                             <label for="character-library-select" class="form-label">Seleziona Personaggio dalla Libreria</label>
                             <select class="form-select" id="character-library-select"></select>
@@ -194,13 +195,14 @@
                         </div>
                     </div>
                     <!-- Colonna destra per anteprima -->
-                    <div class="col-md-5">
-                        <div id="character-preview-container" class="preview-placeholder empty">
+                    <div class="col-md-5 d-flex">
+                        <div id="character-preview-container" class="preview-placeholder empty w-100">
                             <img id="character-preview-image" src="" alt="Character Preview">
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 mt-3">
+
+                <div class="mb-3">
                     <label for="splashart" class="form-label">Carica Splashart (Opzionale)</label>
                     <div class="input-group">
                         <input type="file" class="form-control" id="splashart" name="splashart" accept="image/*">
