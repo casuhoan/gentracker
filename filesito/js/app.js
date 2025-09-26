@@ -703,6 +703,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Listener per la nuova barra di ricerca della libreria
+    const libraryCharSearch = document.getElementById('library-char-search');
+    if (libraryCharSearch) {
+        libraryCharSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#library-character-table-body tr');
+            tableRows.forEach(row => {
+                const charName = row.querySelector('td').textContent.toLowerCase();
+                if (charName.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
     const compareSelect1 = document.getElementById('compare-select-1');
     if(compareSelect1) {
         compareSelect1.addEventListener('change', () => {
