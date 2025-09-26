@@ -215,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 '#manage-builds': 'build-management-view',
                 '#user-management': 'user-management-view',
                 '#settings': 'settings-view',
-                '#add-library-character': 'library-character-creation-view',
             };
             const viewId = routeMap[hash] || 'gallery-view';
             showView(viewId);
@@ -525,11 +524,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadSettingsPage = () => {
         if (!currentUser || !settingsForm) return;
-        document.getElementById('settings-original-username').value = currentUser.username;
-        document.getElementById('settings-username').value = currentUser.username;
-        document.getElementById('settings-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
-        document.getElementById('settings-password').value = '';
-        document.getElementById('settings-password-confirm').value = '';
+        // Gestione form separati
+        const profileForm = document.getElementById('settings-form');
+        if(profileForm) {
+            document.getElementById('settings-original-username').value = currentUser.username;
+            document.getElementById('settings-username').value = currentUser.username;
+            document.getElementById('settings-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
+        }
+        const passwordForm = document.getElementById('password-form');
+        if(passwordForm) passwordForm.reset();
         
         const currentTheme = localStorage.getItem('theme') || 'light';
         const themeRadio = document.getElementById(`theme-${currentTheme}`);
@@ -537,10 +540,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isAdmin) {
             if(syncLibraryBtn) syncLibraryBtn.classList.remove('d-none');
-            const addLibCharBtn = document.getElementById('v-pills-add-lib-char-tab');
-            if(addLibCharBtn) addLibCharBtn.classList.remove('d-none');
+            const libraryTab = document.getElementById('v-pills-library-tab');
+            if(libraryTab) libraryTab.classList.remove('d-none');
         }
     };
+
+    const loadLibraryManagement = async () => {
+        try {
+            const response = await fetch('data/characters_list.json');
+            if (!response.ok) throw new Error('Errore di rete');
+            const library = await response.json();
+            const tableBody = document.getElementById('library-character-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            library.forEach(char => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${char.nome}</td>
+                    <td><img src="data/${char.immagine}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-primary btn-edit-lib-char" data-char-name="${encodeURIComponent(char.nome)}">Modifica</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            showErrorAlert('Impossibile caricare la libreria dei personaggi.');
+            console.error(error);
+        }
+    };
+
+    // Listener per mostrare la tab di gestione libreria
+    const libraryTab = document.getElementById('v-pills-library-tab');
+    if (libraryTab) {
+        libraryTab.addEventListener('shown.bs.tab', loadLibraryManagement);
+    }
+
+    // Listener per i click sulla tabella della libreria
+    const libraryTableBody = document.getElementById('library-character-table-body');
+    if (libraryTableBody) {
+        libraryTableBody.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('btn-edit-lib-char')) {
+                const charName = decodeURIComponent(e.target.dataset.charName);
+                
+                // Carica i dati aggiornati prima di modificare
+                const response = await fetch('data/characters_list.json');
+                const library = await response.json();
+                const charData = library.find(c => c.nome === charName);
+
+                if (charData) {
+                    document.getElementById('edit-library-original-name').value = charData.nome;
+                    document.getElementById('edit-library-char-name').value = charData.nome;
+                    document.getElementById('edit-library-current-image').src = `data/${charData.immagine}`;
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('edit-library-character-modal'));
+                    modal.show();
+                }
+            }
+        });
+    }
+
+    // Listener per il submit del form di modifica personaggio libreria
+    const editLibraryCharacterForm = document.getElementById('edit-library-character-form');
+    if (editLibraryCharacterForm) {
+        editLibraryCharacterForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(editLibraryCharacterForm);
+            formData.append('action', 'update_library_character');
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    const modal = bootstrap.Modal.getInstance(editLibraryCharacterForm.closest('.modal'));
+                    modal.hide();
+                    loadLibraryManagement(); // Ricarica la tabella
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        };
+    }
 
     // --- EVENT LISTENERS ---
     if (document.getElementById('back-to-gallery-btn')) {
@@ -617,6 +700,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!charName) { buildListContainer.innerHTML = ''; return; }
             currentCharacterData = sourceCharacterData.find(c => c.profile.name === charName);
             renderBuildList(currentCharacterData);
+        });
+    }
+
+    const compareSelect1 = document.getElementById('compare-select-1');
+    if(compareSelect1) {
+        compareSelect1.addEventListener('change', () => {
+            displayBuild(1, compareSelect1.value);
+        });
+    }
+
+    const compareSelect2 = document.getElementById('compare-select-2');
+    if(compareSelect2) {
+        compareSelect2.addEventListener('change', () => {
+            displayBuild(2, compareSelect2.value);
         });
     }
 

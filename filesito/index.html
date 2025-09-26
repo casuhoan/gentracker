@@ -99,23 +99,23 @@
         <!-- Sezione Impostazioni -->
         <div id="settings-view" class="view">
             <h2>Impostazioni</h2>
-            <form id="settings-form" enctype="multipart/form-data">
-                <div class="row">
-                    <!-- Menu Laterale -->
-                    <div class="col-md-3">
-                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">Modifica Profilo</a>
-                            <a class="nav-link" id="v-pills-auth-tab" data-bs-toggle="pill" href="#v-pills-auth" role="tab" aria-controls="v-pills-auth" aria-selected="false">Autenticazione</a>
-                            <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false">Aspetto</a>
-                            <a class="nav-link d-none" id="v-pills-sync-tab" href="#"><i class="bi bi-arrow-repeat me-2"></i>Sincronizza Libreria</a>
-                            <a class="nav-link d-none" id="v-pills-add-lib-char-tab" href="#add-library-character"><i class="bi bi-plus-circle-dotted me-2"></i>Aggiungi Personaggio a Libreria</a>
-                        </div>
+            <div class="row">
+                <!-- Menu Laterale -->
+                <div class="col-md-3">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true">Modifica Profilo</a>
+                        <a class="nav-link" id="v-pills-auth-tab" data-bs-toggle="pill" href="#v-pills-auth" role="tab" aria-controls="v-pills-auth" aria-selected="false">Autenticazione</a>
+                        <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false">Aspetto</a>
+                        <a class="nav-link d-none" id="v-pills-sync-tab" href="#"><i class="bi bi-arrow-repeat me-2"></i>Sincronizza Libreria</a>
+                        <a class="nav-link d-none" id="v-pills-library-tab" data-bs-toggle="pill" href="#v-pills-library" role="tab" aria-controls="v-pills-library" aria-selected="false"><i class="bi bi-book-half me-2"></i>Gestione Libreria</a>
                     </div>
-                    <!-- Contenuto delle schede -->
-                    <div class="col-md-9">
-                        <div class="tab-content card card-body" id="v-pills-tabContent">
-                            <!-- Pannello Modifica Profilo -->
-                            <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                </div>
+                <!-- Contenuto delle schede -->
+                <div class="col-md-9">
+                    <div class="tab-content card card-body" id="v-pills-tabContent">
+                        <!-- Pannello Modifica Profilo -->
+                        <div class="tab-pane fade show active" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                            <form id="settings-form" enctype="multipart/form-data">
                                 <input type="hidden" id="settings-original-username" name="original_username">
                                 <div class="text-center mb-4">
                                     <img id="settings-avatar-preview" src="uploads/default_avatar.png" alt="Avatar Preview" class="rounded-circle mb-2">
@@ -128,10 +128,15 @@
                                     <label for="settings-username" class="form-label">Username</label>
                                     <input type="text" class="form-control" id="settings-username" name="username" required>
                                 </div>
-                            </div>
-                            <!-- Pannello Autenticazione -->
-                            <div class="tab-pane fade" id="v-pills-auth" role="tabpanel" aria-labelledby="v-pills-auth-tab">
-                                <h4>Aggiornamento Password</h4>
+                                <div class="mt-4 text-end">
+                                    <button type="submit" class="btn btn-primary">Salva Impostazioni Profilo</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Pannello Autenticazione -->
+                        <div class="tab-pane fade" id="v-pills-auth" role="tabpanel" aria-labelledby="v-pills-auth-tab">
+                            <h4>Aggiornamento Password</h4>
+                            <form id="password-form">
                                 <div class="mb-3">
                                     <label for="settings-password" class="form-label">Nuova Password</label>
                                     <input type="password" class="form-control" id="settings-password" name="password" placeholder="Lascia vuoto per non cambiare">
@@ -140,42 +145,61 @@
                                     <label for="settings-password-confirm" class="form-label">Conferma Nuova Password</label>
                                     <input type="password" class="form-control" id="settings-password-confirm" placeholder="Riscrivi la nuova password">
                                 </div>
+                                <div class="mt-4 text-end">
+                                    <button type="submit" class="btn btn-primary">Aggiorna Password</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Pannello Aspetto -->
+                        <div class="tab-pane fade" id="v-pills-appearance" role="tabpanel" aria-labelledby="v-pills-appearance-tab">
+                            <h4>Tema</h4>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="theme-radios" id="theme-light" value="light">
+                                <label class="form-check-label" for="theme-light">Chiaro</label>
                             </div>
-                            <!-- Pannello Aspetto -->
-                            <div class="tab-pane fade" id="v-pills-appearance" role="tabpanel" aria-labelledby="v-pills-appearance-tab">
-                                <h4>Tema</h4>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="theme-radios" id="theme-light" value="light">
-                                    <label class="form-check-label" for="theme-light">Chiaro</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="theme-radios" id="theme-dark" value="dark">
-                                    <label class="form-check-label" for="theme-dark">Scuro</label>
-                                </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="theme-radios" id="theme-dark" value="dark">
+                                <label class="form-check-label" for="theme-dark">Scuro</label>
                             </div>
                         </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-primary">Salva Impostazioni</button>
+                        <!-- Pannello Gestione Libreria -->
+                        <div class="tab-pane fade" id="v-pills-library" role="tabpanel" aria-labelledby="v-pills-library-tab">
+                            <h4>Aggiungi Personaggio alla Libreria</h4>
+                            <form id="library-character-form" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="library-char-name" class="form-label">Nome Personaggio</label>
+                                    <input type="text" class="form-control" id="library-char-name" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="library-char-image" class="form-label">Immagine (Splashart)</label>
+                                    <input type="file" class="form-control" id="library-char-image" name="splashart" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Aggiungi alla Libreria</button>
+                            </form>
+                            <hr class="my-4">
+                            <h4>Personaggi Esistenti</h4>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Immagine</th>
+                                            <th class="text-end">Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="library-character-table-body">
+                                        <!-- Contenuto generato da JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
 
-        <!-- Sezione per aggiungere un personaggio alla libreria -->
-        <div id="library-character-creation-view" class="view">
-            <h2>Aggiungi Personaggio alla Libreria</h2>
-            <form id="library-character-form" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="library-char-name" class="form-label">Nome Personaggio</label>
-                    <input type="text" class="form-control" id="library-char-name" name="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="library-char-image" class="form-label">Immagine (Splashart)</label>
-                    <input type="file" class="form-control" id="library-char-image" name="splashart" accept="image/*" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Aggiungi alla Libreria</button>
-            </form>
+        <!-- Sezione per aggiungere un personaggio alla libreria (OBSOLETA) -->
+        <div id="library-character-creation-view" class="view d-none">
         </div>
 
         <!-- Sezione per creare un nuovo personaggio -->
@@ -577,6 +601,37 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
                         <button type="submit" class="btn btn-success">Aggiungi Utente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale per Modifica Personaggio Libreria -->
+    <div class="modal fade" id="edit-library-character-modal" tabindex="-1" aria-labelledby="editLibCharModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editLibCharModalLabel">Modifica Personaggio della Libreria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="edit-library-character-form" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="edit-library-original-name" name="original_name">
+                        <div class="mb-3">
+                            <label for="edit-library-char-name" class="form-label">Nuovo Nome</label>
+                            <input type="text" class="form-control" id="edit-library-char-name" name="new_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-library-char-image" class="form-label">Nuova Immagine (Opzionale)</label>
+                            <input class="form-control" type="file" id="edit-library-char-image" name="new_image" accept="image/*">
+                            <small class="form-text text-muted">Carica solo se vuoi sostituire l'immagine corrente.</small>
+                        </div>
+                        <img id="edit-library-current-image" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
                     </div>
                 </form>
             </div>

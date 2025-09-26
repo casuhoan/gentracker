@@ -726,13 +726,92 @@ function add_character_to_library() {
     }
 }
 
+function update_library_character() {
+    $original_name = $_POST['original_name'] ?? '';
+    $new_name = $_POST['new_name'] ?? '';
+
+    if (empty($original_name) || empty($new_name)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'I nomi del personaggio sono obbligatori.']);
+        return;
+    }
+
+    $library_file = __DIR__ . '/../data/characters_list.json';
+    if (!file_exists($library_file)) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'File della libreria non trovato.']);
+        return;
+    }
+
+    $library = json_decode(file_get_contents($library_file), true);
+    if (!is_array($library)) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'File della libreria corrotto.']);
+        return;
+    }
+
+    $char_index = -1;
+    $old_image_name = '';
+    foreach ($library as $index => $char) {
+        if ($char['nome'] === $original_name) {
+            $char_index = $index;
+            $old_image_name = $char['immagine'];
+            break;
+        }
+    }
+
+    if ($char_index === -1) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato nella libreria.']);
+        return;
+    }
+
+    // Aggiorna il nome
+    $library[$char_index]['nome'] = $new_name;
+
+    // Gestisce la nuova immagine, se fornita
+    if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 0) {
+        $upload_dir = __DIR__ . '/../data/';
+        
+        // Cancella la vecchia immagine
+        if (!empty($old_image_name) && file_exists($upload_dir . $old_image_name)) {
+            unlink($upload_dir . $old_image_name);
+        }
+
+        // Carica la nuova immagine
+        $safe_char_name = str_replace(' ', '_', $new_name);
+        $new_file_name = 'Character_' . $safe_char_name . '_Full_Wish.webp';
+        $target_file = $upload_dir . $new_file_name;
+
+        if (move_uploaded_file($_FILES['new_image']['tmp_name'], $target_file)) {
+            $library[$char_index]['immagine'] = $new_file_name;
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Errore nel caricamento della nuova immagine.']);
+            return;
+        }
+    }
+
+    // Riordina la libreria e salva
+    usort($library, function($a, $b) {
+        return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
+    });
+
+    if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        echo json_encode(['status' => 'success', 'message' => 'Personaggio della libreria aggiornato con successo!']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria aggiornato.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character'];
 
 if (in_array($action, $public_actions)) {
     $action();
