@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let dataLoaded = false;
     let currentUser = null;
     let isAdmin = false;
-    let isNavigatingToEdit = false; // Flag to handle character edit navigation
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
@@ -207,6 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 location.hash = '#';
             }
+        } else if (hash.startsWith('#edit-character/')) {
+            const charName = decodeURIComponent(hash.substring(16));
+            const charData = sourceCharacterData.find(c => c.profile.name === charName);
+            if (charData) {
+                loadCharacterEditPage(charData);
+            } else {
+                location.hash = '#';
+            }
         } else {
             const routeMap = {
                 '#': 'gallery-view',
@@ -220,13 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showView(viewId);
 
             if (viewId === 'gallery-view') applyFiltersAndSorting();
-            if (viewId === 'character-creation-view') {
-                if (isNavigatingToEdit) {
-                    isNavigatingToEdit = false;
-                } else {
-                    resetCharacterForm();
-                }
-            }
+            if (viewId === 'character-creation-view') resetCharacterForm();
             if (viewId === 'build-logger-view') loadCharactersForBuildLogger();
             if (viewId === 'build-management-view') loadBuildManagement();
             if (viewId === 'user-management-view') loadUserManagement();
@@ -404,17 +405,26 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = html;
     };
 
-    // --- ALTRE SEZIONI (Creazione, Build, Gestione) ---
-    const populateCharacterFormForEdit = (charData) => {
-        if (!characterForm) return;
-        const profile = charData.profile;
-        characterForm.reset();
-        document.getElementById('character-form-title').textContent = `Modifica ${profile.name}`;
-        document.getElementById('original_name').value = profile.name;
-        document.getElementById('name').value = profile.name;
+    const loadCharacterEditPage = (charData) => {
+        showView('character-edit-view');
+        const form = document.getElementById('character-edit-form');
+        if (!form) return;
 
-        const previewContainer = document.getElementById('character-preview-container');
-        const previewImage = document.getElementById('character-preview-image');
+        const profile = charData.profile;
+        form.reset();
+
+        // Popola i campi base
+        document.getElementById('edit-char-title-name').textContent = profile.name;
+        document.getElementById('edit-original-name').value = profile.name;
+        document.getElementById('edit-name').value = profile.name;
+        
+        // Trova il nome base del personaggio dalla libreria per l'immagine di default
+        const baseChar = characterLibrary.find(c => profile.name.includes(c.nome));
+        document.getElementById('edit-base-char-name').value = baseChar ? baseChar.nome : profile.name;
+
+        // Gestione preview immagine
+        const previewContainer = document.getElementById('character-edit-preview-container');
+        const previewImage = document.getElementById('character-edit-preview-image');
         if (profile.splashart && profile.splashart !== '') {
             previewImage.src = profile.splashart;
             previewContainer.classList.remove('empty');
@@ -422,42 +432,38 @@ document.addEventListener('DOMContentLoaded', () => {
             previewImage.src = '';
             previewContainer.classList.add('empty');
         }
-        
-        if (characterLibrarySelect) {
-            characterLibrarySelect.disabled = true;
-        }
 
-        document.getElementById('element').value = profile.element;
-        document.getElementById('acquisition_date').value = profile.acquisition_date;
-        document.getElementById('constellation').value = profile.constellation;
-        document.getElementById('signature_weapon').value = profile.signature_weapon;
-        document.getElementById('talents').value = profile.talents;
-        const rarityRadio = document.querySelector(`input[name="rarity"][value="${profile.rarity || '5-star'}"]`);
+        // Popola i select e i radio/checkbox
+        document.getElementById('edit-element').value = profile.element;
+        document.getElementById('edit-acquisition_date').value = profile.acquisition_date;
+        document.getElementById('edit-constellation').value = profile.constellation;
+        document.getElementById('edit-signature_weapon').value = profile.signature_weapon;
+        document.getElementById('edit-talents').value = profile.talents;
+        const rarityRadio = document.querySelector(`#edit-rarity-radios input[value="${profile.rarity || '5-star'}"]`);
         if (rarityRadio) rarityRadio.checked = true;
-        document.querySelectorAll('#role-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
-        profile.role.forEach(roleValue => {
-            const checkbox = document.querySelector(`#role-checkboxes input[value="${roleValue}"]`);
-            if (checkbox) checkbox.checked = true;
-        });
-        document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
-        profile.tracked_stats.forEach(statValue => {
-            const checkbox = document.querySelector(`#stats-checkboxes input[value="${statValue}"]`);
-            if (checkbox) checkbox.checked = true;
-        });
-        document.getElementById('ideal-stats-inputs').innerHTML = ''; // Clear and repopulate
+
+        document.querySelectorAll('#edit-role-checkboxes input').forEach(cb => cb.checked = profile.role.includes(cb.value));
+        document.querySelectorAll('#edit-stats-checkboxes input').forEach(cb => cb.checked = profile.tracked_stats.includes(cb.value));
+
+        // Popola stats ideali
+        const idealStatsContainer = document.getElementById('edit-ideal-stats-inputs');
+        idealStatsContainer.innerHTML = '';
         profile.tracked_stats.forEach(stat => {
             const statId = createSafeId(stat);
             const idealValue = profile.ideal_stats[stat] || '';
-            document.getElementById('ideal-stats-inputs').innerHTML += `
+            idealStatsContainer.innerHTML += `
                 <div class="col-md-4 mb-3">
-                    <label for="ideal-${statId}" class="form-label">Ideal ${stat}</label>
-                    <input type="number" step="0.1" class="form-control" id="ideal-${statId}" name="ideal_stats[${stat}]" value="${idealValue}">
+                    <label for="ideal-edit-${statId}" class="form-label">Ideal ${stat}</label>
+                    <input type="number" step="0.1" class="form-control" id="ideal-edit-${statId}" name="ideal_stats[${stat}]" value="${idealValue}">
                 </div>`;
         });
-        characterForm.querySelector('button[type="submit"]').textContent = 'Salva Modifiche';
-        document.getElementById('delete-character-btn').style.display = 'inline-block';
+
+        // Associa il pulsante di cancellazione
+        const deleteBtn = document.getElementById('delete-character-btn');
+        deleteBtn.onclick = () => handleDeleteCharacter(profile.name);
     };
 
+    // --- ALTRE SEZIONI (Creazione, Build, Gestione) ---
     const resetCharacterForm = () => {
         if (!characterForm) return;
         characterForm.reset();
@@ -634,9 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-character-btn').addEventListener('click', (e) => {
             e.preventDefault();
             if (currentCharacterData) {
-                isNavigatingToEdit = true; // Set flag before changing hash
-                populateCharacterFormForEdit(currentCharacterData);
-                location.hash = '#new-character';
+                location.hash = `#edit-character/${encodeURIComponent(currentCharacterData.profile.name)}`;
             }
         });
     }
@@ -890,19 +894,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
 
             const submitButton = characterForm.querySelector('button[type="submit"]');
-            const originalName = document.getElementById('original_name').value;
-            const isEditing = originalName !== '';
+            const isEditing = false; // Semplificato, questo form è solo per la creazione
 
             // Logica soprannome obbligatorio
-            if (!isEditing) {
-                const baseName = characterLibrarySelect.value;
-                const customName = document.getElementById('name').value;
-                const characterExists = sourceCharacterData.some(char => char.profile.name === baseName);
+            const baseName = characterLibrarySelect.value;
+            const customName = document.getElementById('name').value;
+            const characterExists = sourceCharacterData.some(char => char.profile.name === baseName);
 
-                if (characterExists && baseName === customName) {
-                    showErrorAlert('Esiste già un personaggio con questo nome. Fornisci un soprannome unico nel campo "Nome Personalizzato".');
-                    return; // Interrompe il salvataggio
-                }
+            if (characterExists && baseName === customName) {
+                showErrorAlert('Esiste già un personaggio con questo nome. Fornisci un soprannome unico nel campo "Nome Personalizzato".');
+                return; // Interrompe il salvataggio
             }
 
             submitButton.disabled = true;
@@ -910,15 +911,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const formData = new FormData(characterForm);
-                formData.append('action', isEditing ? 'update_character' : 'save_character');
+                formData.append('action', 'save_character');
                 const response = await fetch('php/api.php', { method: 'POST', body: formData });
                 if (!response.ok) throw new Error(`Errore del server: ${response.statusText}`);
                 const result = await response.json();
                 if (result.status === 'success') {
                     showToast(result.message);
                     dataLoaded = false;
-                    const newName = formData.get('name');
-                    location.hash = isEditing ? `#character/${encodeURIComponent(newName)}` : '#';
+                    location.hash = '#';
                 } else { 
                     showErrorAlert(result.message); 
                 }
@@ -926,9 +926,72 @@ document.addEventListener('DOMContentLoaded', () => {
                 showErrorAlert('Impossibile comunicare con il server.');
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = isEditing ? 'Salva Modifiche' : 'Salva Personaggio';
+                submitButton.textContent = 'Salva Personaggio';
             }
         };
+    }
+
+    // Listener per il form di MODIFICA
+    const characterEditForm = document.getElementById('character-edit-form');
+    if (characterEditForm) {
+        characterEditForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const submitButton = characterEditForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio in corso...';
+
+            try {
+                const formData = new FormData(characterEditForm);
+                formData.append('action', 'update_character');
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    dataLoaded = false; // Forza il ricaricamento dei dati
+                    location.hash = `#character/${encodeURIComponent(formData.get('name'))}`;
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva Modifiche';
+            }
+        };
+    }
+
+    // Listener per i pulsanti delle immagini nel form di MODIFICA
+    const editSplashartInput = document.getElementById('edit-splashart');
+    if (editSplashartInput) {
+        editSplashartInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('character-edit-preview-image').src = event.target.result;
+                    document.getElementById('character-edit-preview-container').classList.remove('empty');
+                    document.getElementById('edit-default-image-path').value = '';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    const editUseDefaultBtn = document.getElementById('edit-use-default-image-btn');
+    if (editUseDefaultBtn) {
+        editUseDefaultBtn.addEventListener('click', () => {
+            const baseCharName = document.getElementById('edit-base-char-name').value;
+            const characterFromLibrary = characterLibrary.find(c => c.nome === baseCharName);
+            if (characterFromLibrary) {
+                const imagePath = `data/${characterFromLibrary.immagine}`;
+                document.getElementById('edit-default-image-path').value = imagePath;
+                document.getElementById('character-edit-preview-image').src = imagePath;
+                document.getElementById('character-edit-preview-container').classList.remove('empty');
+                if(editSplashartInput) editSplashartInput.value = '';
+                showToast(`Immagine di default per ${baseCharName} impostata.`);
+            }
+        });
     }
 
     if (settingsForm) {

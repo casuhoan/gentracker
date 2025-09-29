@@ -222,13 +222,12 @@
         <div id="character-creation-view" class="view">
             <h2 id="character-form-title">Crea Personaggio</h2>
             <form id="character-form" enctype="multipart/form-data">
-                <input type="hidden" name="original_name" id="original_name">
                 <input type="hidden" name="default_image_path" id="default_image_path">
                 
                 <div class="row mb-3">
                     <!-- Colonna sinistra per input e descrizione -->
                     <div class="col-md-9" id="character-form-left-col">
-                        <p class="text-muted small">Usa questo modulo per aggiungere un nuovo personaggio al tuo roster o per modificare i dati di uno esistente. Seleziona un personaggio dalla libreria per compilare automaticamente i dati di base.</p>
+                        <p class="text-muted small">Usa questo modulo per aggiungere un nuovo personaggio al tuo roster. Seleziona un personaggio dalla libreria per compilare automaticamente i dati di base.</p>
                         <div class="mb-3">
                             <label for="character-library-select" class="form-label">Seleziona Personaggio dalla Libreria</label>
                             <select class="form-select" id="character-library-select"></select>
@@ -308,7 +307,93 @@
                 </div>
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary">Salva Personaggio</button>
-                    <button type="button" class="btn btn-danger" id="delete-character-btn" style="display: none;">Cancella Personaggio</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sezione per MODIFICARE un personaggio -->
+        <div id="character-edit-view" class="view">
+            <h2>Modifica Personaggio: <span id="edit-char-title-name" class="text-primary"></span></h2>
+            <form id="character-edit-form" enctype="multipart/form-data">
+                <input type="hidden" name="original_name" id="edit-original-name">
+                <input type="hidden" name="base_char_name" id="edit-base-char-name"> 
+                <input type="hidden" name="default_image_path" id="edit-default-image-path">
+
+                <div class="row mb-3">
+                    <div class="col-md-9" id="character-edit-left-col">
+                        <p class="text-muted small">Modifica i dati del tuo personaggio. Puoi cambiare il nome, l'immagine e tutte le altre statistiche associate.</p>
+                        <div class="mb-3">
+                            <label for="edit-name" class="form-label">Nome Personaggio</label>
+                            <input type="text" class="form-control" id="edit-name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div id="character-edit-preview-container" class="preview-placeholder empty">
+                            <img id="character-edit-preview-image" src="" alt="Character Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="edit-splashart" class="form-label">Carica Nuova Splashart (Opzionale)</label>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="edit-splashart" name="splashart" accept="image/*">
+                        <button class="btn btn-outline-secondary" type="button" id="edit-use-default-image-btn">Usa Default</button>
+                    </div>
+                </div>
+                <!-- Campi clonati dalla form di creazione -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="edit-element" class="form-label">Elemento</label>
+                        <select class="form-select" id="edit-element" name="element"></select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Rarità</label>
+                        <div id="edit-rarity-radios">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rarity" id="edit-rarity-4-star" value="4-star">
+                                <label class="form-check-label" for="edit-rarity-4-star">4 Stelle</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rarity" id="edit-rarity-5-star" value="5-star">
+                                <label class="form-check-label" for="edit-rarity-5-star">5 Stelle</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="edit-role" class="form-label">Ruolo/i</label>
+                        <div id="edit-role-checkboxes" class="mb-3"></div>
+                    </div>
+                </div>
+                <hr>
+                <h5>Statistiche da Tracciare</h5>
+                <div id="edit-stats-checkboxes" class="mb-3"></div>
+                <hr>
+                <h5>Statistiche Ideali</h5>
+                <div id="edit-ideal-stats-inputs" class="row"></div>
+                <hr>
+                <h5>Altre Informazioni</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="edit-acquisition_date" class="form-label">Data di Acquisizione</label>
+                        <input type="date" class="form-control" id="edit-acquisition_date" name="acquisition_date">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="edit-constellation" class="form-label">Costellazione (0-6)</label>
+                        <input type="number" class="form-control" id="edit-constellation" name="constellation" min="0" max="6">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="edit-signature_weapon" class="form-label">Signature Weapon</label>
+                        <select class="form-select" id="edit-signature_weapon" name="signature_weapon"></select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="edit-talents" class="form-label">Talenti</label>
+                        <select class="form-select" id="edit-talents" name="talents"></select>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                    <button type="button" class="btn btn-danger" id="delete-character-btn">Cancella Personaggio</button>
                 </div>
             </form>
         </div>
@@ -359,7 +444,10 @@
             <div id="gallery-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
                 <div class="col-lg-4 col-md-6">
                     <label for="name-filter" class="form-label">Filtra per Nome</label>
-                    <input type="search" id="name-filter" class="form-control" placeholder="Cerca personaggio...">
+                    <div class="search-input-container">
+                        <i class="bi bi-search"></i>
+                        <input type="search" id="name-filter" class="form-control" placeholder="Cerca personaggio...">
+                    </div>
                 </div>
                 <div class="col-lg-5 col-md-6">
                     <label class="form-label">Filtra per Elemento</label>
