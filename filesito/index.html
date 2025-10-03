@@ -22,9 +22,10 @@
             color: #6c757d;
             transition: background-color 0.2s, border-color 0.2s;
             overflow: hidden; 
+            margin-left: 20px;
         }
         .preview-placeholder.empty::before {
-            content: 'Anteprima Immagine';
+            content: '';
             font-style: italic;
         }
         .preview-placeholder img {
@@ -52,6 +53,12 @@
         }
         .search-input-container input {
             padding-left: 34px;
+        }
+        #stats-error-message {
+            color: #dc3545;
+        }
+        body.dark-mode #stats-error-message {
+            color: #f8d7da;
         }
     </style>
 </head>
@@ -240,7 +247,7 @@
                     <!-- Colonna destra per anteprima -->
                     <div class="col-md-3">
                         <div id="character-preview-container" class="preview-placeholder empty">
-                            <img id="character-preview-image" src="" alt="Character Preview">
+                            <img id="character-preview-image" src="">
                         </div>
                     </div>
                 </div>
@@ -280,6 +287,7 @@
                 <div id="stats-checkboxes" class="mb-3">
                     <!-- Checkbox generate da JS -->
                 </div>
+                <div id="stats-error-message" class="form-text text-danger mb-3" style="display: none;"></div>
                 <hr>
                 <h5>Statistiche Ideali</h5>
                 <div id="ideal-stats-inputs" class="row">

@@ -893,6 +893,17 @@ document.addEventListener('DOMContentLoaded', () => {
         characterForm.onsubmit = async (e) => {
             e.preventDefault();
 
+            const statsCheckboxes = characterForm.querySelectorAll('input[name="tracked_stats[]"]:checked');
+            const errorMessage = document.getElementById('stats-error-message');
+
+            if (statsCheckboxes.length === 0) {
+                errorMessage.textContent = 'Selezionare delle statistiche da tracciare.';
+                errorMessage.style.display = 'block';
+                return;
+            } else {
+                errorMessage.style.display = 'none';
+            }
+
             const submitButton = characterForm.querySelector('button[type="submit"]');
             const isEditing = false; // Semplificato, questo form è solo per la creazione
 
