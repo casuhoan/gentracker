@@ -473,7 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.src = '';
         if (previewContainer) previewContainer.classList.add('empty');
 
-        document.getElementById('original_name').value = '';
         document.getElementById('character-form-title').textContent = 'Crea Personaggio';
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
