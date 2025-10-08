@@ -99,6 +99,132 @@ function check_session() {
     }
 }
 
+// --- NEW BACKGROUND FUNCTIONS ---
+function get_backgrounds() {
+    $bg_dir = get_backgrounds_dir();
+    if (!is_dir($bg_dir)) {
+        mkdir($bg_dir, 0777, true);
+    }
+    $files = glob($bg_dir . '*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+    $backgrounds = [];
+    foreach ($files as $file) {
+        $backgrounds[] = basename($file);
+    }
+    echo json_encode(['status' => 'success', 'backgrounds' => $backgrounds]);
+}
+
+function upload_background() {
+    if (!isset($_FILES['background_image']) || $_FILES['background_image']['error'] != 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Nessun file caricato o errore nel caricamento.']);
+        return;
+    }
+
+    $bg_dir = get_backgrounds_dir();
+    if (!is_dir($bg_dir)) {
+        mkdir($bg_dir, 0777, true);
+    }
+
+    $file_name = basename($_FILES['background_image']['name']);
+    $target_file = $bg_dir . $file_name;
+
+    if (move_uploaded_file($_FILES['background_image']['tmp_name'], $target_file)) {
+        echo json_encode(['status' => 'success', 'message' => 'Sfondo caricato con successo.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Errore durante il salvataggio dello sfondo.']);
+    }
+}
+
+function delete_background() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $filename = $data['filename'] ?? '';
+
+    if (empty($filename)) {
+        echo json_encode(['status' => 'error', 'message' => 'Nome file non fornito.']);
+        return;
+    }
+
+    $file_path = get_backgrounds_dir() . $filename;
+
+    if (file_exists($file_path)) {
+        if (unlink($file_path)) {
+            echo json_encode(['status' => 'success', 'message' => 'Sfondo eliminato con successo.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Impossibile eliminare lo sfondo.']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Sfondo non trovato.']);
+    }
+}
+
+// --- NEW USER SCHEMA FUNCTIONS ---
+function get_user_schema() {
+    $schema_file = get_user_schema_file();
+    if (!file_exists($schema_file)) {
+        $default_schema = [
+            ['name' => 'username', 'default' => '', 'editable' => false],
+            ['name' => 'passwordHash', 'default' => '', 'editable' => false],
+            ['name' => 'role', 'default' => 'user', 'editable' => true],
+            ['name' => 'avatar', 'default' => '', 'editable' => true],
+            ['name' => 'background', 'default' => 'disattivato', 'editable' => true]
+        ];
+        file_put_contents($schema_file, json_encode($default_schema, JSON_PRETTY_PRINT));
+        echo json_encode($default_schema);
+    } else {
+        echo file_get_contents($schema_file);
+    }
+}
+
+function save_user_schema() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $schema = $data['schema'] ?? null;
+
+    if ($schema === null) {
+        echo json_encode(['status' => 'error', 'message' => 'Nessun dato dello schema ricevuto.']);
+        return;
+    }
+
+    if (file_put_contents(get_user_schema_file(), json_encode($schema, JSON_PRETTY_PRINT))) {
+        echo json_encode(['status' => 'success', 'message' => 'Schema utente salvato con successo.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare lo schema utente.']);
+    }
+}
+
+function enforce_user_schema() {
+    $schema_file = get_user_schema_file();
+    $users_file = get_users_file();
+
+    if (!file_exists($schema_file)) {
+        get_user_schema(); // This will create the default schema if it's missing
+    }
+
+    $schema = json_decode(file_get_contents($schema_file), true);
+    $users = json_decode(file_get_contents($users_file), true);
+    $changes_made = false;
+
+    if (!is_array($users)) $users = [];
+    if (!is_array($schema)) $schema = [];
+
+    foreach ($users as &$user) {
+        foreach ($schema as $field) {
+            if (!isset($user[$field['name']])) {
+                $user[$field['name']] = $field['default'];
+                $changes_made = true;
+            }
+        }
+    }
+
+    if ($changes_made) {
+        if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT))) {
+            echo json_encode(['status' => 'success', 'message' => 'Sincronizzazione utenti completata.']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il salvataggio del file utenti.']);
+        }
+    } else {
+        echo json_encode(['status' => 'success', 'message' => 'Nessuna modifica necessaria, gli utenti sono già sincronizzati.']);
+    }
+}
+
 // --- CHARACTER DATA FUNCTIONS ---
 function get_all_characters() {
     $data_dir = get_user_data_dir();
