@@ -128,6 +128,8 @@
                         <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false"><i class="bi bi-palette-fill me-2"></i>Aspetto</a>
                         <a class="nav-link d-none" id="v-pills-sync-tab" href="#"><i class="bi bi-arrow-repeat me-2"></i>Sincronizza Libreria</a>
                         <a class="nav-link d-none" id="v-pills-library-tab" data-bs-toggle="pill" href="#v-pills-library" role="tab" aria-controls="v-pills-library" aria-selected="false"><i class="bi bi-book-half me-2"></i>Gestione Libreria</a>
+                        <a class="nav-link d-none" id="v-pills-backgrounds-tab" data-bs-toggle="pill" href="#v-pills-backgrounds" role="tab" aria-controls="v-pills-backgrounds" aria-selected="false"><i class="bi bi-images me-2"></i>Gestione Sfondi</a>
+                        <a class="nav-link d-none" id="v-pills-schema-tab" data-bs-toggle="pill" href="#v-pills-schema" role="tab" aria-controls="v-pills-schema" aria-selected="false"><i class="bi bi-diagram-3-fill me-2"></i>Schema Utenti</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -181,6 +183,13 @@
                                 <input class="form-check-input" type="radio" name="theme-radios" id="theme-dark" value="dark">
                                 <label class="form-check-label" for="theme-dark">Scuro</label>
                             </div>
+                            <hr class="my-4">
+                            <h4>Sfondo Galleria</h4>
+                            <p class="text-muted small">Scegli uno sfondo personalizzato per la tua galleria personaggi.</p>
+                            <div id="background-selector-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 mb-3">
+                                <!-- Background thumbnails will be loaded here -->
+                            </div>
+                            <button class="btn btn-secondary" id="disable-background-btn">Nessuno Sfondo</button>
                         </div>
                         <!-- Pannello Gestione Libreria -->
                         <div class="tab-pane fade" id="v-pills-library" role="tabpanel" aria-labelledby="v-pills-library-tab">
@@ -214,6 +223,34 @@
                                         <!-- Contenuto generato da JS -->
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                        <!-- Pannello Gestione Sfondi -->
+                        <div class="tab-pane fade" id="v-pills-backgrounds" role="tabpanel" aria-labelledby="v-pills-backgrounds-tab">
+                            <h4>Gestione Sfondi Galleria</h4>
+                            <p class="text-muted small">Aggiungi o rimuovi immagini di sfondo per la galleria.</p>
+                            <form id="upload-background-form" class="mb-4">
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="background-upload-input" name="background_image" accept="image/*" required>
+                                    <button class="btn btn-primary" type="submit">Carica Sfondo</button>
+                                </div>
+                            </form>
+                            <div id="background-management-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+                                <!-- Admin background management grid -->
+                            </div>
+                        </div>
+                        <!-- Pannello Schema Utenti -->
+                        <div class="tab-pane fade" id="v-pills-schema" role="tabpanel" aria-labelledby="v-pills-schema-tab">
+                            <h4>Sincronizzazione Dati Utente</h4>
+                            <p class="text-muted small">Questo strumento assicura che tutti gli utenti abbiano gli stessi campi dati. Aggiungi o modifica i campi e i loro valori di default, poi avvia la sincronizzazione per applicare le modifiche a tutti i profili utente.</p>
+                            <div id="user-schema-container" class="mb-3">
+                                <!-- Schema fields will be loaded here -->
+                            </div>
+                            <button class="btn btn-outline-secondary" id="add-schema-field-btn"><i class="bi bi-plus-circle me-2"></i>Aggiungi Campo</button>
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-primary" id="save-schema-btn"><i class="bi bi-save me-2"></i>Salva Schema</button>
+                                <button class="btn btn-success" id="enforce-schema-btn"><i class="bi bi-arrow-repeat me-2"></i>Avvia Sincronizzazione</button>
                             </div>
                         </div>
                     </div>
@@ -298,7 +335,10 @@
                 <div class="row">
                     <div class="col-md-3 mb-3">
                         <label for="acquisition_date" class="form-label">Data di Acquisizione</label>
-                        <input type="date" class="form-control" id="acquisition_date" name="acquisition_date">
+                        <div class="input-group">
+                            <input type="date" class="form-control" id="acquisition_date" name="acquisition_date">
+                            <button class="btn btn-outline-secondary" type="button" id="set-today-acquisition">Oggi</button>
+                        </div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="constellation" class="form-label">Costellazione (0-6)</label>
@@ -418,7 +458,10 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="build-date" class="form-label">Data Registrazione</label>
-                        <input type="date" id="build-date" name="date" class="form-control" required>
+                        <div class="input-group">
+                            <input type="date" id="build-date" name="date" class="form-control" required>
+                            <button class="btn btn-outline-secondary" type="button" id="set-today-build">Oggi</button>
+                        </div>
                     </div>
                 </div>
                 <hr>

@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserManagementLink = document.getElementById('nav-user-management');
     const navUserAvatar = document.getElementById('nav-user-avatar');
     const themeToggle = document.getElementById('theme-toggle-checkbox');
-    // Nuovi elementi
     const characterLibrarySelect = document.getElementById('character-library-select');
     const useDefaultImageBtn = document.getElementById('use-default-image-btn');
     const defaultImagePathInput = document.getElementById('default_image_path');
@@ -418,11 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-original-name').value = profile.name;
         document.getElementById('edit-name').value = profile.name;
         
-        // Trova il nome base del personaggio dalla libreria per l'immagine di default
         const baseChar = characterLibrary.find(c => profile.name.includes(c.nome));
         document.getElementById('edit-base-char-name').value = baseChar ? baseChar.nome : profile.name;
 
-        // Gestione preview immagine
         const previewContainer = document.getElementById('character-edit-preview-container');
         const previewImage = document.getElementById('character-edit-preview-image');
         if (profile.splashart && profile.splashart !== '') {
@@ -433,7 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
             previewContainer.classList.add('empty');
         }
 
-        // Popola i select e i radio/checkbox
         document.getElementById('edit-element').value = profile.element;
         document.getElementById('edit-acquisition_date').value = profile.acquisition_date;
         document.getElementById('edit-constellation').value = profile.constellation;
@@ -445,7 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#edit-role-checkboxes input').forEach(cb => cb.checked = profile.role.includes(cb.value));
         document.querySelectorAll('#edit-stats-checkboxes input').forEach(cb => cb.checked = profile.tracked_stats.includes(cb.value));
 
-        // Popola stats ideali
         const idealStatsContainer = document.getElementById('edit-ideal-stats-inputs');
         idealStatsContainer.innerHTML = '';
         profile.tracked_stats.forEach(stat => {
@@ -458,7 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         });
 
-        // Associa il pulsante di cancellazione
         const deleteBtn = document.getElementById('delete-character-btn');
         deleteBtn.onclick = () => handleDeleteCharacter(profile.name);
     };
@@ -477,7 +471,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ideal-stats-inputs').innerHTML = '';
         document.querySelectorAll('#stats-checkboxes input[type=checkbox]').forEach(cb => cb.checked = false);
         characterForm.querySelector('button[type="submit"]').textContent = 'Salva Personaggio';
-        document.getElementById('delete-character-btn').style.display = 'none';
+        const deleteBtn = document.getElementById('delete-character-btn');
+        if(deleteBtn) {
+            deleteBtn.style.display = 'none';
+        }
         if (characterLibrarySelect) {
             characterLibrarySelect.disabled = false;
             characterLibrarySelect.selectedIndex = 0;
@@ -529,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadSettingsPage = () => {
         if (!currentUser || !settingsForm) return;
-        // Gestione form separati
+        
         const profileForm = document.getElementById('settings-form');
         if(profileForm) {
             document.getElementById('settings-original-username').value = currentUser.username;
@@ -545,10 +542,220 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (isAdmin) {
             if(syncLibraryBtn) syncLibraryBtn.classList.remove('d-none');
-            const libraryTab = document.getElementById('v-pills-library-tab');
-            if(libraryTab) libraryTab.classList.remove('d-none');
+            document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
         }
     };
+
+    async function loadBackgroundSelector() {
+        const response = await fetch('php/api.php?action=get_backgrounds');
+        const data = await response.json();
+        const grid = document.getElementById('background-selector-grid');
+        grid.innerHTML = '';
+        if (data.status === 'success') {
+            data.backgrounds.forEach(bg => {
+                const div = document.createElement('div');
+                div.className = 'col';
+                div.innerHTML = `<img src="data/backgrounds/${bg}" class="img-thumbnail" style="cursor:pointer;" data-bg="${bg}">`;
+                grid.appendChild(div);
+            });
+        }
+    }
+
+    document.getElementById('v-pills-appearance-tab').addEventListener('shown.bs.tab', loadBackgroundSelector);
+
+    async function loadBackgroundManagement() {
+        const response = await fetch('php/api.php?action=get_backgrounds');
+        const data = await response.json();
+        const grid = document.getElementById('background-management-grid');
+        grid.innerHTML = '';
+        if (data.status === 'success') {
+            data.backgrounds.forEach(bg => {
+                const div = document.createElement('div');
+                div.className = 'col';
+                div.innerHTML = `
+                    <div class="card">
+                        <img src="data/backgrounds/${bg}" class="card-img-top">
+                        <div class="card-body text-center">
+                            <button class="btn btn-sm btn-danger delete-background-btn" data-bg="${bg}">Elimina</button>
+                        </div>
+                    </div>`;
+                grid.appendChild(div);
+            });
+        }
+    }
+
+    async function loadUserSchema() {
+        const response = await fetch('php/api.php?action=get_user_schema');
+        const schema = await response.json();
+        const container = document.getElementById('user-schema-container');
+        container.innerHTML = '';
+        schema.forEach(field => {
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <span class="input-group-text">Campo</span>
+                <input type="text" class="form-control" placeholder="Nome Campo" value="${field.name}" ${!field.editable ? 'disabled' : ''}>
+                <span class="input-group-text">Default</span>
+                <input type="text" class="form-control" placeholder="Valore Default" value="${field.default}" ${!field.editable ? 'disabled' : ''}>
+                ${field.editable ? '<button class="btn btn-outline-danger remove-schema-field-btn">&times;</button>' : '<button class="btn btn-outline-secondary" disabled>&times;</button>'}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    document.getElementById('v-pills-backgrounds-tab')?.addEventListener('shown.bs.tab', loadBackgroundManagement);
+    document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
+
+    document.getElementById('background-selector-grid').addEventListener('click', async (e) => {
+        if (e.target.tagName === 'IMG') {
+            const bg = e.target.dataset.bg;
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('background', bg);
+            const response = await fetch('php/api.php', { method: 'POST', body: formData });
+            const result = await response.json();
+            if (result.status === 'success') {
+                showToast('Sfondo aggiornato!');
+                currentUser.background = bg;
+            } else {
+                showErrorAlert(result.message);
+            }
+        }
+    });
+
+    document.getElementById('disable-background-btn').addEventListener('click', async () => {
+        const formData = new FormData();
+        formData.append('action', 'update_user');
+        formData.append('original_username', currentUser.username);
+        formData.append('username', currentUser.username);
+        formData.append('background', 'disattivato');
+        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.status === 'success') {
+            showToast('Sfondo disattivato.');
+            currentUser.background = 'disattivato';
+        } else {
+            showErrorAlert(result.message);
+        }
+    });
+
+    document.getElementById('upload-background-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        formData.append('action', 'upload_background');
+        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.status === 'success') {
+            showToast(result.message);
+            loadBackgroundManagement();
+            e.target.reset();
+        } else {
+            showErrorAlert(result.message);
+        }
+    });
+
+    document.getElementById('background-management-grid')?.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-background-btn')) {
+            const filename = e.target.dataset.bg;
+            Swal.fire({
+                title: 'Sei sicuro?',
+                text: `Vuoi davvero eliminare lo sfondo ${filename}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonText: 'Annulla',
+                confirmButtonText: 'Sì, elimina!'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const response = await fetch('php/api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete_background', filename })
+                    });
+                    const res = await response.json();
+                    if (res.status === 'success') {
+                        showToast(res.message);
+                        loadBackgroundManagement();
+                    } else {
+                        showErrorAlert(res.message);
+                    }
+                }
+            });
+        }
+    });
+
+    document.getElementById('add-schema-field-btn')?.addEventListener('click', () => {
+        const container = document.getElementById('user-schema-container');
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+        div.innerHTML = `
+            <span class="input-group-text">Campo</span>
+            <input type="text" class="form-control" placeholder="Nome Campo">
+            <span class="input-group-text">Default</span>
+            <input type="text" class="form-control" placeholder="Valore Default">
+            <button class="btn btn-outline-danger remove-schema-field-btn">&times;</button>
+        `;
+        container.appendChild(div);
+    });
+
+    document.getElementById('user-schema-container')?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-schema-field-btn')) {
+            e.target.parentElement.remove();
+        }
+    });
+
+    document.getElementById('save-schema-btn')?.addEventListener('click', async () => {
+        const schema = [];
+        document.querySelectorAll('#user-schema-container .input-group').forEach(group => {
+            const inputs = group.querySelectorAll('input[type="text"]');
+            const name = inputs[0].value;
+            const def = inputs[1].value;
+            if (name) {
+                schema.push({ name: name, default: def, editable: !inputs[0].disabled });
+            }
+        });
+        const response = await fetch('php/api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'save_user_schema', schema })
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+            showToast(result.message);
+        } else {
+            showErrorAlert(result.message);
+        }
+    });
+
+    document.getElementById('enforce-schema-btn')?.addEventListener('click', async () => {
+        Swal.fire({
+            title: 'Sei sicuro?',
+            text: "Questa azione modificherà tutti i profili utente per aggiungere i campi mancanti. L'operazione non è reversibile.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonText: 'Annulla',
+            confirmButtonText: 'Sì, sincronizza!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const response = await fetch('php/api.php', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'enforce_user_schema' })
+                });
+                const res = await response.json();
+                if (res.status === 'success') {
+                    showToast(res.message);
+                } else {
+                    showErrorAlert(res.message);
+                }
+            }
+        });
+    });
 
     const loadLibraryManagement = async () => {
         try {
@@ -1143,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Swal.fire({
             title: 'Sei sicuro?',
-            text: `Vuoi davvero cancellare la build del ${build.date}? L\'azione è irreversibile.`,
+            text: `Vuoi davvero cancellare la build del ${build.date}? L'azione è irreversibile.`, 
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -1183,7 +1390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleDeleteCharacter = (characterName) => {
         Swal.fire({
             title: 'Sei sicuro?',
-            text: `Vuoi davvero cancellare ${characterName}? L\'azione è irreversibile e cancellerà anche tutte le build associate.`,
+            text: `Vuoi davvero cancellare ${characterName}? L'azione è irreversibile e cancellerà anche tutte le build associate.`, 
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -1295,6 +1502,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Rimuove il campo di input
                 existingInputContainer.remove();
             }
+        });
+    }
+
+    const setTodayAcquisitionBtn = document.getElementById('set-today-acquisition');
+    if (setTodayAcquisitionBtn) {
+        setTodayAcquisitionBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('acquisition_date').value = today;
+        });
+    }
+
+    const setTodayBuildBtn = document.getElementById('set-today-build');
+    if (setTodayBuildBtn) {
+        setTodayBuildBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('build-date').value = today;
         });
     }
 
