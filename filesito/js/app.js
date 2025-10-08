@@ -175,11 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeView) {
             activeView.classList.add('active');
         }
+
+        // Gestione sfondo galleria
         if (viewId === 'gallery-view' && currentUser && currentUser.background && currentUser.background !== 'disattivato') {
-            document.getElementById('gallery-view').style.backgroundImage = `url(data/backgrounds/${currentUser.background})`;
-            document.getElementById('gallery-view').style.backgroundSize = 'cover';
-        } else if (viewId === 'gallery-view') {
-            document.getElementById('gallery-view').style.backgroundImage = 'none';
+            document.documentElement.style.setProperty('--gallery-background', `url(../data/backgrounds/${currentUser.background})`);
+            document.body.classList.add('body-has-background');
+        } else {
+            document.body.classList.remove('body-has-background');
+            document.documentElement.style.removeProperty('--gallery-background');
         }
     };
 
@@ -649,7 +652,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // UI Feedback
             document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
             e.target.classList.add('selected');
-            document.getElementById('gallery-view').style.backgroundImage = `url(data/backgrounds/${bg})`;
+            document.documentElement.style.setProperty('--gallery-background', `url(../data/backgrounds/${bg})`);
+            document.body.classList.add('body-has-background');
 
             // Save data
             const formData = new FormData();
@@ -671,7 +675,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('disable-background-btn').addEventListener('click', async () => {
         // UI Feedback
         document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
-        document.getElementById('gallery-view').style.backgroundImage = 'none';
+        document.body.classList.remove('body-has-background');
+        document.documentElement.style.removeProperty('--gallery-background');
 
         // Save data
         const formData = new FormData();

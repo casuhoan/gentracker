@@ -19,10 +19,20 @@ body {
     min-height: 100vh;
 }
 
-#gallery-view {
+body.body-has-background {
+    background-image: var(--gallery-background);
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
+}
+
+body.body-has-background #gallery-view h2,
+body.body-has-background #gallery-view .text-muted {
+    color: #212529 !important; 
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff;
+}
+
+#gallery-view {
     flex-grow: 1; /* Aggiunto per farla espandere */
 }
 
