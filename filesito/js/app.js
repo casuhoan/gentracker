@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadSettingsPage = () => {
-        if (!currentUser || !settingsForm) return;
+        if (!currentUser || !settingsForm) return; 
         
         const profileForm = document.getElementById('settings-form');
         if(profileForm) {
@@ -551,6 +551,30 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
+        }
+    };
+
+    const loadLibraryManagement = () => {
+        try {
+            const tableBody = document.getElementById('library-character-table-body');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            if (characterLibrary && characterLibrary.length > 0) {
+                characterLibrary.forEach(char => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${char.nome}</td>
+                        <td><img src="data/${char.immagine}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-primary btn-edit-lib-char" data-char-name="${encodeURIComponent(char.nome)}">Modifica</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        } catch (error) {
+            showErrorAlert('Impossibile caricare la libreria dei personaggi.');
+            console.error(error);
         }
     };
 
