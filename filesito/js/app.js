@@ -563,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             data.backgrounds.forEach(bg => {
                 const div = document.createElement('div');
                 div.className = 'col';
-                div.innerHTML = `<img src="data/backgrounds/${bg}" class="img-thumbnail" style="cursor:pointer;" data-bg="${bg}">`;
+                const isSelected = (currentUser.background === bg);
+                div.innerHTML = `<img src="data/backgrounds/${bg}" class="img-thumbnail ${isSelected ? 'selected' : ''}" style="cursor:pointer;" data-bg="${bg}">`;
                 grid.appendChild(div);
             });
         }
@@ -619,6 +620,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('background-selector-grid').addEventListener('click', async (e) => {
         if (e.target.tagName === 'IMG') {
             const bg = e.target.dataset.bg;
+            
+            // UI Feedback
+            document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
+            e.target.classList.add('selected');
+            document.getElementById('gallery-view').style.backgroundImage = `url(data/backgrounds/${bg})`;
+
+            // Save data
             const formData = new FormData();
             formData.append('action', 'update_user');
             formData.append('original_username', currentUser.username);
@@ -636,6 +644,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('disable-background-btn').addEventListener('click', async () => {
+        // UI Feedback
+        document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
+        document.getElementById('gallery-view').style.backgroundImage = 'none';
+
+        // Save data
         const formData = new FormData();
         formData.append('action', 'update_user');
         formData.append('original_username', currentUser.username);
