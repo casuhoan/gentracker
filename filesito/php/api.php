@@ -708,7 +708,7 @@ function add_character_to_library() {
             });
 
             if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-                echo json_encode(['status' => 'success', 'message' => 'Personaggio '' . $char_name . '' aggiunto alla libreria!']);
+                echo json_encode(['status' => 'success', 'message' => "Personaggio '" . $char_name . "' aggiunto alla libreria!"]);
             } else {
                 http_response_code(500);
                 echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
