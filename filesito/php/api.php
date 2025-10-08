@@ -715,11 +715,11 @@ function add_character_to_library() {
             }
         } else {
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine. Impossibile spostare il file in: ' . $target_file]);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine. Impossibile spostare il file in: ' . $target_file]);
         }
     } else {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'L\'immagine dello splashart è obbligatoria.']);
+        echo json_encode(['status' => 'error', 'message' => 'L'immagine dello splashart è obbligatoria.']);
     }
 }
 
