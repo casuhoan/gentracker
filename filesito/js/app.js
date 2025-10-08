@@ -640,6 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-appearance-tab').addEventListener('shown.bs.tab', loadBackgroundSelector);
     document.getElementById('v-pills-backgrounds-tab')?.addEventListener('shown.bs.tab', loadBackgroundManagement);
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
+    document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
 
     document.getElementById('background-selector-grid').addEventListener('click', async (e) => {
         if (e.target.tagName === 'IMG') {
@@ -787,7 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonText: 'Sì, sincronizza!'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const response = await fetch('php/api.php', { 
+                const response = await fetch('php/api.php', {
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'enforce_user_schema' })
