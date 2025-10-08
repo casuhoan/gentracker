@@ -175,6 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeView) {
             activeView.classList.add('active');
         }
+        if (viewId === 'gallery-view' && currentUser && currentUser.background && currentUser.background !== 'disattivato') {
+            document.getElementById('gallery-view').style.backgroundImage = `url(data/backgrounds/${currentUser.background})`;
+            document.getElementById('gallery-view').style.backgroundSize = 'cover';
+        } else if (viewId === 'gallery-view') {
+            document.getElementById('gallery-view').style.backgroundImage = 'none';
+        }
     };
 
     const handleRouteChange = async () => {
@@ -240,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/api.php?action=check_session');
             const result = await response.json();
             if (result.status === 'success') {
-                currentUser = { username: result.username, role: result.role, avatar: result.avatar };
+                currentUser = { username: result.username, role: result.role, avatar: result.avatar, background: result.background };
                 isAdmin = (result.role === 'admin');
             } else {
                 currentUser = null;
@@ -563,8 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    document.getElementById('v-pills-appearance-tab').addEventListener('shown.bs.tab', loadBackgroundSelector);
-
     async function loadBackgroundManagement() {
         const response = await fetch('php/api.php?action=get_backgrounds');
         const data = await response.json();
@@ -591,20 +595,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const schema = await response.json();
         const container = document.getElementById('user-schema-container');
         container.innerHTML = '';
-        schema.forEach(field => {
-            const div = document.createElement('div');
-            div.className = 'input-group mb-2';
-            div.innerHTML = `
-                <span class="input-group-text">Campo</span>
-                <input type="text" class="form-control" placeholder="Nome Campo" value="${field.name}" ${!field.editable ? 'disabled' : ''}>
-                <span class="input-group-text">Default</span>
-                <input type="text" class="form-control" placeholder="Valore Default" value="${field.default}" ${!field.editable ? 'disabled' : ''}>
-                ${field.editable ? '<button class="btn btn-outline-danger remove-schema-field-btn">&times;</button>' : '<button class="btn btn-outline-secondary" disabled>&times;</button>'}
-            `;
-            container.appendChild(div);
-        });
+        if (Array.isArray(schema)) {
+            schema.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'input-group mb-2';
+                div.innerHTML = `
+                    <span class="input-group-text">Campo</span>
+                    <input type="text" class="form-control" placeholder="Nome Campo" value="${field.name}" ${!field.editable ? 'disabled' : ''}>
+                    <span class="input-group-text">Default</span>
+                    <input type="text" class="form-control" placeholder="Valore Default" value="${field.default}" ${!field.editable ? 'disabled' : ''}>
+                    ${field.editable ? '<button class="btn btn-outline-danger remove-schema-field-btn">&times;</button>' : '<button class="btn btn-outline-secondary" disabled>&times;</button>'}
+                `;
+                container.appendChild(div);
+            });
+        }
     }
 
+    // --- EVENT LISTENERS ---
+    document.getElementById('v-pills-appearance-tab').addEventListener('shown.bs.tab', loadBackgroundSelector);
     document.getElementById('v-pills-backgrounds-tab')?.addEventListener('shown.bs.tab', loadBackgroundManagement);
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
 
@@ -757,87 +765,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const loadLibraryManagement = async () => {
-        try {
-            const response = await fetch('data/characters_list.json');
-            if (!response.ok) throw new Error('Errore di rete');
-            const library = await response.json();
-            const tableBody = document.getElementById('library-character-table-body');
-            if (!tableBody) return;
-            tableBody.innerHTML = '';
-            library.forEach(char => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${char.nome}</td>
-                    <td><img src="data/${char.immagine}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-primary btn-edit-lib-char" data-char-name="${encodeURIComponent(char.nome)}">Modifica</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        } catch (error) {
-            showErrorAlert('Impossibile caricare la libreria dei personaggi.');
-            console.error(error);
-        }
-    };
-
-    // Listener per mostrare la tab di gestione libreria
-    const libraryTab = document.getElementById('v-pills-library-tab');
-    if (libraryTab) {
-        libraryTab.addEventListener('shown.bs.tab', loadLibraryManagement);
-    }
-
-    // Listener per i click sulla tabella della libreria
-    const libraryTableBody = document.getElementById('library-character-table-body');
-    if (libraryTableBody) {
-        libraryTableBody.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('btn-edit-lib-char')) {
-                const charName = decodeURIComponent(e.target.dataset.charName);
-                
-                // Carica i dati aggiornati prima di modificare
-                const response = await fetch('data/characters_list.json');
-                const library = await response.json();
-                const charData = library.find(c => c.nome === charName);
-
-                if (charData) {
-                    document.getElementById('edit-library-original-name').value = charData.nome;
-                    document.getElementById('edit-library-char-name').value = charData.nome;
-                    document.getElementById('edit-library-current-image').src = `data/${charData.immagine}`;
-                    
-                    const modal = new bootstrap.Modal(document.getElementById('edit-library-character-modal'));
-                    modal.show();
-                }
-            }
-        });
-    }
-
-    // Listener per il submit del form di modifica personaggio libreria
-    const editLibraryCharacterForm = document.getElementById('edit-library-character-form');
-    if (editLibraryCharacterForm) {
-        editLibraryCharacterForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(editLibraryCharacterForm);
-            formData.append('action', 'update_library_character');
-
-            try {
-                const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showToast(result.message);
-                    const modal = bootstrap.Modal.getInstance(editLibraryCharacterForm.closest('.modal'));
-                    modal.hide();
-                    loadLibraryManagement(); // Ricarica la tabella
-                } else {
-                    showErrorAlert(result.message);
-                }
-            } catch (error) {
-                showErrorAlert('Errore di comunicazione con il server.');
-            }
-        };
-    }
-
-    // --- EVENT LISTENERS ---
     if (document.getElementById('back-to-gallery-btn')) {
         document.getElementById('back-to-gallery-btn').addEventListener('click', (e) => { e.preventDefault(); location.hash = '#'; });
     }
@@ -913,7 +840,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Listener per la nuova barra di ricerca della libreria
     const libraryCharSearch = document.getElementById('library-char-search');
     if (libraryCharSearch) {
         libraryCharSearch.addEventListener('input', (e) => {

@@ -514,7 +514,18 @@ function update_user() {
             }
 
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
-                // ... (avatar upload logic remains the same)
+                $upload_dir = __DIR__ . '/../uploads/';
+                if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
+                    unlink(__DIR__ . '/../' . $user['avatar']);
+                }
+                $file_extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+                $safe_username = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_username));
+                $file_name = $safe_username . '_avatar.' . $file_extension;
+                $target_file = $upload_dir . $file_name;
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $target_file)) {
+                    $user['avatar'] = 'uploads/' . $file_name;
+                    $new_avatar_path = $user['avatar'];
+                }
             }
             
             $user['username'] = $new_username;
@@ -697,18 +708,18 @@ function add_character_to_library() {
             });
 
             if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-                echo json_encode(['status' => 'success', 'message' => 'Personaggio \'' . $char_name . '\' aggiunto alla libreria!']);
+                echo json_encode(['status' => 'success', 'message' => 'Personaggio '' . $char_name . '' aggiunto alla libreria!']);
             } else {
                 http_response_code(500);
                 echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
             }
         } else {
             http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine. Impossibile spostare il file in: ' . $target_file]);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine. Impossibile spostare il file in: ' . $target_file]);
         }
     } else {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'L\'immagine dello splashart è obbligatoria.']);
+        echo json_encode(['status' => 'error', 'message' => 'L'immagine dello splashart è obbligatoria.']);
     }
 }
 
