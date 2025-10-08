@@ -1179,14 +1179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsForm.onsubmit = async (e) => {
             e.preventDefault();
 
-            const password = document.getElementById('settings-password').value;
-            const passwordConfirm = document.getElementById('settings-password-confirm').value;
-
-            if (password !== passwordConfirm) {
-                showErrorAlert('Le password non coincidono.');
-                return;
-            }
-
             const submitButton = settingsForm.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.textContent = 'Salvataggio...';
@@ -1215,7 +1207,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 showErrorAlert('Impossibile comunicare con il server.');
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Salva Impostazioni';
+                submitButton.textContent = 'Salva Impostazioni Profilo';
+            }
+        };
+    }
+
+    const passwordForm = document.getElementById('password-form');
+    if (passwordForm) {
+        passwordForm.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const password = document.getElementById('settings-password').value;
+            const passwordConfirm = document.getElementById('settings-password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                showErrorAlert('Le password non coincidono.');
+                return;
+            }
+            if (!password) {
+                showErrorAlert('Il campo password non può essere vuoto.');
+                return;
+            }
+
+            const submitButton = passwordForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'update_user');
+                formData.append('original_username', currentUser.username);
+                formData.append('username', currentUser.username); // Keep username the same
+                formData.append('password', password);
+
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Password aggiornata con successo!');
+                    passwordForm.reset();
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Aggiorna Password';
             }
         };
     }
