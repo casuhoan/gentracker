@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Gestione sfondo galleria
         if (viewId === 'gallery-view' && currentUser && currentUser.background && currentUser.background !== 'disattivato') {
-            document.documentElement.style.setProperty('--gallery-background', `url(../data/backgrounds/${currentUser.background})`);
+            document.documentElement.style.setProperty('--gallery-background', `url(data/backgrounds/${currentUser.background})`);
             document.body.classList.add('body-has-background');
         } else {
             document.body.classList.remove('body-has-background');
@@ -649,11 +649,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.tagName === 'IMG') {
             const bg = e.target.dataset.bg;
             
-            // UI Feedback
+            // UI Feedback (only highlight selection, no live background change on settings page)
             document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
             e.target.classList.add('selected');
-            document.documentElement.style.setProperty('--gallery-background', `url(../data/backgrounds/${bg})`);
-            document.body.classList.add('body-has-background');
 
             // Save data
             const formData = new FormData();
@@ -666,6 +664,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.status === 'success') {
                 showToast('Sfondo aggiornato!');
                 currentUser.background = bg;
+                // Force re-render of gallery if currently active
+                if (location.hash === '#' || location.hash === '#gallery-view') {
+                    handleRouteChange();
+                }
             } else {
                 showErrorAlert(result.message);
             }
@@ -675,8 +677,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('disable-background-btn').addEventListener('click', async () => {
         // UI Feedback
         document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
-        document.body.classList.remove('body-has-background');
-        document.documentElement.style.removeProperty('--gallery-background');
 
         // Save data
         const formData = new FormData();
@@ -689,6 +689,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.status === 'success') {
             showToast('Sfondo disattivato.');
             currentUser.background = 'disattivato';
+            // Force re-render of gallery if currently active
+            if (location.hash === '#' || location.hash === '#gallery-view') {
+                handleRouteChange();
+            }
         } else {
             showErrorAlert(result.message);
         }
