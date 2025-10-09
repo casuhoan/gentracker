@@ -20,7 +20,7 @@ function get_user_data_dir() {
 }
 
 function get_users_file() {
-    return __DIR__ . '/users.json';
+    return __DIR__ . '/../data/users.json';
 }
 
 function get_backgrounds_dir() {
@@ -408,7 +408,7 @@ function delete_character() {
     $char_name = $_POST['character_name'] ?? '';
     if (empty($char_name)) {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Nome del personaggio non fornito.']);
+        echo json_encode(['status' => 'error', 'message' => 'Nome del personaggio mancante.']);
         return;
     }
 
@@ -611,6 +611,11 @@ function update_user() {
     $users_file = get_users_file();
     $users = json_decode(file_get_contents($users_file), true);
 
+    if (!is_array($users)) {
+        echo json_encode(['status' => 'error', 'message' => 'File utenti corrotto o vuoto.']);
+        return;
+    }
+
     $original_username = $_POST['original_username'] ?? '';
     $new_username = $_POST['username'] ?? '';
 
@@ -620,13 +625,25 @@ function update_user() {
         return;
     }
 
-    $user_found = false;
-    $new_avatar_path = null;
+    // Check if new username already exists
+    if ($original_username !== $new_username) {
+        foreach ($users as $u) {
+            if ($u['username'] === $new_username) {
+                echo json_encode(['status' => 'error', 'message' => 'Questo username è già stato preso.']);
+                return;
+            }
+        }
+    }
 
-    foreach ($users as &$user) {
+    $user_found = false;
+    $user_index = -1;
+    $new_avatar_path = null; // Initialize to null
+
+    foreach ($users as $index => &$user) {
         if ($user['username'] === $original_username) {
             $user_found = true;
-
+            $user_index = $index;
+            
             if (is_admin() && isset($_POST['role'])) {
                 $user['role'] = $_POST['role'];
             }
@@ -654,8 +671,7 @@ function update_user() {
                 }
             }
             
-            $user['username'] = $new_username;
-
+            // Username update is handled after directory rename
             break;
         }
     }
@@ -665,6 +681,23 @@ function update_user() {
         echo json_encode(['status' => 'error', 'message' => 'Utente non trovato.']);
         return;
     }
+
+    // Rename user data directory if username changed
+    $old_dir_path = __DIR__ . '/../data/users/' . $original_username;
+    if ($original_username !== $new_username && is_dir($old_dir_path)) {
+        $new_dir_path = __DIR__ . '/../data/users/' . $new_username;
+        if (is_dir($new_dir_path)) {
+            echo json_encode(['status' => 'error', 'message' => 'Una cartella dati per il nuovo username esiste già.']);
+            return;
+        }
+        if (!rename($old_dir_path, $new_dir_path)) {
+            echo json_encode(['status' => 'error', 'message' => 'Impossibile rinominare la cartella dati dell\'utente. Controllare i permessi della cartella /data/users.']);
+            return;
+        }
+    }
+    
+    // Update username in the array
+    $users[$user_index]['username'] = $new_username;
 
     if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
         if ($original_username !== $new_username) {
