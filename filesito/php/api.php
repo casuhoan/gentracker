@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 
 // --- HELPERS ---
 function is_logged_in() {
-    return isset($_SESSION['username']);
+    return isset($_SESSION['user_id']); // Usa user_id come riferimento
 }
 
 function is_admin() {
@@ -16,7 +16,8 @@ function is_admin() {
 
 function get_user_data_dir() {
     if (!is_logged_in()) return null;
-    return __DIR__ . '/../data/users/' . $_SESSION['username'] . '/';
+    // La cartella dati ora è basata sull'ID, non sul nome utente
+    return __DIR__ . '/../data/users/' . $_SESSION['user_id'] . '/';
 }
 
 function get_users_file() {
@@ -55,6 +56,8 @@ function login() {
         }
 
         if ($user['username'] === $username && password_verify($password, $user['passwordHash'])) {
+            // Imposta tutte le variabili di sessione necessarie
+            $_SESSION['user_id'] = $user['id']; // <-- MODIFICA CHIAVE
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             echo json_encode(['status' => 'success', 'message' => 'Login effettuato con successo.']);
@@ -80,13 +83,17 @@ function check_session() {
     $users = json_decode(file_get_contents($users_file), true);
     $found_user = null;
     foreach ($users as $user) {
-        if ($user['username'] === $_SESSION['username']) {
+        // Cerca per ID, non per username
+        if ($user['id'] === $_SESSION['user_id']) {
             $found_user = $user;
             break;
         }
     }
 
     if ($found_user) {
+        // Rinfresca il nome utente nella sessione se è cambiato
+        $_SESSION['username'] = $found_user['username'];
+
         echo json_encode([
             'status' => 'success',
             'username' => $found_user['username'],
@@ -95,6 +102,7 @@ function check_session() {
             'background' => $found_user['background'] ?? 'disattivato'
         ]);
     } else {
+        // Se l'ID utente in sessione non esiste più, distruggi la sessione
         logout();
     }
 }
@@ -269,14 +277,15 @@ function save_character() {
     $default_image_path = $_POST['default_image_path'] ?? '';
     $char_name = $_POST['name'] ?? '';
 
-    // Gestione Immagine
+    // Gestione Immagine - Usa l'ID utente per il nome del file
     if (!empty($default_image_path)) {
         $source_file = __DIR__ . '/../' . $default_image_path;
         if (file_exists($source_file)) {
             $upload_dir = __DIR__ . '/../uploads/';
             $file_extension = pathinfo($source_file, PATHINFO_EXTENSION);
             $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name));
-            $file_name = $_SESSION['username'] . '_' . $safe_char_name . '.' . $file_extension;
+            // Nuovo formato nome file: USERID_CHARNAME.ext
+            $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
             $target_file = $upload_dir . $file_name;
             if (copy($source_file, $target_file)) {
                 $splashart_path = 'uploads/' . $file_name;
@@ -286,7 +295,8 @@ function save_character() {
         $upload_dir = __DIR__ . '/../uploads/';
         $file_extension = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name));
-        $file_name = $_SESSION['username'] . '_' . $safe_char_name . '.' . $file_extension;
+        // Nuovo formato nome file: USERID_CHARNAME.ext
+        $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
         $target_file = $upload_dir . $file_name;
         if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
             $splashart_path = 'uploads/' . $file_name;
@@ -348,7 +358,7 @@ function update_character() {
 
     $data = json_decode(file_get_contents($original_file_path), true);
 
-    // Gestione Immagine
+    // Gestione Immagine - Usa l'ID utente per il nome del file
     $default_image_path = $_POST['default_image_path'] ?? '';
     if (!empty($default_image_path)) {
         if(!empty($data['profile']['splashart']) && file_exists(__DIR__.'/../'.$data['profile']['splashart'])) {
@@ -360,7 +370,7 @@ function update_character() {
             $upload_dir = __DIR__ . '/../uploads/';
             $file_extension = pathinfo($source_file, PATHINFO_EXTENSION);
             $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_name));
-            $file_name = $_SESSION['username'] . '_' . $safe_char_name . '.' . $file_extension;
+            $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
             $target_file = $upload_dir . $file_name;
             if (copy($source_file, $target_file)) {
                 $data['profile']['splashart'] = 'uploads/' . $file_name;
@@ -372,7 +382,7 @@ function update_character() {
         }
         $upload_dir = __DIR__ . '/../uploads/';
         $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
-        $file_name = $_SESSION['username'].'_'.preg_replace('/[^a-zA-Z0-9_-]/','_',strtolower($new_name)).'.'.$file_ext;
+        $file_name = $_SESSION['user_id'].'_'.preg_replace('/[^a-zA-Z0-9_-]/','_',strtolower($new_name)).'.'.$file_ext;
         $target_file = $upload_dir . $file_name;
         if(move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
             $data['profile']['splashart'] = 'uploads/'.$file_name;
@@ -618,17 +628,37 @@ function update_user() {
 
     $original_username = $_POST['original_username'] ?? '';
     $new_username = $_POST['username'] ?? '';
+    $user_to_update_id = '';
 
-    if (!is_admin() && $_SESSION['username'] !== $original_username) {
-        http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'Permesso negato.']);
+    // Un admin può modificare altri, un utente solo se stesso.
+    if (is_admin()) {
+        // L'admin trova l'utente da modificare tramite l'username originale
+        foreach ($users as $user) {
+            if ($user['username'] === $original_username) {
+                $user_to_update_id = $user['id'];
+                break;
+            }
+        }
+    } else {
+        // L'utente normale può modificare solo se stesso, l'ID è in sessione
+        if ($_SESSION['username'] !== $original_username) {
+            http_response_code(403);
+            echo json_encode(['status' => 'error', 'message' => 'Permesso negato.']);
+            return;
+        }
+        $user_to_update_id = $_SESSION['user_id'];
+    }
+
+    if (empty($user_to_update_id)) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Utente originale non trovato.']);
         return;
     }
 
-    // Check if new username already exists
+    // Controlla se il nuovo username è già stato preso da un ALTRO utente
     if ($original_username !== $new_username) {
         foreach ($users as $u) {
-            if ($u['username'] === $new_username) {
+            if ($u['id'] !== $user_to_update_id && $u['username'] === $new_username) {
                 echo json_encode(['status' => 'error', 'message' => 'Questo username è già stato preso.']);
                 return;
             }
@@ -636,34 +666,34 @@ function update_user() {
     }
 
     $user_found = false;
-    $user_index = -1;
-    $new_avatar_path = null; // Initialize to null
+    $new_avatar_path = null;
 
-    foreach ($users as $index => &$user) {
-        if ($user['username'] === $original_username) {
+    foreach ($users as &$user) {
+        if ($user['id'] === $user_to_update_id) {
             $user_found = true;
-            $user_index = $index;
             
+            // Aggiorna i campi
+            $user['username'] = $new_username;
             if (is_admin() && isset($_POST['role'])) {
                 $user['role'] = $_POST['role'];
             }
-
             if (isset($_POST['background'])) {
                 $user['background'] = $_POST['background'];
             }
-
             if (!empty($_POST['password'])) {
                 $user['passwordHash'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
 
+            // Gestione Avatar
             if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
                 $upload_dir = __DIR__ . '/../uploads/';
+                // Cancella il vecchio avatar se esiste
                 if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
                     unlink(__DIR__ . '/../' . $user['avatar']);
                 }
                 $file_extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-                $safe_username = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_username));
-                $file_name = $safe_username . '_avatar.' . $file_extension;
+                // Nuovo formato nome file: USERID_avatar.ext
+                $file_name = $user['id'] . '_avatar.' . $file_extension;
                 $target_file = $upload_dir . $file_name;
                 if (move_uploaded_file($_FILES['avatar']['tmp_name'], $target_file)) {
                     $user['avatar'] = 'uploads/' . $file_name;
@@ -671,36 +701,21 @@ function update_user() {
                 }
             }
             
-            // Username update is handled after directory rename
             break;
         }
     }
 
     if (!$user_found) {
         http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Utente non trovato.']);
+        echo json_encode(['status' => 'error', 'message' => 'Utente non trovato (ID mismatch).']);
         return;
     }
 
-    // Rename user data directory if username changed
-    $old_dir_path = __DIR__ . '/../data/users/' . $original_username;
-    if ($original_username !== $new_username && is_dir($old_dir_path)) {
-        $new_dir_path = __DIR__ . '/../data/users/' . $new_username;
-        if (is_dir($new_dir_path)) {
-            echo json_encode(['status' => 'error', 'message' => 'Una cartella dati per il nuovo username esiste già.']);
-            return;
-        }
-        if (!rename($old_dir_path, $new_dir_path)) {
-            echo json_encode(['status' => 'error', 'message' => 'Impossibile rinominare la cartella dati dell\'utente. Controllare i permessi della cartella /data/users.']);
-            return;
-        }
-    }
-    
-    // Update username in the array
-    $users[$user_index]['username'] = $new_username;
+    // NON c'è più bisogno di rinominare la cartella dati!
 
     if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-        if ($original_username !== $new_username) {
+        // Aggiorna il nome utente in sessione se l'utente ha modificato se stesso
+        if ($_SESSION['user_id'] === $user_to_update_id) {
             $_SESSION['username'] = $new_username;
         }
         echo json_encode(['status' => 'success', 'message' => 'Profilo aggiornato con successo.', 'new_avatar_path' => $new_avatar_path]);
@@ -750,7 +765,10 @@ function register() {
         }
     }
 
+    $new_user_id = 'user_' . str_replace('.', '', uniqid('', true));
+
     $users[] = [
+        'id' => $new_user_id, // Aggiungi ID anche alla registrazione
         'username' => $username,
         'passwordHash' => password_hash($password, PASSWORD_DEFAULT),
         'role' => $_POST['role'] ?? 'user',
