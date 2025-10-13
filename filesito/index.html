@@ -64,6 +64,47 @@
             border: 3px solid #0d6efd;
             box-shadow: 0 0 10px #0d6efd;
         }
+        .background-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            cursor: pointer;
+        }
+        .background-item .img-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            padding: 0;
+        }
+        .background-item .background-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 2px 0;
+        }
+        .background-item:hover .background-item-overlay {
+            opacity: 1;
+        }
+        .background-item .preview-icon {
+            font-size: 1.2rem;
+        }
+        #background-selector-container {
+            transition: all 0.4s ease-in-out;
+            max-height: 1000px; /* Large enough value */
+            opacity: 1;
+            overflow: hidden;
+        }
+        #background-selector-container.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin-top: -1rem; /* Optional: to make the collapse smoother */
+        }
     </style>
 </head>
 <body>
@@ -189,11 +230,16 @@
                             </div>
                             <hr class="my-4">
                             <h4>Sfondo Galleria</h4>
-                            <p class="text-muted small">Scegli uno sfondo personalizzato per la tua galleria personaggi.</p>
-                            <div id="background-selector-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 mb-3">
-                                <!-- Background thumbnails will be loaded here -->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="enable-background-switch">
+                                <label class="form-check-label" for="enable-background-switch">Abilita Sfondo Personalizzato</label>
                             </div>
-                            <button class="btn btn-secondary" id="disable-background-btn">Nessuno Sfondo</button>
+                            <div id="background-selector-container">
+                                <p class="text-muted small">Scegli uno sfondo personalizzato per la tua galleria personaggi.</p>
+                                <div id="background-selector-grid" class="row row-cols-2 row-cols-sm-4 row-cols-md-5 g-3 mb-3">
+                                    <!-- Background thumbnails will be loaded here -->
+                                </div>
+                            </div>
                         </div>
                         <!-- Pannello Gestione Libreria -->
                         <div class="tab-pane fade" id="v-pills-library" role="tabpanel" aria-labelledby="v-pills-library-tab">

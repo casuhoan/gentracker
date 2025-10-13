@@ -585,14 +585,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch('php/api.php?action=get_backgrounds');
         const data = await response.json();
         const grid = document.getElementById('background-selector-grid');
+        const container = document.getElementById('background-selector-container');
+        const bgSwitch = document.getElementById('enable-background-switch');
+        
+        if (!grid || !container || !bgSwitch) return;
+
         grid.innerHTML = '';
+
+        const isBgEnabled = currentUser.background && currentUser.background !== 'disattivato';
+        bgSwitch.checked = isBgEnabled;
+        container.classList.toggle('hidden', !isBgEnabled);
+
         if (data.status === 'success') {
             data.backgrounds.forEach(bg => {
-                const div = document.createElement('div');
-                div.className = 'col';
                 const isSelected = (currentUser.background === bg);
-                div.innerHTML = `<img src="data/backgrounds/${bg}" class="img-thumbnail ${isSelected ? 'selected' : ''}" style="cursor:pointer;" data-bg="${bg}">`;
-                grid.appendChild(div);
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'col';
+                itemWrapper.innerHTML = `
+                    <div class="background-item" data-bg="${bg}">
+                        <img src="data/backgrounds/${bg}" class="img-thumbnail ${isSelected ? 'selected' : ''}">
+                        <div class="background-item-overlay">
+                            <i class="bi bi-eye-fill preview-icon"></i>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(itemWrapper);
             });
         }
     }
@@ -645,51 +662,75 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
 
-    document.getElementById('background-selector-grid').addEventListener('click', async (e) => {
-        if (e.target.tagName === 'IMG') {
-            const bg = e.target.dataset.bg;
-            
-            // UI Feedback (only highlight selection, no live background change on settings page)
-            document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
-            e.target.classList.add('selected');
+    document.getElementById('v-pills-appearance-tab').addEventListener('click', async (e) => {
+        const bgSwitch = e.target.closest('#enable-background-switch');
+        const container = document.getElementById('background-selector-container');
 
-            // Save data
-            const formData = new FormData();
-            formData.append('action', 'update_user');
-            formData.append('original_username', currentUser.username);
-            formData.append('username', currentUser.username);
-            formData.append('background', bg);
-            const response = await fetch('php/api.php', { method: 'POST', body: formData });
-            const result = await response.json();
-            if (result.status === 'success') {
-                showToast('Sfondo aggiornato!');
-                currentUser.background = bg;
-                // Force re-render of gallery if currently active
-                if (location.hash === '#' || location.hash === '#gallery-view') {
-                    handleRouteChange();
+        // Logic for the main switch
+        if (bgSwitch) {
+            const isEnabled = bgSwitch.checked;
+            container.classList.toggle('hidden', !isEnabled);
+            if (!isEnabled) {
+                // If disabled, set background to 'disattivato' and update UI
+                const formData = new FormData();
+                formData.append('action', 'update_user');
+                formData.append('original_username', currentUser.username);
+                formData.append('username', currentUser.username);
+                formData.append('background', 'disattivato');
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Sfondo disattivato.');
+                    currentUser.background = 'disattivato';
+                    document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
+                    if (location.hash === '#' || location.hash === '#gallery-view') {
+                        handleRouteChange();
+                    }
+                } else {
+                    showErrorAlert(result.message);
                 }
-            } else {
-                showErrorAlert(result.message);
             }
+            return; // Stop further processing
         }
-    });
 
-    document.getElementById('disable-background-btn').addEventListener('click', async () => {
-        // UI Feedback
-        document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
+        // Logic for grid clicks
+        const backgroundItem = e.target.closest('.background-item');
+        if (!backgroundItem) return;
 
-        // Save data
+        const bg = backgroundItem.dataset.bg;
+
+        // If preview icon is clicked
+        if (e.target.classList.contains('preview-icon')) {
+            Swal.fire({
+                imageUrl: `data/backgrounds/${bg}`,
+                imageHeight: '80vh',
+                imageAlt: 'Anteprima Sfondo',
+                showConfirmButton: false,
+                background: '#000000d0',
+                backdrop: `
+                    rgba(0,0,0,0.4)
+                    url("data/backgrounds/${bg}")
+                    center/cover
+                    no-repeat
+                `
+            });
+            return;
+        }
+
+        // If image itself is clicked for selection
+        document.querySelectorAll('#background-selector-grid .img-thumbnail').forEach(img => img.classList.remove('selected'));
+        backgroundItem.querySelector('.img-thumbnail').classList.add('selected');
+
         const formData = new FormData();
         formData.append('action', 'update_user');
         formData.append('original_username', currentUser.username);
         formData.append('username', currentUser.username);
-        formData.append('background', 'disattivato');
+        formData.append('background', bg);
         const response = await fetch('php/api.php', { method: 'POST', body: formData });
         const result = await response.json();
         if (result.status === 'success') {
-            showToast('Sfondo disattivato.');
-            currentUser.background = 'disattivato';
-            // Force re-render of gallery if currently active
+            showToast('Sfondo aggiornato!');
+            currentUser.background = bg;
             if (location.hash === '#' || location.hash === '#gallery-view') {
                 handleRouteChange();
             }
