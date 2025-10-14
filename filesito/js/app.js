@@ -666,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function loadUserSchema() {
+    async function loadBackgroundSelector() {
         const response = await fetch('php/api.php?action=get_backgrounds');
         const data = await response.json();
         const grid = document.getElementById('background-selector-grid');
