@@ -662,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
 
-    document.getElementById('v-pills-appearance-tab').addEventListener('click', async (e) => {
+    document.getElementById('v-pills-appearance').addEventListener('click', async (e) => {
         const bgSwitch = e.target.closest('#enable-background-switch');
         const container = document.getElementById('background-selector-container');
 
@@ -706,6 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageHeight: '80vh',
                 imageAlt: 'Anteprima Sfondo',
                 showConfirmButton: false,
+                showCloseButton: true,
                 background: '#000000d0',
                 backdrop: `
                     rgba(0,0,0,0.4)
