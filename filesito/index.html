@@ -179,6 +179,7 @@
                         <a class="nav-link d-none" id="v-pills-library-tab" data-bs-toggle="pill" href="#v-pills-library" role="tab" aria-controls="v-pills-library" aria-selected="false"><i class="bi bi-book-half me-2"></i>Gestione Libreria</a>
                         <a class="nav-link d-none" id="v-pills-backgrounds-tab" data-bs-toggle="pill" href="#v-pills-backgrounds" role="tab" aria-controls="v-pills-backgrounds" aria-selected="false"><i class="bi bi-images me-2"></i>Gestione Sfondi</a>
                         <a class="nav-link d-none" id="v-pills-schema-tab" data-bs-toggle="pill" href="#v-pills-schema" role="tab" aria-controls="v-pills-schema" aria-selected="false"><i class="bi bi-diagram-3-fill me-2"></i>Schema Utenti</a>
+                        <a class="nav-link d-none" id="v-pills-elements-tab" data-bs-toggle="pill" href="#v-pills-elements" role="tab" aria-controls="v-pills-elements" aria-selected="false"><i class="bi bi-gem me-2"></i>Gestione Elementi</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -248,14 +249,43 @@
                         <!-- Pannello Gestione Libreria -->
                         <div class="tab-pane fade" id="v-pills-library" role="tabpanel" aria-labelledby="v-pills-library-tab">
                             <h4>Aggiungi Personaggio alla Libreria</h4>
-                            <form id="library-character-form" enctype="multipart/form-data">
-                                <div class="mb-3">
-                                    <label for="library-char-name" class="form-label">Nome Personaggio</label>
-                                    <input type="text" class="form-control" id="library-char-name" name="name" required>
+                            <form id="library-character-form" class="p-3 border rounded mb-4">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-name" class="form-label">Nome Personaggio</label>
+                                        <input type="text" class="form-control" id="library-char-name" name="name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-title" class="form-label">Titolo</label>
+                                        <input type="text" class="form-control" id="library-char-title" name="title">
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="library-char-image" class="form-label">Immagine (Splashart)</label>
-                                    <input type="file" class="form-control" id="library-char-image" name="splashart" accept="image/*" required>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-element" class="form-label">Elemento</label>
+                                        <select class="form-select" id="library-char-element" name="element" required></select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-weapon" class="form-label">Arma</label>
+                                        <input type="text" class="form-control" id="library-char-weapon" name="weapon">
+                                    </div>
+                                </div>
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-image" class="form-label">Immagine (Splashart)</label>
+                                        <input type="file" class="form-control" id="library-char-image" name="splashart" accept="image/*" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label d-block">Rarità</label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="rarity" id="lib-rarity-4" value="4-star">
+                                            <label class="form-check-label" for="lib-rarity-4">4 Stelle</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="rarity" id="lib-rarity-5" value="5-star" checked>
+                                            <label class="form-check-label" for="lib-rarity-5">5 Stelle</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Aggiungi alla Libreria</button>
                             </form>
@@ -269,7 +299,9 @@
                                     <thead>
                                         <tr>
                                             <th>Nome</th>
-                                            <th>Immagine</th>
+                                            <th>Titolo</th>
+                                            <th>Elemento</th>
+                                            <th>Rarità</th>
                                             <th class="text-end">Azioni</th>
                                         </tr>
                                     </thead>
@@ -306,6 +338,31 @@
                                 <button class="btn btn-primary" id="save-schema-btn"><i class="bi bi-save me-2"></i>Salva Schema</button>
                                 <button class="btn btn-success" id="enforce-schema-btn"><i class="bi bi-arrow-repeat me-2"></i>Avvia Sincronizzazione</button>
                             </div>
+                        </div>
+
+                        <!-- Pannello Gestione Elementi -->
+                        <div class="tab-pane fade" id="v-pills-elements" role="tabpanel" aria-labelledby="v-pills-elements-tab">
+                            <h4>Gestione Icone Elementi</h4>
+                            <p class="text-muted small">Aggiungi nuovi elementi o aggiorna l'icona di quelli esistenti. Le icone dovrebbero essere file PNG quadrati e trasparenti.</p>
+                            <form id="add-element-form" class="mb-4 p-3 border rounded">
+                                <h5>Aggiungi Nuovo Elemento</h5>
+                                <div class="row align-items-end">
+                                    <div class="col-md-5">
+                                        <label for="new-element-name" class="form-label">Nome Elemento</label>
+                                        <input type="text" id="new-element-name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="new-element-icon" class="form-label">Icona</label>
+                                        <input type="file" id="new-element-icon" class="form-control" accept="image/*" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100">Aggiungi</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr>
+                            <h5>Elementi Esistenti</h5>
+                            <div id="elements-list-container" class="list-group"></div>
                         </div>
                     </div>
                 </div>
@@ -350,22 +407,17 @@
                         <button class="btn btn-outline-secondary" type="button" id="use-default-image-btn">Usa Default</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-md-4 mb-3">
-                        <label for="element" class="form-label">Elemento</label>
-                        <select class="form-select" id="element" name="element"></select>
+                        <label class="form-label">Elemento</label>
+                        <div id="character-element-display" class="p-2 border rounded bg-light d-flex align-items-center" style="height: 38px;">
+                            <!-- Icona elemento caricata da JS -->
+                        </div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Rarità</label>
-                        <div id="rarity-radios">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="rarity" id="rarity-4-star" value="4-star">
-                                <label class="form-check-label" for="rarity-4-star">4 Stelle</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="rarity" id="rarity-5-star" value="5-star" checked>
-                                <label class="form-check-label" for="rarity-5-star">5 Stelle</label>
-                            </div>
+                        <div id="character-rarity-display" class="p-2 border rounded bg-light d-flex align-items-center" style="height: 38px;">
+                            <!-- Stelle rarità caricate da JS -->
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
@@ -818,7 +870,7 @@
 
     <!-- Modale per Modifica Personaggio Libreria -->
     <div class="modal fade" id="edit-library-character-modal" tabindex="-1" aria-labelledby="editLibCharModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editLibCharModalLabel">Modifica Personaggio della Libreria</h5>
@@ -827,20 +879,48 @@
                 <form id="edit-library-character-form" enctype="multipart/form-data">
                     <div class="modal-body">
                         <input type="hidden" id="edit-library-original-name" name="original_name">
-                        <div class="mb-3">
-                            <label for="edit-library-char-name" class="form-label">Nuovo Nome</label>
-                            <input type="text" class="form-control" id="edit-library-char-name" name="new_name" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-name" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="edit-library-char-name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-title" class="form-label">Titolo</label>
+                                <input type="text" class="form-control" id="edit-library-char-title" name="title">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="edit-library-char-image" class="form-label">Nuova Immagine (Opzionale)</label>
-                            <input class="form-control" type="file" id="edit-library-char-image" name="new_image" accept="image/*">
-                            <small class="form-text text-muted">Carica solo se vuoi sostituire l'immagine corrente.</small>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-element" class="form-label">Elemento</label>
+                                <select class="form-select" id="edit-library-char-element" name="element" required></select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-weapon" class="form-label">Arma</label>
+                                <input type="text" class="form-control" id="edit-library-char-weapon" name="weapon">
+                            </div>
                         </div>
-                        <img id="edit-library-current-image" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
+                        <div class="row align-items-center">
+                             <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">Rarità</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="rarity" id="edit-lib-rarity-4" value="4-star">
+                                    <label class="form-check-label" for="edit-lib-rarity-4">4 Stelle</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="rarity" id="edit-lib-rarity-5" value="5-star">
+                                    <label class="form-check-label" for="edit-lib-rarity-5">5 Stelle</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-image" class="form-label">Nuova Immagine (Opzionale)</label>
+                                <input class="form-control" type="file" id="edit-library-char-image" name="splashart" accept="image/*">
+                                <img id="edit-library-current-image" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                        <button type="submit" class="btn btn-primary">Salva e Sincronizza Modifiche</button>
                     </div>
                 </form>
             </div>

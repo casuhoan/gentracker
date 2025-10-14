@@ -32,6 +32,134 @@ function get_user_schema_file() {
     return __DIR__ . '/../data/user_schema.json';
 }
 
+function get_elements_file() {
+    return __DIR__ . '/../data/elements.json';
+}
+
+function get_element_icons_dir() {
+    $dir = __DIR__ . '/../data/icons/elements/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    return $dir;
+}
+
+// --- ELEMENT FUNCTIONS ---
+function init_elements_file() {
+    $elements_file = get_elements_file();
+    if (!file_exists($elements_file)) {
+        $default_elements = [
+            ["name" => "Anemo", "icon" => ""],
+            ["name" => "Geo", "icon" => ""],
+            ["name" => "Electro", "icon" => ""],
+            ["name" => "Dendro", "icon" => ""],
+            ["name" => "Hydro", "icon" => ""],
+            ["name" => "Pyro", "icon" => ""],
+            ["name" => "Cryo", "icon" => ""],
+        ];
+        file_put_contents($elements_file, json_encode($default_elements, JSON_PRETTY_PRINT));
+    }
+}
+
+function get_elements() {
+    init_elements_file(); // Ensure it exists
+    get_element_icons_dir(); // Ensure the directory exists
+    header('Content-Type: application/json');
+    echo file_get_contents(get_elements_file());
+}
+
+function add_element() {
+    $elements_file = get_elements_file();
+    $elements = json_decode(file_get_contents($elements_file), true);
+
+    $element_name = $_POST['element_name'] ?? '';
+    if (empty($element_name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il nome dell'elemento è obbligatorio.']);
+        return;
+    }
+
+    foreach ($elements as $el) {
+        if (strcasecmp($el['name'], $element_name) == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Un elemento con questo nome esiste già.']);
+            return;
+        }
+    }
+
+    $icon_path = '';
+    if (isset($_FILES['element_icon']) && $_FILES['element_icon']['error'] == 0) {
+        $icons_dir = get_element_icons_dir();
+        $file_ext = pathinfo($_FILES['element_icon']['name'], PATHINFO_EXTENSION);
+        $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($element_name));
+        $file_name = $safe_name . '.' . $file_ext;
+        $target_file = $icons_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['element_icon']['tmp_name'], $target_file)) {
+            $icon_path = $file_name;
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'icona.']);
+            return;
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'L\'icona è obbligatoria.']);
+        return;
+    }
+
+    $elements[] = ['name' => $element_name, 'icon' => $icon_path];
+    file_put_contents($elements_file, json_encode($elements, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
+function update_element_icon() {
+    $elements_file = get_elements_file();
+    $elements = json_decode(file_get_contents($elements_file), true);
+    
+    $element_name = $_POST['element_name'] ?? '';
+    if (empty($element_name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Nome elemento non specificato.']);
+        return;
+    }
+
+    $icon_path = '';
+    if (isset($_FILES['element_icon']) && $_FILES['element_icon']['error'] == 0) {
+        $icons_dir = get_element_icons_dir();
+        $file_ext = pathinfo($_FILES['element_icon']['name'], PATHINFO_EXTENSION);
+        $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($element_name));
+        $file_name = $safe_name . '.' . $file_ext;
+        $target_file = $icons_dir . $file_name;
+
+        // Rimuovi vecchia icona se esiste e ha un nome diverso
+        foreach ($elements as $el) {
+            if ($el['name'] === $element_name && !empty($el['icon']) && $el['icon'] !== $file_name) {
+                $old_icon_path = $icons_dir . $el['icon'];
+                if (file_exists($old_icon_path)) {
+                    unlink($old_icon_path);
+                }
+                break;
+            }
+        }
+
+        if (move_uploaded_file($_FILES['element_icon']['tmp_name'], $target_file)) {
+            $icon_path = $file_name;
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento della nuova icona.']);
+            return;
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Nessuna icona caricata.']);
+        return;
+    }
+
+    foreach ($elements as &$el) {
+        if ($el['name'] === $element_name) {
+            $el['icon'] = $icon_path;
+            break;
+        }
+    }
+
+    file_put_contents($elements_file, json_encode($elements, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
 // --- AUTHENTICATION FUNCTIONS ---
 function login() {
     $users_file = get_users_file();
@@ -841,137 +969,152 @@ function sync_library() {
 function add_character_to_library() {
     $char_name = $_POST['name'] ?? '';
     if (empty($char_name)) {
-        http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'Il nome del personaggio è obbligatorio.']);
         return;
     }
 
     $library_file = __DIR__ . '/../data/characters_list.json';
-    if (file_exists($library_file)) {
-        $library_content = file_get_contents($library_file);
-        $library = json_decode($library_content, true);
-    } else {
-        $library = [];
-    }
-
-
-    if (!is_array($library)) {
-        $library = [];
-    }
+    $library = file_exists($library_file) ? json_decode(file_get_contents($library_file), true) : [];
+    if (!is_array($library)) $library = [];
 
     foreach ($library as $char) {
-        if (strtolower($char['nome']) === strtolower($char_name)) {
-            http_response_code(409); // Conflict
-            echo json_encode(['status' => 'error', 'message' => 'Un personaggio con questo nome esiste già nella libreria.']);
+        if (strcasecmp($char['nome'], $char_name) == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Un personaggio con questo nome esiste già.']);
             return;
         }
     }
 
     if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
-        $upload_dir = __DIR__ . '/../data/';
-        $safe_char_name = str_replace(' ', '_', $char_name);
-        $file_name = 'Character_' . $safe_char_name . '_Full_Wish.webp';
+        $upload_dir = __DIR__ . '/../data/library/';
+        if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+        $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $char_name);
+        $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
+        $file_name = 'character_' . $safe_char_name . '_wish.' . $file_ext;
         $target_file = $upload_dir . $file_name;
 
         if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
             $new_char = [
                 'nome' => $char_name,
-                'immagine' => $file_name
+                'immagine' => 'library/' . $file_name,
+                'titolo' => $_POST['title'] ?? '',
+                'elemento' => $_POST['element'] ?? '',
+                'arma' => $_POST['weapon'] ?? '',
+                'rarita' => $_POST['rarity'] ?? '5-star',
             ];
             $library[] = $new_char;
 
-            usort($library, function($a, $b) {
-                return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
-            });
+            usort($library, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
 
             if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-                echo json_encode(['status' => 'success', 'message' => "Personaggio '" . $char_name . "' aggiunto alla libreria!"]);
+                echo json_encode(['status' => 'success', 'message' => "Personaggio '{$char_name}' aggiunto!"]);
             } else {
-                http_response_code(500);
                 echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
             }
         } else {
-            http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine. Impossibile spostare il file in: ' . $target_file]);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine.']);
         }
     } else {
-        http_response_code(400);
         echo json_encode(['status' => 'error', 'message' => 'L\'immagine dello splashart è obbligatoria.']);
+    }
+}
+
+function sync_character_across_all_users($character_name, $new_data) {
+    $users_dir = __DIR__ . '/../data/users/';
+    $user_folders = glob($users_dir . '*', GLOB_ONLYDIR);
+    $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($character_name));
+    $char_file_name = $safe_char_name . '.json';
+
+    foreach ($user_folders as $user_folder) {
+        $char_file_path = $user_folder . '/' . $char_file_name;
+        if (file_exists($char_file_path)) {
+            $user_char_data = json_decode(file_get_contents($char_file_path), true);
+            
+            // Update only the library-managed fields
+            $user_char_data['profile']['element'] = $new_data['elemento'];
+            $user_char_data['profile']['rarity'] = $new_data['rarita'];
+            $user_char_data['profile']['weapon'] = $new_data['arma'];
+            $user_char_data['profile']['title'] = $new_data['titolo'];
+            
+            // Also update the default splashart if the user hasn't set a custom one
+            // This assumes custom splasharts are in /uploads/ and library ones in /data/library/
+            if (strpos($user_char_data['profile']['splashart'], 'data/library/') !== false) {
+                 $user_char_data['profile']['splashart'] = 'data/' . $new_data['immagine'];
+            }
+
+            file_put_contents($char_file_path, json_encode($user_char_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
     }
 }
 
 function update_library_character() {
     $original_name = $_POST['original_name'] ?? '';
-    $new_name = $_POST['new_name'] ?? '';
+    $new_name = $_POST['name'] ?? '';
 
     if (empty($original_name) || empty($new_name)) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'I nomi del personaggio sono obbligatori.']);
+        echo json_encode(['status' => 'error', 'message' => 'I nomi sono obbligatori.']);
         return;
     }
 
     $library_file = __DIR__ . '/../data/characters_list.json';
-    if (!file_exists($library_file)) {
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'File della libreria non trovato.']);
-        return;
-    }
-
     $library = json_decode(file_get_contents($library_file), true);
-    if (!is_array($library)) {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'File della libreria corrotto.']);
-        return;
-    }
-
+    
     $char_index = -1;
-    $old_image_name = '';
     foreach ($library as $index => $char) {
         if ($char['nome'] === $original_name) {
             $char_index = $index;
-            $old_image_name = $char['immagine'];
             break;
         }
     }
 
     if ($char_index === -1) {
-        http_response_code(404);
-        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato nella libreria.']);
+        echo json_encode(['status' => 'error', 'message' => 'Personaggio non trovato.']);
         return;
     }
 
-    // Aggiorna il nome
-    $library[$char_index]['nome'] = $new_name;
+    // Update fields
+    $updated_char_data = &$library[$char_index];
+    $updated_char_data['nome'] = $new_name;
+    $updated_char_data['titolo'] = $_POST['title'] ?? '';
+    $updated_char_data['elemento'] = $_POST['element'] ?? '';
+    $updated_char_data['arma'] = $_POST['weapon'] ?? '';
+    $updated_char_data['rarita'] = $_POST['rarity'] ?? '5-star';
 
-    if (isset($_FILES['new_image']) && $_FILES['new_image']['error'] == 0) {
-        $upload_dir = __DIR__ . '/../data/';
-        
-        if (!empty($old_image_name) && file_exists($upload_dir . $old_image_name)) {
-            unlink($upload_dir . $old_image_name);
+    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        $upload_dir = __DIR__ . '/../data/library/';
+        if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+
+        // Delete old image if it exists
+        if (!empty($updated_char_data['immagine']) && file_exists(__DIR__ . '/../data/' . $updated_char_data['immagine'])) {
+            unlink(__DIR__ . '/../data/' . $updated_char_data['immagine']);
         }
 
-        $safe_char_name = str_replace(' ', '_', $new_name);
-        $new_file_name = 'Character_' . $safe_char_name . '_Full_Wish.webp';
-        $target_file = $upload_dir . $new_file_name;
+        $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $new_name);
+        $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
+        $file_name = 'character_' . $safe_char_name . '_wish.' . $file_ext;
+        $target_file = $upload_dir . $file_name;
 
-        if (move_uploaded_file($_FILES['new_image']['tmp_name'], $target_file)) {
-            $library[$char_index]['immagine'] = $new_file_name;
+        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
+            $updated_char_data['immagine'] = 'library/' . $file_name;
         } else {
-            http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Errore nel caricamento della nuova immagine.']);
+            echo json_encode(['status' => 'error', 'message' => 'Errore caricamento nuova immagine.']);
             return;
         }
     }
 
-    usort($library, function($a, $b) {
-        return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
-    });
+    usort($library, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
 
     if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-        echo json_encode(['status' => 'success', 'message' => 'Personaggio della libreria aggiornato con successo!']);
+        // Trigger synchronization
+        sync_character_across_all_users($original_name, $updated_char_data);
+        if ($original_name !== $new_name) {
+            // If name changed, we might need to rename files, but that's more complex.
+            // For now, we just sync data.
+        }
+
+        echo json_encode(['status' => 'success', 'message' => 'Personaggio aggiornato e sincronizzato!']);
     } else {
-        http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria aggiornato.']);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
     }
 }
 
@@ -979,9 +1122,9 @@ function update_library_character() {
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
 
-$public_actions = ['login', 'logout', 'check_session'];
+$public_actions = ['login', 'logout', 'check_session', 'get_elements'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon'];
 
 if (in_array($action, $public_actions)) {
     $action();

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STATO APPLICAZIONE ---
     let sourceCharacterData = [];
     let characterLibrary = [];
+    let elementsData = []; // Cache for elements data
     let currentCharacterData = null;
     let dataLoaded = false;
     let currentUser = null;
@@ -369,8 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- SEZIONE: DASHBOARD ---
     const loadDashboard = (charData) => {
         currentCharacterData = charData;
-        document.getElementById('dashboard-title').textContent = 
-`Confronto Build: ${charData.profile.name}`;
+        
+        const element = elementsData.find(e => e.name === charData.profile.element);
+        const elementIconHtml = element && element.icon ? `<img src="data/icons/elements/${element.icon}" style="height: 32px; margin-right: 10px;" alt="${charData.profile.element}">` : '';
+
+        document.getElementById('dashboard-title').innerHTML = `${elementIconHtml}Confronto Build: ${charData.profile.name}`;
+        
         const buildOptions = charData.builds.map((build, index) => ({ name: `Build del ${build.date} (Build #${charData.builds.length - index})`, value: index }));
         populateSelect('compare-select-1', buildOptions);
         populateSelect('compare-select-2', buildOptions);
@@ -554,11 +559,23 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
         }
     };
 
-    const loadLibraryManagement = () => {
+    const loadLibraryManagement = async () => {
         try {
+            // Pre-fetch elements if not already loaded
+            if (elementsData.length === 0) {
+                const response = await fetch('php/api.php?action=get_elements');
+                elementsData = await response.json();
+            }
+            
+            // Populate element dropdowns in the add/edit forms
+            const elementOptions = elementsData.map(el => ({ name: el.name, value: el.name }));
+            populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
+            populateSelect('edit-library-char-element', elementOptions);
+
             const tableBody = document.getElementById('library-character-table-body');
             if (!tableBody) return;
             tableBody.innerHTML = '';
@@ -566,8 +583,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 characterLibrary.forEach(char => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${char.nome}</td>
-                        <td><img src="data/${char.immagine}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"></td>
+                        <td>
+                            <img src="${char.immagine ? 'data/' + char.immagine : ''}" class="me-2" style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%;">
+                            <strong>${char.nome}</strong>
+                        </td>
+                        <td>${char.titolo || '-'}</td>
+                        <td>${char.elemento || '-'}</td>
+                        <td>${char.rarita || '-'}</td>
                         <td class="text-end">
                             <button class="btn btn-sm btn-primary btn-edit-lib-char" data-char-name="${encodeURIComponent(char.nome)}">Modifica</button>
                         </td>
@@ -580,6 +602,29 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(error);
         }
     };
+
+    document.getElementById('library-character-table-body')?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-edit-lib-char')) {
+            const charName = decodeURIComponent(e.target.dataset.charName);
+            const charData = characterLibrary.find(c => c.nome === charName);
+            if (!charData) return;
+
+            const modal = new bootstrap.Modal(document.getElementById('edit-library-character-modal'));
+            document.getElementById('edit-library-original-name').value = charData.nome;
+            document.getElementById('edit-library-char-name').value = charData.nome;
+            document.getElementById('edit-library-char-title').value = charData.titolo || '';
+            document.getElementById('edit-library-char-element').value = charData.elemento || '';
+            document.getElementById('edit-library-char-weapon').value = charData.arma || '';
+            
+            const rarityRadio = document.querySelector(`input[name="rarity"][value="${charData.rarita || '5-star'}"]`);
+            if(rarityRadio) rarityRadio.checked = true;
+
+            const currentImage = document.getElementById('edit-library-current-image');
+            currentImage.src = charData.immagine ? `data/${charData.immagine}` : '';
+            
+            modal.show();
+        }
+    });
 
     async function loadBackgroundSelector() {
         const response = await fetch('php/api.php?action=get_backgrounds');
@@ -656,11 +701,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadElementsManagement() {
+        const response = await fetch('php/api.php?action=get_elements');
+        const elements = await response.json();
+        const container = document.getElementById('elements-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+        elements.forEach(element => {
+            const elementNode = document.createElement('div');
+            elementNode.className = 'list-group-item d-flex justify-content-between align-items-center';
+            elementNode.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <img src="${element.icon ? 'data/icons/elements/' + element.icon : ''}" class="me-3" style="width: 32px; height: 32px; object-fit: contain;">
+                    <strong>${element.name}</strong>
+                </div>
+                <form class="update-element-icon-form" style="max-width: 250px;">
+                    <input type="hidden" name="element_name" value="${element.name}">
+                    <div class="input-group">
+                        <input type="file" name="element_icon" class="form-control form-control-sm" required>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Aggiorna</button>
+                    </div>
+                </form>
+            `;
+            container.appendChild(elementNode);
+        });
+    }
+
     // --- EVENT LISTENERS ---
     document.getElementById('v-pills-appearance-tab').addEventListener('shown.bs.tab', loadBackgroundSelector);
     document.getElementById('v-pills-backgrounds-tab')?.addEventListener('shown.bs.tab', loadBackgroundManagement);
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
+    document.getElementById('v-pills-elements-tab')?.addEventListener('shown.bs.tab', loadElementsManagement);
+
+    document.getElementById('v-pills-elements')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        let action = '';
+        let formData = null;
+        let successMessage = '';
+
+        if (e.target.id === 'add-element-form') {
+            action = 'add_element';
+            formData = new FormData();
+            formData.append('element_name', document.getElementById('new-element-name').value);
+            formData.append('element_icon', document.getElementById('new-element-icon').files[0]);
+            successMessage = 'Elemento aggiunto con successo!';
+        } else if (e.target.classList.contains('update-element-icon-form')) {
+            action = 'update_element_icon';
+            formData = new FormData(e.target);
+            successMessage = 'Icona elemento aggiornata!';
+        }
+
+        if (action && formData) {
+            try {
+                formData.append('action', action);
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(successMessage);
+                    loadElementsManagement(); // Refresh the list
+                    if (e.target.id === 'add-element-form') e.target.reset();
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        }
+    });
 
     document.getElementById('v-pills-appearance').addEventListener('click', async (e) => {
         const bgSwitch = e.target.closest('#enable-background-switch');
@@ -968,6 +1077,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameInput = document.getElementById('name');
             const previewContainer = document.getElementById('character-preview-container');
             const previewImage = document.getElementById('character-preview-image');
+            const elementDisplay = document.getElementById('character-element-display');
+            const rarityDisplay = document.getElementById('character-rarity-display');
 
             if (selectedCharName) {
                 const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
@@ -976,14 +1087,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nameInput) nameInput.value = selectedCharName;
                     if (previewImage) previewImage.src = imagePath;
                     if (previewContainer) previewContainer.classList.remove('empty');
-                    
                     if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
+
+                    // Populate Element Icon
+                    if (elementDisplay) {
+                        const element = elementsData.find(e => e.name === characterFromLibrary.elemento);
+                        elementDisplay.innerHTML = element && element.icon ? 
+                            `<img src="data/icons/elements/${element.icon}" style="height: 24px;" alt="${element.name}"> <span class="ms-2">${element.name}</span>` : 
+                            'N/D';
+                    }
+
+                    // Populate Rarity Stars
+                    if (rarityDisplay) {
+                        const starCount = characterFromLibrary.rarita === '5-star' ? 5 : 4;
+                        rarityDisplay.innerHTML = '';
+                        for(let i=0; i<starCount; i++) {
+                            rarityDisplay.innerHTML += '<i class="bi bi-star-fill text-warning"></i>';
+                        }
+                    }
                 }
             } else {
                 if (nameInput) nameInput.value = '';
                 if (previewImage) previewImage.src = '';
                 if (previewContainer) previewContainer.classList.add('empty');
                 if (defaultImagePathInput) defaultImagePathInput.value = '';
+                if (elementDisplay) elementDisplay.innerHTML = '';
+                if (rarityDisplay) rarityDisplay.innerHTML = '';
             }
         });
     }
