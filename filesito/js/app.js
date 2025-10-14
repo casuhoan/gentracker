@@ -702,9 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // If preview icon is clicked
         if (e.target.classList.contains('preview-icon')) {
             Swal.fire({
-                imageUrl: `data/backgrounds/${bg}`,
-                imageHeight: '80vh',
-                imageAlt: 'Anteprima Sfondo',
+                html: `<img src="data/backgrounds/${bg}" style="max-width: 90vw; max-height: 80vh; object-fit: contain;">`,
                 showConfirmButton: false,
                 showCloseButton: true,
                 background: '#000000d0',
