@@ -184,6 +184,13 @@ function login() {
         }
 
         if ($user['username'] === $username && password_verify($password, $user['passwordHash'])) {
+            // Controlla che l'utente abbia un ID valido prima del login
+            if (!isset($user['id']) || empty($user['id'])) {
+                error_log("Login fallito per l'utente '{$username}': ID utente mancante o vuoto in users.json.");
+                echo json_encode(['status' => 'error', 'message' => 'Errore di configurazione dell\'account (ID mancante). Contattare un amministratore.']);
+                return;
+            }
+
             // Imposta tutte le variabili di sessione necessarie
             $_SESSION['user_id'] = $user['id']; // <-- MODIFICA CHIAVE
             $_SESSION['username'] = $user['username'];
