@@ -1,6 +1,48 @@
 <?php
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 error_reporting(E_ALL);
+
+// Custom error handler to ensure JSON responses even on PHP errors
+set_error_handler(function($severity, $message, $file, $line) {
+    if (!(error_reporting() & $severity)) {
+        return;
+    }
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Internal Server Error',
+        'error_details' => [
+            'type' => 'Handler Caught',
+            'severity' => $severity,
+            'message' => $message,
+            'file' => $file,
+            'line' => $line
+        ]
+    ]);
+    exit;
+});
+
+// Custom shutdown function to catch fatal errors
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        http_response_code(500);
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Fatal Server Error',
+            'error_details' => [
+                'type' => 'Shutdown Caught',
+                'message' => $error['message'],
+                'file' => $error['file'],
+                'line' => $error['line']
+            ]
+        ]);
+    }
+});
+
 session_start();
 
 header('Content-Type: application/json');
@@ -74,7 +116,7 @@ function add_element() {
 
     $element_name = $_POST['element_name'] ?? '';
     if (empty($element_name)) {
-        echo json_encode(['status' => 'error', 'message' => 'Il nome dell'elemento è obbligatorio.']);
+        echo json_encode(['status' => 'error', 'message' => 'Il nome dell\'elemento è obbligatorio.']);
         return;
     }
 
@@ -96,7 +138,7 @@ function add_element() {
         if (move_uploaded_file($_FILES['element_icon']['tmp_name'], $target_file)) {
             $icon_path = $file_name;
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'icona.']);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'icona.']);
             return;
         }
     } else {
@@ -1011,7 +1053,7 @@ function add_character_to_library() {
             ];
             $library[] = $new_char;
 
-            usort($library, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
+            usort($library, function($a, $b) { return strcasecmp($a['nome'], $b['nome']); });
 
             if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
                 echo json_encode(['status' => 'success', 'message' => "Personaggio '{$char_name}' aggiunto!"]);
@@ -1019,7 +1061,7 @@ function add_character_to_library() {
                 echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della libreria.']);
             }
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell'immagine.']);
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine.']);
         }
     } else {
         echo json_encode(['status' => 'error', 'message' => 'L\'immagine dello splashart è obbligatoria.']);
@@ -1109,7 +1151,7 @@ function update_library_character() {
         }
     }
 
-    usort($library, fn($a, $b) => strcasecmp($a['nome'], $b['nome']));
+    usort($library, function($a, $b) { return strcasecmp($a['nome'], $b['nome']); });
 
     if (file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
         // Trigger synchronization
