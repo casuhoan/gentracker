@@ -117,12 +117,24 @@
             background-color: #343a40; /* Custom dark background */
             border-color: #495057;
         }
-        body:not(.dark-mode) #gallery-controls {
+        /* Explicit styles for Gallery Controls and Cards */
+        #gallery-controls {
             background-color: #f8f9fa;
+            border-color: #dee2e6 !important;
         }
-        body:not(.dark-mode) .gallery-card {
-            background-color: #f8f9fa;
+        .gallery-card {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
         }
+
+        body.dark-mode #gallery-controls {
+            background-color: #2c3034;
+        }
+        body.dark-mode .gallery-card {
+            background-color: #2c3034;
+            border-color: #495057;
+        }
+
         .element-filter-label {
             cursor: pointer;
             padding: 5px;

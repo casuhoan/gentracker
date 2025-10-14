@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             label.title = element.name; // Tooltip with element name
 
             label.innerHTML = `
-                <input class="form-check-input element-filter-checkbox" type="checkbox" value="${element.name}" id="${elId}">
+                <input class="form-check-input element-filter-checkbox" type="checkbox" value="${element.name}" id="${elId}" checked>
                 <img src="${iconPath}" class="element-filter-icon" alt="${element.name}">
             `;
             elementFiltersContainer.appendChild(label);
