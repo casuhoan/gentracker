@@ -117,6 +117,39 @@
             background-color: #343a40; /* Custom dark background */
             border-color: #495057;
         }
+        body:not(.dark-mode) #gallery-controls {
+            background-color: #f8f9fa;
+        }
+        body:not(.dark-mode) .gallery-card {
+            background-color: #f8f9fa;
+        }
+        .element-filter-label {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        .element-filter-label:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        body.dark-mode .element-filter-label:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        .element-filter-checkbox {
+            display: none; /* Hide the actual checkbox */
+        }
+        .element-filter-icon {
+            width: 32px;
+            height: 32px;
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+        .element-filter-checkbox:checked + .element-filter-icon {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.15);
+        }
     </style>
 </head>
 <body>

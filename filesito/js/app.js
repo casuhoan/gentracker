@@ -269,11 +269,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const initGalleryControls = () => {
         const elementFiltersContainer = document.getElementById('element-filters');
         if (!elementFiltersContainer) return;
-        elementFiltersContainer.innerHTML = '';
-        config.elements.forEach(element => {
-            const elId = `filter-${createSafeId(element)}`;
-            elementFiltersContainer.innerHTML += `<div class="form-check"><input class="form-check-input" type="checkbox" value="${element}" id="${elId}"><label class="form-check-label" for="${elId}">${element}</label></div>`;
+        
+        elementFiltersContainer.innerHTML = ''; // Clear previous filters
+        
+        elementsData.forEach(element => {
+            const elId = `filter-${createSafeId(element.name)}`;
+            const iconPath = element.icon ? `data/icons/elements/${element.icon}` : '';
+
+            const label = document.createElement('label');
+            label.className = 'element-filter-label';
+            label.setAttribute('for', elId);
+            label.title = element.name; // Tooltip with element name
+
+            label.innerHTML = `
+                <input class="form-check-input element-filter-checkbox" type="checkbox" value="${element.name}" id="${elId}">
+                <img src="${iconPath}" class="element-filter-icon" alt="${element.name}">
+            `;
+            elementFiltersContainer.appendChild(label);
         });
+
         document.getElementById('name-filter').addEventListener('input', applyFiltersAndSorting);
         document.getElementById('sort-select').addEventListener('change', applyFiltersAndSorting);
         elementFiltersContainer.addEventListener('change', applyFiltersAndSorting);
