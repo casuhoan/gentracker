@@ -109,6 +109,9 @@
             object-fit: contain !important;
             max-height: 80vh !important;
         }
+        .readonly-display-field {
+            background-color: var(--bs-secondary-bg);
+        }
     </style>
 </head>
 <body>
@@ -410,13 +413,13 @@
                 <div class="row align-items-center">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Elemento</label>
-                        <div id="character-element-display" class="p-2 border rounded bg-light d-flex align-items-center" style="height: 38px;">
+                        <div id="character-element-display" class="p-2 border rounded readonly-display-field d-flex align-items-center" style="height: 38px;">
                             <!-- Icona elemento caricata da JS -->
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Rarità</label>
-                        <div id="character-rarity-display" class="p-2 border rounded bg-light d-flex align-items-center" style="height: 38px;">
+                        <div id="character-rarity-display" class="p-2 border rounded readonly-display-field d-flex align-items-center" style="height: 38px;">
                             <!-- Stelle rarità caricate da JS -->
                         </div>
                     </div>
