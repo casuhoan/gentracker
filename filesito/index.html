@@ -110,7 +110,12 @@
             max-height: 80vh !important;
         }
         .readonly-display-field {
-            background-color: var(--bs-secondary-bg);
+            background-color: #e9ecef; /* Default light background */
+            border-color: #ced4da;
+        }
+        body.dark-mode .readonly-display-field {
+            background-color: #343a40; /* Custom dark background */
+            border-color: #495057;
         }
     </style>
 </head>
