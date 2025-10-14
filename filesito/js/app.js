@@ -702,10 +702,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // If preview icon is clicked
         if (e.target.classList.contains('preview-icon')) {
             Swal.fire({
-                html: `<img src="data/backgrounds/${bg}" style="max-width: 90vw; max-height: 80vh; object-fit: contain;">`,
+                imageUrl: `data/backgrounds/${bg}`,
+                imageWidth: '90vw',
+                imageAlt: 'Anteprima Sfondo',
                 showConfirmButton: false,
                 showCloseButton: true,
                 background: '#000000d0',
+                customClass: {
+                    image: 'swal-image-responsive'
+                },
                 backdrop: `
                     rgba(0,0,0,0.4)
                     url("data/backgrounds/${bg}")
