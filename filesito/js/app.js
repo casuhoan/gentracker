@@ -565,13 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadLibraryManagement = async () => {
         try {
-            // Pre-fetch elements if not already loaded
-            if (elementsData.length === 0) {
-                const response = await fetch('php/api.php?action=get_elements');
-                elementsData = await response.json();
-            }
-            
-            // Populate element dropdowns in the add/edit forms
+            // Data is now pre-fetched at init.
             const elementOptions = elementsData.map(el => ({ name: el.name, value: el.name }));
             populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
             populateSelect('edit-library-char-element', elementOptions);
@@ -605,6 +599,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('library-character-table-body')?.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn-edit-lib-char')) {
+            // Reset the form to clear old values, especially the file input
+            document.getElementById('edit-library-character-form').reset();
+
             const charName = decodeURIComponent(e.target.dataset.charName);
             const charData = characterLibrary.find(c => c.nome === charName);
             if (!charData) return;
@@ -1686,13 +1683,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INIZIALIZZAZIONE ---
     const init = async () => {
         try {
-            const response = await fetch('data/characters_list.json');
-            if (!response.ok) throw new Error('Network response was not ok');
-            characterLibrary = await response.json();
+            // Fetch all essential data in parallel for faster startup
+            const [charLibResponse, elementsResponse] = await Promise.all([
+                fetch('data/characters_list.json?v=' + new Date().getTime()), // Cache-busting for library
+                fetch('php/api.php?action=get_elements')
+            ]);
+
+            if (!charLibResponse.ok) throw new Error('Failed to load characters_list.json');
+            characterLibrary = await charLibResponse.json();
+
+            if (elementsResponse.ok) {
+                elementsData = await elementsResponse.json();
+            } else {
+                console.error('Could not load elements data.');
+            }
+
             initCharacterLibrarySelect();
         } catch (error) {
-            console.error('Impossibile caricare la libreria dei personaggi:', error);
-            showErrorAlert('Impossibile caricare la libreria dei personaggi. Alcune funzionalità potrebbero non essere disponibili.');
+            console.error('Failed to load essential library data:', error);
+            showErrorAlert('Impossibile caricare dati essenziali (personaggi/elementi). Alcune funzionalità potrebbero non essere disponibili.');
         }
 
         initCharacterCreationForm();
