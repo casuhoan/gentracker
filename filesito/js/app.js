@@ -626,7 +626,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function loadBackgroundSelector() {
+    const editLibraryCharacterForm = document.getElementById('edit-library-character-form');
+    if (editLibraryCharacterForm) {
+        editLibraryCharacterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = editLibraryCharacterForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Salvataggio...';
+
+            const formData = new FormData(editLibraryCharacterForm);
+            formData.append('action', 'update_library_character');
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('edit-library-character-modal'));
+                    modal.hide();
+                    
+                    // Refresh library data
+                    const libResponse = await fetch('data/characters_list.json?v=' + new Date().getTime()); // Cache-busting
+                    characterLibrary = await libResponse.json();
+                    loadLibraryManagement();
+                    
+                    // Mark main data as stale to force reload on next view change
+                    dataLoaded = false; 
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+                console.error('Update library character error:', error);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Salva e Sincronizza Modifiche';
+            }
+        });
+    }
+
+    async function loadUserSchema() {
         const response = await fetch('php/api.php?action=get_backgrounds');
         const data = await response.json();
         const grid = document.getElementById('background-selector-grid');
