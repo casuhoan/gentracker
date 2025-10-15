@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Anemo",
+        "icon": "anemo.webp"
+    },
+    {
+        "name": "Geo",
+        "icon": "geo.webp"
+    },
+    {
+        "name": "Electro",
+        "icon": "electro.webp"
+    },
+    {
+        "name": "Dendro",
+        "icon": "dendro.webp"
+    },
+    {
+        "name": "Hydro",
+        "icon": "hydro.webp"
+    },
+    {
+        "name": "Pyro",
+        "icon": "pyro.webp"
+    },
+    {
+        "name": "Cryo",
+        "icon": "cryo.webp"
+    }
+]

@@ -110,9 +110,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function applyCardOpacity(opacity) {
+        if (opacity === 'on') {
+            document.body.classList.add('card-opacity-on');
+        } else {
+            document.body.classList.remove('card-opacity-on');
+        }
+    }
+
+
+
     function initTheme() {
         const currentTheme = localStorage.getItem('theme') || 'light';
         applyTheme(currentTheme);
+        
+        // Apply card opacity on load based on user preference
+        if (currentUser && currentUser.card_opacity) {
+            applyCardOpacity(currentUser.card_opacity);
+        }
+        
+        // Apply card opacity on load based on user preference
+        if (currentUser && currentUser.card_opacity) {
+            applyCardOpacity(currentUser.card_opacity);
+        }
 
         if (themeToggle) {
             themeToggle.addEventListener('change', () => {
@@ -250,7 +270,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/api.php?action=check_session');
             const result = await response.json();
             if (result.status === 'success') {
-                currentUser = { username: result.username, role: result.role, avatar: result.avatar, background: result.background };
+                currentUser = { 
+                    username: result.username, 
+                    role: result.role, 
+                    avatar: result.avatar, 
+                    background: result.background,
+                    card_opacity: result.card_opacity 
+                };
                 isAdmin = (result.role === 'admin');
             } else {
                 currentUser = null;
@@ -369,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const constellationColorClass = getStatusColorClass('constellation', char.latest_constellation, char.rarity);
             galleryGrid.innerHTML += `
                 <div class="col">
-                    <div class="card h-100 text-center gallery-card">
+                    <div class="custom-card gallery-card">
                         ${hoverStatsHtml}
                         <div class="card-constellation ${constellationColorClass}">C${char.latest_constellation || 0}</div>
                         <img src="${char.splashart || 'uploads/default_avatar.png'}" class="card-img-top" alt="${char.name}" style="height: 250px; object-fit: contain;">
@@ -553,23 +579,32 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadSettingsPage = () => {
-        if (!currentUser || !settingsForm) return; 
-        
+        if (!currentUser) return;
+
+        // Profile Tab
         const profileForm = document.getElementById('settings-form');
-        if(profileForm) {
+        if (profileForm) {
             document.getElementById('settings-original-username').value = currentUser.username;
             document.getElementById('settings-username').value = currentUser.username;
             document.getElementById('settings-avatar-preview').src = currentUser.avatar || 'uploads/default_avatar.png';
         }
+
+        // Auth Tab
         const passwordForm = document.getElementById('password-form');
-        if(passwordForm) passwordForm.reset();
-        
+        if (passwordForm) passwordForm.reset();
+
+        // Appearance Tab
         const currentTheme = localStorage.getItem('theme') || 'light';
         const themeRadio = document.getElementById(`theme-${currentTheme}`);
-        if(themeRadio) themeRadio.checked = true;
+        if (themeRadio) themeRadio.checked = true;
+
+        const opacitySwitch = document.getElementById('enable-card-opacity-switch');
+        if (opacitySwitch) {
+            opacitySwitch.checked = (currentUser.card_opacity === 'on');
+        }
 
         if (isAdmin) {
-            if(syncLibraryBtn) syncLibraryBtn.classList.remove('d-none');
+            document.getElementById('v-pills-sync-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
@@ -823,6 +858,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('v-pills-appearance').addEventListener('click', async (e) => {
+        const opacitySwitch = e.target.closest('#enable-card-opacity-switch');
+        if (opacitySwitch) {
+            const isEnabled = opacitySwitch.checked;
+            const newValue = isEnabled ? 'on' : 'off';
+
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('card_opacity', newValue);
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(`Opacità card ${isEnabled ? 'attivata' : 'disattivata'}.`);
+                    currentUser.card_opacity = newValue;
+                    applyCardOpacity(newValue);
+                } else {
+                    showErrorAlert(result.message);
+                    // Revert the switch if the save fails
+                    opacitySwitch.checked = !isEnabled;
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+                opacitySwitch.checked = !isEnabled;
+            }
+            return; // Stop further processing for this click
+        }
+
         const bgSwitch = e.target.closest('#enable-background-switch');
         const container = document.getElementById('background-selector-container');
 
@@ -1146,6 +1211,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         elementDisplay.innerHTML = element && element.icon ? 
                             `<img src="data/icons/elements/${element.icon}" style="height: 24px;" alt="${element.name}"> <span class="ms-2">${element.name}</span>` : 
                             'N/D';
+                        const elementInput = document.getElementById('character-element');
+                        if (elementInput) {
+                            elementInput.value = characterFromLibrary.elemento || '';
+                        }
                     }
 
                     // Populate Rarity Stars
@@ -1164,6 +1233,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (defaultImagePathInput) defaultImagePathInput.value = '';
                 if (elementDisplay) elementDisplay.innerHTML = '';
                 if (rarityDisplay) rarityDisplay.innerHTML = '';
+                const elementInput = document.getElementById('character-element');
+                if (elementInput) {
+                    elementInput.value = '';
+                }
             }
         });
     }

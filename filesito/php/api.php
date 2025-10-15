@@ -276,7 +276,8 @@ function check_session() {
             'username' => $found_user['username'],
             'role' => $found_user['role'],
             'avatar' => $found_user['avatar'] ?? '',
-            'background' => $found_user['background'] ?? 'disattivato'
+            'background' => $found_user['background'] ?? 'disattivato',
+            'card_opacity' => $found_user['card_opacity'] ?? 'off'
         ]);
     } else {
         // Se l'ID utente in sessione non esiste più, distruggi la sessione
@@ -350,7 +351,8 @@ function get_user_schema() {
             ['name' => 'passwordHash', 'default' => '', 'editable' => false],
             ['name' => 'role', 'default' => 'user', 'editable' => true],
             ['name' => 'avatar', 'default' => '', 'editable' => true],
-            ['name' => 'background', 'default' => 'disattivato', 'editable' => true]
+            ['name' => 'background', 'default' => 'disattivato', 'editable' => true],
+            ['name' => 'card_opacity', 'default' => 'off', 'editable' => true]
         ];
         file_put_contents($schema_file, json_encode($default_schema, JSON_PRETTY_PRINT));
         echo json_encode($default_schema);

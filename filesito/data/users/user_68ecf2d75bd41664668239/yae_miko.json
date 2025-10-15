@@ -1,0 +1,22 @@
+{
+    "profile": {
+        "name": "Yae Miko",
+        "splashart": "uploads\/user_68ecf2d75bd41664668239_yae_miko.webp",
+        "element": "Geo",
+        "role": [
+            "Support"
+        ],
+        "tracked_stats": [
+            "Elemental Mastery"
+        ],
+        "ideal_stats": {
+            "Elemental Mastery": 6
+        },
+        "acquisition_date": "2025-10-15",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": []
+}

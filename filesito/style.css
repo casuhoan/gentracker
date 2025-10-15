@@ -148,6 +148,12 @@ body.dark-mode .btn-close {
 }
 
 /* Stili per la galleria personaggi */
+
+
+body:not(.dark-mode) #gallery-view #gallery-controls {
+    background-color: #e9ecef;
+}
+
 .gallery-card {
     position: relative;
     overflow: hidden; /* Nasconde parti degli overlay che escono dalla card */
@@ -518,3 +524,36 @@ body.dark-mode .table td {
       height: 150px;
       object-fit: cover;
   }
+
+/* Custom Card for Gallery */
+.custom-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+    /*border: 1px solid rgba(0, 0, 0, 0.175);
+    border-radius: 0.375rem;*/
+    height: 100%;
+    text-align: center;
+}
+
+body:not(.dark-mode) .custom-card {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+body.dark-mode .custom-card {
+    background-color: #343a40;
+    color: #dee2e6;
+}
+
+/* Opacity Styles */
+body.card-opacity-on:not(.dark-mode) .custom-card {
+    background-color: rgba(233, 236, 239, 0.3);
+}
+
+body.card-opacity-on.dark-mode .custom-card {
+    background-color: rgba(52, 58, 64, 0.3);
+}
