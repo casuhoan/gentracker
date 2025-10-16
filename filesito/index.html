@@ -275,6 +275,7 @@
                                 <input class="form-check-input" type="checkbox" id="enable-card-opacity-switch">
                                 <label class="form-check-label" for="enable-card-opacity-switch">Attiva Opacità Card</label>
                             </div>
+
                             <hr class="my-4">
                             <h4>Sfondo Galleria</h4>
                             <div class="form-check form-switch mb-3">
@@ -638,8 +639,37 @@
 
         <!-- Sezione per la galleria personaggi -->
         <div id="gallery-view" class="view">
-            <h2>Galleria Personaggi</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Galleria Personaggi</h2>
+                <button class="btn btn-sm btn-outline-secondary" id="gallery-settings-toggle-btn" title="Impostazioni Galleria">
+                    <i class="bi bi-gear-fill"></i>
+                </button>
+            </div>
             <p class="text-muted small mb-4">Esplora la tua collezione di personaggi. Usa i filtri per cercare e l'ordinamento per confrontare le loro performance.</p>
+
+            <!-- Gallery Settings Pop-up Panel -->
+            <div id="gallery-settings-panel" class="card p-3 shadow-sm" style="position: absolute; top: 10px; right: 10px; width: 300px; z-index: 1050; display: none;">
+                <h5>Impostazioni Galleria</h5>
+                <hr>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="gallery-enable-background-switch">
+                    <label class="form-check-label" for="gallery-enable-background-switch">Sfondo Personalizzato</label>
+                </div>
+
+                <div id="gallery-background-options" style="display: none;">
+                    <p class="text-muted small">Scegli uno sfondo:</p>
+                    <div id="gallery-background-selector-grid" class="row row-cols-2 g-2 mb-3">
+                        <!-- Background thumbnails will be loaded here -->
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="gallery-enable-card-opacity-switch">
+                        <label class="form-check-label" for="gallery-enable-card-opacity-switch">Opacità Schede</label>
+                    </div>
+
+
+                </div>
+            </div>
 
             <div id="gallery-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
                 <div class="col-lg-4 col-md-6">

@@ -26,6 +26,263 @@ body.body-has-background {
     background-attachment: fixed;
 }
 
+
+
+/* Specific overrides to remove text shadow and ensure appropriate color */
+body.body-has-background #gallery-settings-toggle-btn i,
+body.body-has-background .custom-card h5,
+body.body-has-background .custom-card span,
+body.body-has-background #gallery-controls * {
+    text-shadow: none !important;
+    color: inherit !important; /* Revert to inherited color */
+}
+
+/* Ensure text in custom cards is readable */
+body.body-has-background .custom-card h5,
+body.body-has-background .custom-card span {
+    color: #212529; /* Default text color for cards */
+}
+
+body.body-has-background.dark-mode .custom-card h5,
+body.body-has-background.dark-mode .custom-card span {
+    color: var(--dark-color); /* Dark mode text color for cards */
+}
+
+/* Specific overrides for elements that should not have text shadow/forced color */
+body.body-has-background .navbar *,
+body.body-has-background .site-footer * {
+    color: #fff !important; /* Force white color for navbar text */
+    text-shadow: none !important; /* Remove text shadow */
+}
+
+/* Text color and shadow for main content (excluding navbar, footer, and settings view) */
+/* Text color and shadow for main content (excluding navbar, footer, and settings view) */
+body.body-has-background main h1,
+body.body-has-background main h2 {
+    color: #212529; /* Default text color for light mode */
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Text glow */
+}
+
+body.body-has-background.dark-mode main h1,
+body.body-has-background.dark-mode main h2 {
+    color: #dee2e6; /* White text for dark mode */
+}
+
+body.body-has-background main h3,
+body.body-has-background main h4,
+body.body-has-background main h5,
+body.body-has-background main h6,
+body.body-has-background main p,
+body.body-has-background main span,
+body.body-has-background main a,
+body.body-has-background main li,
+body.body-has-background main label {
+    text-shadow: none !important; /* Remove text glow from other elements */
+    color: #212529; /* Default text color for light mode */
+}
+
+body.body-has-background.dark-mode main h3,
+body.body-has-background.dark-mode main h4,
+body.body-has-background.dark-mode main h5,
+body.body-has-background.dark-mode main h6,
+body.body-has-background.dark-mode main p,
+body.body-has-background.dark-mode main span,
+body.body-has-background.dark-mode main a,
+body.body-has-background.dark-mode main li,
+body.body-has-background.dark-mode main label {
+    color: #dee2e6; /* White text for dark mode */
+}
+
+/* Specific overrides for dashboard title and comparison labels */
+body.body-has-background #dashboard-title,
+body.body-has-background #dashboard-view .form-label,
+body.body-has-background #character-creation-view h2,
+body.body-has-background #build-logger-view h2,
+body.body-has-background #build-management-view h2 {
+    color: #212529 !important; /* Black text */
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Text glow */
+}
+
+/* Remove text shadow from these elements when no background is active */
+body:not(.body-has-background) #dashboard-title,
+body:not(.body-has-background) #dashboard-view .form-label,
+body:not(.body-has-background) #character-creation-view h2,
+body:not(.body-has-background) #build-logger-view h2,
+body:not(.body-has-background) #build-management-view h2 {
+    text-shadow: none !important;
+}
+
+/* Ensure text color follows theme when no background is active */
+body:not(.body-has-background).dark-mode #dashboard-title,
+body:not(.body-has-background).dark-mode #dashboard-view .form-label,
+body:not(.body-has-background).dark-mode #character-creation-view h2,
+body:not(.body-has-background).dark-mode #build-logger-view h2,
+body:not(.body-has-background).dark-mode #build-management-view h2 {
+    color: var(--dark-color) !important;
+}
+
+body.body-has-background.dark-mode #dashboard-view .form-label {
+    color: var(--dark-color) !important;
+}
+
+body:not(.body-has-background):not(.dark-mode) #dashboard-title,
+body:not(.body-has-background):not(.dark-mode) #dashboard-view .form-label,
+body:not(.body-has-background):not(.dark-mode) #character-creation-view h2,
+body:not(.body-has-background):not(.dark-mode) #build-logger-view h2,
+body:not(.body-has-background):not(.dark-mode) #build-management-view h2 {
+    color: var(--light-color) !important;
+}
+
+/* Small texts (p, label) in specific views: white with illumination in dark mode when background is active */
+body.body-has-background.dark-mode #character-creation-view p,
+body.body-has-background.dark-mode #character-creation-view label,
+body.body-has-background.dark-mode #build-logger-view p,
+body.body-has-background.dark-mode #build-logger-view label,
+body.body-has-background.dark-mode #build-management-view p,
+body.body-has-background.dark-mode #build-management-view label,
+body.body-has-background.dark-mode #dashboard-view p,
+body.body-has-background.dark-mode #dashboard-view label {
+    color: #dee2e6 !important; /* White text */
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Text glow */
+}
+
+/* Character card constellation and acquisition date */
+body.body-has-background .card-constellation,
+body.body-has-background .card-acquisition-date {
+    color: #fff !important; /* Always white text */
+    text-shadow: none !important; /* No glow */
+}
+
+/* Character card hover stats */
+body.body-has-background .card-hover-stats * {
+    color: #fff !important; /* Always white text */
+    text-shadow: none !important; /* No glow */
+}
+
+/* Remove text shadow from interactive elements in specific views */
+body.body-has-background #character-creation-view .form-control,
+body.body-has-background #character-creation-view .form-select,
+body.body-has-background #character-creation-view .btn,
+body.body-has-background #build-logger-view .form-control,
+body.body-has-background #build-logger-view .form-select,
+body.body-has-background #build-logger-view .btn,
+body.body-has-background #build-management-view .form-control,
+body.body-has-background #build-management-view .form-select,
+body.body-has-background #build-management-view .btn,
+body.body-has-background #dashboard-view .form-control,
+body.body-has-background #dashboard-view .form-select,
+body.body-has-background #dashboard-view .btn,
+body.body-has-background #dashboard-view .table * {
+    text-shadow: none !important;
+}
+
+/* Ensure text color adapts to theme for these elements */
+body.body-has-background #character-creation-view .form-control,
+body.body-has-background #character-creation-view .form-select,
+body.body-has-background #build-logger-view .form-control,
+body.body-has-background #build-logger-view .form-select,
+body.body-has-background #build-management-view .form-control,
+body.body-has-background #build-management-view .form-select,
+body.body-has-background #dashboard-view .form-control,
+body.body-has-background #dashboard-view .form-select {
+    color: #212529; /* Default text color for light mode */
+}
+
+body.body-has-background.dark-mode #character-creation-view .form-control,
+body.body-has-background.dark-mode #character-creation-view .form-select,
+body.body-has-background.dark-mode #build-logger-view .form-control,
+body.body-has-background.dark-mode #build-logger-view .form-select,
+body.body-has-background.dark-mode #build-management-view .form-control,
+body.body-has-background.dark-mode #build-management-view .form-select,
+body.body-has-background.dark-mode #dashboard-view .form-control,
+body.body-has-background.dark-mode #dashboard-view .form-select {
+    color: #dee2e6; /* White text for dark mode */
+}
+
+/* Remove text shadow from statistics in dashboard comparison tables */
+body.body-has-background #dashboard-view .card-body ul li,
+body.body-has-background #dashboard-view .card-body ul li * {
+    text-shadow: none !important;
+}
+
+/* Darker blue for specific headings when background is active */
+body.body-has-background main h5 {
+    color: #003366 !important; /* Darker blue */
+}
+
+body.body-has-background.dark-mode main h5 {
+    color: #6ea8fe !important; /* Keep light blue for dark mode */
+}
+
+/* Ensure form controls remain readable */
+body.body-has-background .form-control,
+body.body-has-background .form-select {
+    color: #212529; /* Default text color for form controls */
+    text-shadow: none;
+}
+
+body.body-has-background.dark-mode .form-control,
+body.body-has-background.dark-mode .form-select {
+    color: var(--dark-color); /* Dark mode text color for form controls */
+}
+
+/* Settings view specific styling */
+body.body-has-background #settings-view h2 {
+    background-color: rgba(255, 255, 255, 0.8); /* Background for settings title */
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    color: #212529 !important;
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Keep glow for title */
+}
+
+body.body-has-background.dark-mode #settings-view h2 {
+    background-color: rgba(52, 58, 64, 0.8); /* Dark background for settings title */
+    color: #dee2e6 !important;
+}
+
+body.body-has-background #settings-view .nav-pills .nav-link {
+    background-color: rgba(255, 255, 255, 0.9); /* Background for nav links in settings */
+    color: #212529; /* Ensure text is readable */
+    text-shadow: none; /* Remove text shadow */
+    margin-bottom: 2px; /* Small gap between items */
+    border-radius: 0.375rem; /* Rounded corners */
+    transition: all 0.2s ease-in-out;
+}
+
+body.body-has-background.dark-mode #settings-view .nav-pills .nav-link {
+    background-color: rgba(52, 58, 64, 0.9); /* Dark background for nav links */
+    color: #dee2e6; /* Dark mode text color */
+}
+
+body.body-has-background #settings-view .nav-pills .nav-link:hover,
+body.body-has-background #settings-view .nav-pills .nav-link.active {
+    background-color: rgba(200, 200, 200, 0.95); /* Lighter on hover/active */
+    transform: translateY(-1px); /* Slight lift effect */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1; /* Bring to front on hover */
+}
+
+body.body-has-background.dark-mode #settings-view .nav-pills .nav-link:hover,
+body.body-has-background.dark-mode #settings-view .nav-pills .nav-link.active {
+    background-color: rgba(70, 70, 70, 0.95); /* Lighter dark on hover/active */
+}
+
+body.body-has-background #settings-view .tab-content {
+    background-color: rgba(255, 255, 255, 0.9); /* Background for tab content */
+    text-shadow: none; /* Remove text shadow */
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+body.body-has-background.dark-mode #settings-view .tab-content {
+    background-color: rgba(52, 58, 64, 0.9); /* Dark background for tab content */
+}
+
+body.body-has-background.dark-mode #settings-view .tab-content {
+    background-color: rgba(52, 58, 64, 0.9); /* Dark background for tab content */
+}
+
 body.body-has-background #gallery-view h2,
 body.body-has-background #gallery-view .text-muted {
     color: #212529 !important; 
@@ -145,6 +402,37 @@ body.dark-mode .modal-title {
 
 body.dark-mode .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.body-has-background .btn-outline-secondary {
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    border-color: #6c757d; /* Keep original border color */
+}
+
+body.body-has-background.dark-mode .btn-outline-secondary {
+    background-color: rgba(52, 58, 64, 0.8); /* Semi-transparent dark background */
+    border-color: #adb5bd; /* Adjust border color for dark mode */
+    color: #dee2e6; /* Adjust text color for dark mode */
+}
+
+/* User Dropdown Menu Styling */
+body.body-has-background .dropdown-menu {
+    background-color: #212529; /* Black background */
+    border-color: #343a40;
+}
+
+body.body-has-background .dropdown-menu .dropdown-item {
+    color: #fff; /* White text */
+}
+
+body.body-has-background .dropdown-menu .dropdown-item:hover,
+body.body-has-background .dropdown-menu .dropdown-item:focus {
+    background-color: #495057; /* Darker gray on hover */
+    color: #fff; /* Ensure text remains white on hover */
+}
+
+body.body-has-background .dropdown-menu .dropdown-divider {
+    border-top-color: #6c757d; /* Lighter divider in dark menu */
 }
 
 /* Stili per la galleria personaggi */
@@ -556,4 +844,41 @@ body.card-opacity-on:not(.dark-mode) .custom-card {
 
 body.card-opacity-on.dark-mode .custom-card {
     background-color: rgba(52, 58, 64, 0.3);
+}
+/* Gallery Settings Panel */
+#gallery-settings-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 300px;
+    z-index: 1050;
+    display: none; /* Hidden by default */
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    border: 1px solid rgba(0, 0, 0, 0.175);
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+}
+
+body.dark-mode #gallery-settings-panel {
+    background-color: rgba(52, 58, 64, 0.9); /* Semi-transparent dark */
+    border-color: rgba(255, 255, 255, 0.175);
+}
+
+#gallery-settings-panel h5 {
+    margin-bottom: 0.5rem;
+}
+
+#gallery-settings-panel hr {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#gallery-background-selector-grid .background-item {
+    width: 100%; /* Make items fill available width */
+    height: 70px; /* Adjust height for smaller thumbnails */
+}
+
+#gallery-card-opacity-slider-container {
+    margin-top: 1rem;
 }

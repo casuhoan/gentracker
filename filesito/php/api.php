@@ -277,7 +277,7 @@ function check_session() {
             'role' => $found_user['role'],
             'avatar' => $found_user['avatar'] ?? '',
             'background' => $found_user['background'] ?? 'disattivato',
-            'card_opacity' => $found_user['card_opacity'] ?? 'off'
+            'opacity' => $found_user['opacity'] ?? 'no'
         ]);
     } else {
         // Se l'ID utente in sessione non esiste più, distruggi la sessione
@@ -858,6 +858,9 @@ function update_user() {
             }
             if (isset($_POST['background'])) {
                 $user['background'] = $_POST['background'];
+            }
+            if (isset($_POST['opacity'])) {
+                $user['opacity'] = $_POST['opacity'];
             }
             if (!empty($_POST['password'])) {
                 $user['passwordHash'] = password_hash($_POST['password'], PASSWORD_DEFAULT);

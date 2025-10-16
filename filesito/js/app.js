@@ -110,29 +110,152 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function applyCardOpacity(opacity) {
-        if (opacity === 'on') {
-            document.body.classList.add('card-opacity-on');
+    function updateAppearanceUI() {
+        if (!currentUser) return;
+
+        // Apply Theme (to main settings and global)
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(currentTheme); // Applies to body class and themeToggle/radios
+
+        // Apply Background (to main settings and gallery view)
+        const galleryBackgroundElement = document.documentElement;
+        const bodyElement = document.body;
+
+        // Main settings switches/containers
+        const enableBackgroundSwitch = document.getElementById('enable-background-switch');
+        const backgroundSelectorContainer = document.getElementById('background-selector-container');
+        const backgroundSelectorGrid = document.getElementById('background-selector-grid');
+
+        // Gallery settings switches/containers
+        const galleryEnableBackgroundSwitch = document.getElementById('gallery-enable-background-switch');
+        const galleryBackgroundOptions = document.getElementById('gallery-background-options');
+        const galleryBackgroundSelectorGrid = document.getElementById('gallery-background-selector-grid');
+
+        if (currentUser.background && currentUser.background !== 'disattivato') {
+            galleryBackgroundElement.style.setProperty('--gallery-background', `url(data/backgrounds/${currentUser.background})`);
+            bodyElement.classList.add('body-has-background');
+
+            // Update main settings UI
+            if (enableBackgroundSwitch) enableBackgroundSwitch.checked = true;
+            if (backgroundSelectorContainer) backgroundSelectorContainer.classList.remove('hidden');
+            
+            // Update gallery settings UI
+            if (galleryEnableBackgroundSwitch) galleryEnableBackgroundSwitch.checked = true;
+            if (galleryBackgroundOptions) galleryBackgroundOptions.style.display = 'block';
+
+            // Select the background in both grids
+            [backgroundSelectorGrid, galleryBackgroundSelectorGrid].forEach(grid => {
+                if (grid) {
+                    grid.querySelectorAll('.img-thumbnail').forEach(img => {
+                        if (img.closest('.background-item').dataset.bg === currentUser.background) {
+                            img.classList.add('selected');
+                        } else {
+                            img.classList.remove('selected');
+                        }
+                    });
+                }
+            });
         } else {
-            document.body.classList.remove('card-opacity-on');
+            bodyElement.classList.remove('body-has-background');
+            galleryBackgroundElement.style.removeProperty('--gallery-background');
+
+            // Update main settings UI
+            if (enableBackgroundSwitch) enableBackgroundSwitch.checked = false;
+            if (backgroundSelectorContainer) backgroundSelectorContainer.classList.add('hidden');
+
+            // Update gallery settings UI
+            if (galleryEnableBackgroundSwitch) galleryEnableBackgroundSwitch.checked = false;
+            if (galleryBackgroundOptions) galleryBackgroundOptions.style.display = 'none';
+
+            // Deselect backgrounds in both grids
+            [backgroundSelectorGrid, galleryBackgroundSelectorGrid].forEach(grid => {
+                if (grid) {
+                    grid.querySelectorAll('.img-thumbnail').forEach(img => img.classList.remove('selected'));
+                }
+            });
+        }
+
+        // Apply Card Opacity (to main settings and gallery view)
+        const enableCardOpacitySwitch = document.getElementById('enable-card-opacity-switch'); // Main settings switch
+        const cardOpacitySliderContainer = document.getElementById('card-opacity-slider-container'); // Main settings slider container
+
+        const galleryEnableCardOpacitySwitch = document.getElementById('gallery-enable-card-opacity-switch'); // Gallery settings switch
+        const galleryCardOpacitySliderContainer = document.getElementById('gallery-card-opacity-slider-container');
+
+        if (currentUser.background && currentUser.background !== 'disattivato') {
+            galleryBackgroundElement.style.setProperty('--gallery-background', `url(data/backgrounds/${currentUser.background})`);
+            bodyElement.classList.add('body-has-background');
+
+            // Update main settings UI
+            if (enableBackgroundSwitch) enableBackgroundSwitch.checked = true;
+            if (backgroundSelectorContainer) backgroundSelectorContainer.classList.remove('hidden');
+
+            // Update gallery settings UI
+            if (galleryEnableBackgroundSwitch) galleryEnableBackgroundSwitch.checked = true;
+            if (galleryBackgroundOptions) galleryBackgroundOptions.style.display = 'block';
+
+            // Select the background in both grids
+            [backgroundSelectorGrid, galleryBackgroundSelectorGrid].forEach(grid => {
+                if (grid) {
+                    grid.querySelectorAll('.img-thumbnail').forEach(img => {
+                        if (img.closest('.background-item').dataset.bg === currentUser.background) {
+                            img.classList.add('selected');
+                        } else {
+                            img.classList.remove('selected');
+                        }
+                    });
+                }
+            });
+
+            // Card Opacity: Only enable/show if background is active
+            if (enableCardOpacitySwitch) enableCardOpacitySwitch.disabled = false;
+            if (galleryEnableCardOpacitySwitch) galleryEnableCardOpacitySwitch.disabled = false;
+
+            if (currentUser.card_opacity === 'on') {
+                bodyElement.classList.add('card-opacity-on');
+                if (enableCardOpacitySwitch) enableCardOpacitySwitch.checked = true;
+                if (cardOpacitySliderContainer) cardOpacitySliderContainer.style.display = 'block';
+                if (galleryEnableCardOpacitySwitch) galleryEnableCardOpacitySwitch.checked = true;
+                if (galleryCardOpacitySliderContainer) galleryCardOpacitySliderContainer.style.display = 'block';
+            } else {
+                bodyElement.classList.remove('card-opacity-on');
+                if (enableCardOpacitySwitch) enableCardOpacitySwitch.checked = false;
+                if (cardOpacitySliderContainer) cardOpacitySliderContainer.style.display = 'none';
+                if (galleryEnableCardOpacitySwitch) galleryEnableCardOpacitySwitch.checked = false;
+                if (galleryCardOpacitySliderContainer) galleryCardOpacitySliderContainer.style.display = 'none';
+            }
+
+        } else { // Background is 'disattivato'
+            bodyElement.classList.remove('body-has-background');
+            galleryBackgroundElement.style.removeProperty('--gallery-background');
+
+            // Update main settings UI
+            if (enableBackgroundSwitch) enableBackgroundSwitch.checked = false;
+            if (backgroundSelectorContainer) backgroundSelectorContainer.classList.add('hidden');
+
+            // Update gallery settings UI
+            if (galleryEnableBackgroundSwitch) galleryEnableBackgroundSwitch.checked = false;
+            if (galleryBackgroundOptions) galleryBackgroundOptions.style.display = 'none';
+
+            // Deselect backgrounds in both grids
+            [backgroundSelectorGrid, galleryBackgroundSelectorGrid].forEach(grid => {
+                if (grid) {
+                    grid.querySelectorAll('.img-thumbnail').forEach(img => img.classList.remove('selected'));
+                }
+            });
+
+            // Card Opacity: Disable/hide if background is not active
+            bodyElement.classList.remove('card-opacity-on');
+            if (enableCardOpacitySwitch) { enableCardOpacitySwitch.checked = false; enableCardOpacitySwitch.disabled = true; }
+            if (cardOpacitySliderContainer) cardOpacitySliderContainer.style.display = 'none';
+
+            if (galleryEnableCardOpacitySwitch) { galleryEnableCardOpacitySwitch.checked = false; galleryEnableCardOpacitySwitch.disabled = true; }
+            if (galleryCardOpacitySliderContainer) galleryCardOpacitySliderContainer.style.display = 'none';
         }
     }
 
-
-
     function initTheme() {
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        applyTheme(currentTheme);
-        
-        // Apply card opacity on load based on user preference
-        if (currentUser && currentUser.card_opacity) {
-            applyCardOpacity(currentUser.card_opacity);
-        }
-        
-        // Apply card opacity on load based on user preference
-        if (currentUser && currentUser.card_opacity) {
-            applyCardOpacity(currentUser.card_opacity);
-        }
+        updateAppearanceUI();
 
         if (themeToggle) {
             themeToggle.addEventListener('change', () => {
@@ -197,13 +320,8 @@ document.addEventListener('DOMContentLoaded', () => {
             activeView.classList.add('active');
         }
 
-        // Gestione sfondo galleria
-        if (viewId === 'gallery-view' && currentUser && currentUser.background && currentUser.background !== 'disattivato') {
-            document.documentElement.style.setProperty('--gallery-background', `url(data/backgrounds/${currentUser.background})`);
-            document.body.classList.add('body-has-background');
-        } else {
-            document.body.classList.remove('body-has-background');
-            document.documentElement.style.removeProperty('--gallery-background');
+        if (viewId === 'gallery-view') {
+            updateAppearanceUI();
         }
     };
 
@@ -274,10 +392,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     username: result.username, 
                     role: result.role, 
                     avatar: result.avatar, 
-                    background: result.background,
-                    card_opacity: result.card_opacity 
-                };
-                isAdmin = (result.role === 'admin');
+                                        background: result.background,
+                                        card_opacity: (result.opacity === 'yes' ? 'on' : 'off')
+                                    };                isAdmin = (result.role === 'admin');
             } else {
                 currentUser = null;
                 isAdmin = false;
@@ -295,9 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const initGalleryControls = () => {
         const elementFiltersContainer = document.getElementById('element-filters');
         if (!elementFiltersContainer) return;
-        
+
         elementFiltersContainer.innerHTML = ''; // Clear previous filters
-        
+
         elementsData.forEach(element => {
             const elId = `filter-${createSafeId(element.name)}`;
             const iconPath = element.icon ? `data/icons/elements/${element.icon}` : '';
@@ -407,7 +524,176 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // --- SEZIONE: DASHBOARD ---
+
+    const initGallerySettings = async () => {
+        const settingsToggleBtn = document.getElementById('gallery-settings-toggle-btn');
+        const settingsPanel = document.getElementById('gallery-settings-panel');
+        const enableBackgroundSwitch = document.getElementById('gallery-enable-background-switch');
+        const backgroundOptionsContainer = document.getElementById('gallery-background-options');
+        const backgroundSelectorGrid = document.getElementById('gallery-background-selector-grid');
+        const galleryEnableCardOpacitySwitch = document.getElementById('gallery-enable-card-opacity-switch'); // This is the switch for card opacity in gallery panel
+
+        if (!settingsToggleBtn || !settingsPanel || !enableBackgroundSwitch || !backgroundOptionsContainer || !backgroundSelectorGrid || !galleryEnableCardOpacitySwitch) return;
+
+        // Toggle settings panel visibility
+        settingsToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.style.display = settingsPanel.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Hide panel if clicked outside
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target) && e.target !== settingsToggleBtn) {
+                settingsPanel.style.display = 'none';
+            }
+        });
+
+        // Populate background selector grid
+        const response = await fetch('php/api.php?action=get_backgrounds');
+        const data = await response.json();
+        if (data.status === 'success') {
+            backgroundSelectorGrid.innerHTML = '';
+            data.backgrounds.forEach(bg => {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'col';
+                itemWrapper.innerHTML = `
+                    <div class="background-item" data-bg="${bg}">
+                        <img src="data/backgrounds/${bg}" class="img-thumbnail">
+                        <div class="background-item-overlay">
+                            <i class="bi bi-eye-fill preview-icon"></i>
+                        </div>
+                    </div>
+                `;
+                backgroundSelectorGrid.appendChild(itemWrapper);
+            });
+        }
+
+        // Event listener for Custom Background Activation switch
+        enableBackgroundSwitch.addEventListener('change', async () => {
+            const isEnabled = enableBackgroundSwitch.checked;
+            backgroundOptionsContainer.style.display = isEnabled ? 'block' : 'none';
+
+            let newBackgroundValue = currentUser.background;
+            if (!isEnabled) {
+                newBackgroundValue = 'disattivato';
+            } else {
+                // If enabling and no background is set, try to set a default
+                if (currentUser.background === 'disattivato' || !currentUser.background) {
+                    const backgroundsResponse = await fetch('php/api.php?action=get_backgrounds');
+                    const backgroundsData = await backgroundsResponse.json();
+                    if (backgroundsData.status === 'success' && backgroundsData.backgrounds.length > 0) {
+                        newBackgroundValue = backgroundsData.backgrounds[0]; // Pick the first one as default
+                    } else {
+                        showToast('Nessuno sfondo disponibile. Carica uno sfondo o disattiva l\'opzione.');
+                        enableBackgroundSwitch.checked = false; // Revert switch
+                        backgroundOptionsContainer.style.display = 'none';
+                        return;
+                    }
+                }
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('background', newBackgroundValue);
+
+            try {
+                const updateResponse = await fetch('php/api.php', { method: 'POST', body: formData });
+                const updateResult = await updateResponse.json();
+                if (updateResult.status === 'success') {
+                    showToast(`Sfondo personalizzato ${isEnabled ? 'attivato' : 'disattivato'}.`);
+                    currentUser.background = newBackgroundValue;
+                    updateAppearanceUI();
+                } else {
+                    showErrorAlert(updateResult.message);
+                    enableBackgroundSwitch.checked = !isEnabled; // Revert switch
+                    backgroundOptionsContainer.style.display = isEnabled ? 'none' : 'block';
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+                enableBackgroundSwitch.checked = !isEnabled; // Revert switch
+                backgroundOptionsContainer.style.display = isEnabled ? 'none' : 'block';
+            }
+        });
+
+        // Event listener for background selection in the new panel
+        backgroundSelectorGrid.addEventListener('click', async (e) => {
+            const backgroundItem = e.target.closest('.background-item');
+            if (!backgroundItem) return;
+
+            const bg = backgroundItem.dataset.bg;
+
+            // If preview icon is clicked
+            if (e.target.classList.contains('preview-icon')) {
+                Swal.fire({
+                    imageUrl: `data/backgrounds/${bg}`,
+                    imageWidth: '90vw',
+                    imageAlt: 'Anteprima Sfondo',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    background: '#000000d0',
+                    customClass: {
+                        image: 'swal-image-responsive'
+                    },
+                    backdrop: `
+                        rgba(0,0,0,0.4)
+                        url("data/backgrounds/${bg}")
+                        center/cover
+                        no-repeat
+                    `
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('background', bg);
+            const updateResponse = await fetch('php/api.php', { method: 'POST', body: formData });
+            const updateResult = await updateResponse.json();
+            if (updateResult.status === 'success') {
+                showToast('Sfondo aggiornato!');
+                currentUser.background = bg;
+                updateAppearanceUI();
+            }
+        });
+
+        // Event listener for Card Opacity switch (in gallery panel)
+        galleryEnableCardOpacitySwitch.addEventListener('change', async () => {
+            const isEnabled = galleryEnableCardOpacitySwitch.checked;
+
+            const newOpacityValue = isEnabled ? 'yes' : 'no';
+
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('opacity', newOpacityValue);
+
+            try {
+                const updateResponse = await fetch('php/api.php', { method: 'POST', body: formData });
+                const updateResult = await updateResponse.json();
+                console.log('Gallery Opacity Update Result:', updateResult);
+                if (updateResult.status === 'success') {
+                    // showToast(`Opacità card ${isEnabled ? 'attivata' : 'disattivata'}.`); // Suppressed feedback
+                    currentUser.card_opacity = (newOpacityValue === 'yes' ? 'on' : 'off');
+                    updateAppearanceUI();
+                } else {
+                    showErrorAlert(updateResult.message);
+                    galleryEnableCardOpacitySwitch.checked = !isEnabled; // Revert switch
+                }
+            } catch (error) {
+                console.error('Error updating gallery opacity:', error);
+                showErrorAlert('Errore di comunicazione con il server.');
+                galleryEnableCardOpacitySwitch.checked = !isEnabled; // Revert switch
+            }
+        });
+
+        // Initial UI update for the new panel
+        updateAppearanceUI();
+    };
     const loadDashboard = (charData) => {
         currentCharacterData = charData;
         
@@ -861,21 +1147,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const opacitySwitch = e.target.closest('#enable-card-opacity-switch');
         if (opacitySwitch) {
             const isEnabled = opacitySwitch.checked;
-            const newValue = isEnabled ? 'on' : 'off';
+            const newOpacityValue = isEnabled ? 'yes' : 'no';
 
             const formData = new FormData();
             formData.append('action', 'update_user');
             formData.append('original_username', currentUser.username);
             formData.append('username', currentUser.username);
-            formData.append('card_opacity', newValue);
+            formData.append('opacity', newOpacityValue);
 
             try {
                 const response = await fetch('php/api.php', { method: 'POST', body: formData });
                 const result = await response.json();
+                console.log('Main Opacity Update Result:', result);
                 if (result.status === 'success') {
-                    showToast(`Opacità card ${isEnabled ? 'attivata' : 'disattivata'}.`);
-                    currentUser.card_opacity = newValue;
-                    applyCardOpacity(newValue);
+                    // showToast(`Opacità card ${isEnabled ? 'attivata' : 'disattivata'}.`); // Suppressed feedback
+                    currentUser.card_opacity = (newOpacityValue === 'yes' ? 'on' : 'off');
+                    updateAppearanceUI();
                 } else {
                     showErrorAlert(result.message);
                     // Revert the switch if the save fails
@@ -908,9 +1195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast('Sfondo disattivato.');
                     currentUser.background = 'disattivato';
                     document.querySelectorAll('#background-selector-grid img').forEach(img => img.classList.remove('selected'));
-                    if (location.hash === '#' || location.hash === '#gallery-view') {
-                        handleRouteChange();
-                    }
+                    updateAppearanceUI();
                 } else {
                     showErrorAlert(result.message);
                 }
@@ -960,13 +1245,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.status === 'success') {
             showToast('Sfondo aggiornato!');
             currentUser.background = bg;
-            if (location.hash === '#' || location.hash === '#gallery-view') {
-                handleRouteChange();
-            }
+            updateAppearanceUI();
         } else {
             showErrorAlert(result.message);
         }
     });
+
+
 
     document.getElementById('upload-background-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1793,9 +2078,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initCharacterCreationForm();
         initGalleryControls();
-        initTheme();
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
+        initTheme();
+        initGallerySettings();
         updateLoginUI();
     };
 

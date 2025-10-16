@@ -1,0 +1,22 @@
+{
+    "profile": {
+        "name": "Ayaka",
+        "splashart": "uploads\/user_68ecf2d75bd41664668239_ayaka.webp",
+        "element": "Cryo",
+        "role": [
+            "Healer"
+        ],
+        "tracked_stats": [
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Crit Damage (%)": 2
+        },
+        "acquisition_date": "2025-10-16",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": []
+}

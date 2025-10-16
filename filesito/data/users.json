@@ -5,6 +5,7 @@
         "role": "admin",
         "avatar": "uploads\/user_68ecf2d75bd41664668239_avatar.webp",
         "background": "Natlan.webp",
-        "id": "user_68ecf2d75bd41664668239"
+        "id": "user_68ecf2d75bd41664668239",
+        "opacity": "yes"
     }
 ]

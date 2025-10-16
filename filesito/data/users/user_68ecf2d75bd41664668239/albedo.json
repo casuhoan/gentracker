@@ -18,5 +18,15 @@
         "talents": "Sì",
         "rarity": "5-star"
     },
-    "builds": []
+    "builds": [
+        {
+            "date": "2025-10-16",
+            "stats": {
+                "Energy Recharge (%)": "4"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        }
+    ]
 }
