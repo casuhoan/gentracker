@@ -882,3 +882,18 @@ body.dark-mode #gallery-settings-panel {
 #gallery-card-opacity-slider-container {
     margin-top: 1rem;
 }
+
+/* Stili per le sezioni del form di creazione personaggio */
+.form-section-box {
+    background-color: var(--light-card-bg);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--light-card-border);
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+body.dark-mode .form-section-box {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
