@@ -1268,6 +1268,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('upload-favicon-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Caricamento...';
+
+        const formData = new FormData(form);
+        formData.append('action', 'upload_favicon');
+
+        try {
+            const response = await fetch('php/api.php', { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                showToast('Favicon aggiornata con successo!');
+                
+                const faviconTag = document.querySelector('link[rel="icon"]');
+                if (faviconTag) {
+                    faviconTag.href = result.path;
+                }
+                
+                form.reset();
+            } else {
+                showErrorAlert(result.message || 'Si è verificato un errore.');
+            }
+        } catch (error) {
+            showErrorAlert('Errore di comunicazione con il server.');
+            console.error('Favicon upload error:', error);
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Carica Favicon';
+        }
+    });
+
     document.getElementById('background-management-grid')?.addEventListener('click', async (e) => {
         if (e.target.classList.contains('delete-background-btn')) {
             const filename = e.target.dataset.bg;

@@ -897,3 +897,23 @@ body.dark-mode .form-section-box {
     background-color: var(--dark-card-bg);
     border-color: var(--dark-card-border);
 }
+
+/*
+ * Fix per Stile Testo con Sfondo Attivo (Richiesta Utente)
+ * Applica l'effetto luminoso e i colori corretti a specifici elementi
+ * quando è impostato uno sfondo globale.
+ */
+
+/* [FIX] Vista CREA PERSONAGGIO */
+
+/* Applica effetto luminoso a p e label in light mode (già presente in dark mode) */
+body.body-has-background:not(.dark-mode) #character-creation-view .form-label,
+body.body-has-background:not(.dark-mode) #character-creation-view p.text-muted {
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff;
+}
+
+/* Applica effetto luminoso e colore blu scuro ai titoli h5 */
+body.body-has-background #character-creation-view h5 {
+    color: #0056b3 !important; /* Blu scuro richiesto */
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff;
+}

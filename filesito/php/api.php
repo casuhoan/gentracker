@@ -342,6 +342,34 @@ function delete_background() {
     }
 }
 
+function upload_favicon() {
+    if (!isset($_FILES['favicon_file']) || $_FILES['favicon_file']['error'] != 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Nessun file caricato o errore nel caricamento.']);
+        return;
+    }
+
+    $favicon_dir = __DIR__ . '/../data/favicons/';
+    if (!is_dir($favicon_dir)) {
+        mkdir($favicon_dir, 0777, true);
+    }
+
+    // Rimuovi vecchie favicon per tenerne solo una
+    $existing_favicons = glob($favicon_dir . 'favicon.*');
+    foreach ($existing_favicons as $existing) {
+        unlink($existing);
+    }
+
+    $file_ext = pathinfo($_FILES['favicon_file']['name'], PATHINFO_EXTENSION);
+    $file_name = 'favicon.' . $file_ext;
+    $target_file = $favicon_dir . $file_name;
+
+    if (move_uploaded_file($_FILES['favicon_file']['tmp_name'], $target_file)) {
+        echo json_encode(['status' => 'success', 'message' => 'Favicon caricata con successo.', 'path' => 'data/favicons/' . $file_name]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Errore durante il salvataggio della favicon.']);
+    }
+}
+
 // --- NEW USER SCHEMA FUNCTIONS ---
 function get_user_schema() {
     $schema_file = get_user_schema_file();
@@ -1178,7 +1206,7 @@ $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon'];
 
 if (in_array($action, $public_actions)) {
     $action();
