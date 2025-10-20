@@ -98,9 +98,18 @@ body.body-has-background #dashboard-title,
 body.body-has-background #dashboard-view .form-label,
 body.body-has-background #character-creation-view h2,
 body.body-has-background #build-logger-view h2,
-body.body-has-background #build-management-view h2 {
+body.body-has-background #build-management-view h2,
+body.body-has-background #character-creation-view p.text-muted,
+body.body-has-background #character-creation-view label[for="character-library-select"],
+body.body-has-background #character-creation-view label[for="name"],
+body.body-has-background #character-creation-view label[for="splashart"],
+body.body-has-background #character-creation-view label[for="acquisition_date"],
+body.body-has-background #character-creation-view label[for="constellation"],
+body.body-has-background #character-creation-view label[for="signature_weapon"],
+body.body-has-background #character-creation-view label[for="talents"],
+body.body-has-background #character-creation-view .row.align-items-center .col-md-4 > .form-label {
     color: #212529 !important; /* Black text */
-    text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Text glow */
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff !important; /* Text glow */
 }
 
 /* Remove text shadow from these elements when no background is active */
@@ -134,8 +143,6 @@ body:not(.body-has-background):not(.dark-mode) #build-management-view h2 {
 }
 
 /* Small texts (p, label) in specific views: white with illumination in dark mode when background is active */
-body.body-has-background.dark-mode #character-creation-view p,
-body.body-has-background.dark-mode #character-creation-view label,
 body.body-has-background.dark-mode #build-logger-view p,
 body.body-has-background.dark-mode #build-logger-view label,
 body.body-has-background.dark-mode #build-management-view p,
@@ -913,7 +920,7 @@ body.body-has-background:not(.dark-mode) #character-creation-view p.text-muted {
 }
 
 /* Applica effetto luminoso e colore blu scuro ai titoli h5 */
-body.body-has-background #character-creation-view h5 {
+body.body-has-background #character-creation-view hr + h5 {
     color: #0056b3 !important; /* Blu scuro richiesto */
-    text-shadow: 0 0 8px #fff, 0 0 10px #fff;
+    text-shadow: 0 0 8px #fff, 0 0 10px #fff !important;
 }
