@@ -242,26 +242,35 @@ body.body-has-background #settings-view h2 {
     text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Keep glow for title */
 }
 
+/* Style for the unified settings menu container */
+body.body-has-background #settings-view #v-pills-tab {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+}
+body.body-has-background.dark-mode #settings-view #v-pills-tab {
+    background-color: rgba(52, 58, 64, 0.9);
+}
+
+/* Reset individual link backgrounds */
 body.body-has-background #settings-view .nav-pills .nav-link {
-    background-color: rgba(255, 255, 255, 0.9); /* Background for nav links in settings */
-    color: #212529; /* Ensure text is readable */
-    text-shadow: none; /* Remove text shadow */
-    margin-bottom: 2px; /* Small gap between items */
-    border-radius: 0.375rem; /* Rounded corners */
-    transition: all 0.2s ease-in-out;
+    background-color: transparent; /* No individual background */
+    color: #212529;
+    text-shadow: none;
+    margin-bottom: 2px; /* Keep a small gap */
+    border-radius: 0.25rem; /* Smaller radius for the hover effect */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 body.body-has-background.dark-mode #settings-view .nav-pills .nav-link {
-    background-color: rgba(52, 58, 64, 0.9); /* Dark background for nav links */
-    color: #dee2e6; /* Dark mode text color */
+    background-color: transparent;
+    color: #dee2e6;
 }
 
+/* Style for hover/active links */
 body.body-has-background #settings-view .nav-pills .nav-link:hover,
 body.body-has-background #settings-view .nav-pills .nav-link.active {
-    background-color: rgba(200, 200, 200, 0.95); /* Lighter on hover/active */
-    transform: translateY(-1px); /* Slight lift effect */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1; /* Bring to front on hover */
+    background-color: rgba(200, 200, 200, 0.95); /* Lighter gray on hover/active */
 }
 
 body.body-has-background.dark-mode #settings-view .nav-pills .nav-link:hover,
