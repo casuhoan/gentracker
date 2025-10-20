@@ -1,0 +1,32 @@
+[
+    {
+        "name": "username",
+        "default": "",
+        "editable": false
+    },
+    {
+        "name": "passwordHash",
+        "default": "",
+        "editable": false
+    },
+    {
+        "name": "role",
+        "default": "user",
+        "editable": true
+    },
+    {
+        "name": "avatar",
+        "default": "",
+        "editable": true
+    },
+    {
+        "name": "background",
+        "default": "disattivato",
+        "editable": true
+    },
+    {
+        "name": "card_opacity",
+        "default": "off",
+        "editable": true
+    }
+]

@@ -107,7 +107,11 @@ body.body-has-background #character-creation-view label[for="acquisition_date"],
 body.body-has-background #character-creation-view label[for="constellation"],
 body.body-has-background #character-creation-view label[for="signature_weapon"],
 body.body-has-background #character-creation-view label[for="talents"],
-body.body-has-background #character-creation-view .row.align-items-center .col-md-4 > .form-label {
+body.body-has-background #character-creation-view .row.align-items-center .col-md-4 > .form-label,
+body.body-has-background #build-logger-view p.text-muted,
+body.body-has-background #build-logger-view .form-label,
+body.body-has-background #build-management-view p.text-muted,
+body.body-has-background #build-management-view .form-label {
     color: #212529 !important; /* Black text */
     text-shadow: 0 0 8px #fff, 0 0 10px #fff !important; /* Text glow */
 }
@@ -143,10 +147,6 @@ body:not(.body-has-background):not(.dark-mode) #build-management-view h2 {
 }
 
 /* Small texts (p, label) in specific views: white with illumination in dark mode when background is active */
-body.body-has-background.dark-mode #build-logger-view p,
-body.body-has-background.dark-mode #build-logger-view label,
-body.body-has-background.dark-mode #build-management-view p,
-body.body-has-background.dark-mode #build-management-view label,
 body.body-has-background.dark-mode #dashboard-view p,
 body.body-has-background.dark-mode #dashboard-view label {
     color: #dee2e6 !important; /* White text */
@@ -235,17 +235,11 @@ body.body-has-background.dark-mode .form-select {
 
 /* Settings view specific styling */
 body.body-has-background #settings-view h2 {
-    background-color: rgba(255, 255, 255, 0.8); /* Background for settings title */
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     margin-bottom: 1rem;
     color: #212529 !important;
     text-shadow: 0 0 8px #fff, 0 0 10px #fff; /* Keep glow for title */
-}
-
-body.body-has-background.dark-mode #settings-view h2 {
-    background-color: rgba(52, 58, 64, 0.8); /* Dark background for settings title */
-    color: #dee2e6 !important;
 }
 
 body.body-has-background #settings-view .nav-pills .nav-link {
@@ -272,7 +266,7 @@ body.body-has-background #settings-view .nav-pills .nav-link.active {
 
 body.body-has-background.dark-mode #settings-view .nav-pills .nav-link:hover,
 body.body-has-background.dark-mode #settings-view .nav-pills .nav-link.active {
-    background-color: rgba(70, 70, 70, 0.95); /* Lighter dark on hover/active */
+    background-color: rgba(45, 50, 55, 0.95); /* Darker on hover/active */
 }
 
 body.body-has-background #settings-view .tab-content {
@@ -872,6 +866,10 @@ body.dark-mode #gallery-settings-panel {
     border-color: rgba(255, 255, 255, 0.175);
 }
 
+body.body-has-background.dark-mode #gallery-settings-panel p {
+    color: #dee2e6 !important;
+}
+
 #gallery-settings-panel h5 {
     margin-bottom: 0.5rem;
 }
@@ -905,6 +903,11 @@ body.dark-mode .form-section-box {
     border-color: var(--dark-card-border);
 }
 
+/* Unify switch animation speed to match theme toggle */
+.form-switch .form-check-input {
+    transition: background-position .4s ease-in-out !important;
+}
+
 /*
  * Fix per Stile Testo con Sfondo Attivo (Richiesta Utente)
  * Applica l'effetto luminoso e i colori corretti a specifici elementi
@@ -920,7 +923,8 @@ body.body-has-background:not(.dark-mode) #character-creation-view p.text-muted {
 }
 
 /* Applica effetto luminoso e colore blu scuro ai titoli h5 */
-body.body-has-background #character-creation-view hr + h5 {
+body.body-has-background #character-creation-view hr + h5,
+body.body-has-background #build-logger-view h5 {
     color: #0056b3 !important; /* Blu scuro richiesto */
     text-shadow: 0 0 8px #fff, 0 0 10px #fff !important;
 }

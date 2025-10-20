@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showToast = (title, icon = 'success') => {
-        Swal.fire({ toast: true, position: 'top-end', icon, title, showConfirmButton: false, timer: 3000, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); } });
+        Swal.fire({ toast: true, position: 'top-end', icon, title, showConfirmButton: false, timer: 1500, timerProgressBar: true, didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); } });
     };
 
     const showErrorAlert = (message) => {
@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const updateResponse = await fetch('php/api.php', { method: 'POST', body: formData });
                 const updateResult = await updateResponse.json();
                 if (updateResult.status === 'success') {
-                    showToast(`Sfondo personalizzato ${isEnabled ? 'attivato' : 'disattivato'}.`);
+                    // showToast(`Sfondo personalizzato ${isEnabled ? 'attivato' : 'disattivato'}.`);
                     currentUser.background = newBackgroundValue;
                     updateAppearanceUI();
                 } else {
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const updateResponse = await fetch('php/api.php', { method: 'POST', body: formData });
             const updateResult = await updateResponse.json();
             if (updateResult.status === 'success') {
-                showToast('Sfondo aggiornato!');
+                // showToast('Sfondo aggiornato!');
                 currentUser.background = bg;
                 updateAppearanceUI();
             }
