@@ -937,3 +937,94 @@ body.body-has-background #build-logger-view h5 {
     color: #0056b3 !important; /* Blu scuro richiesto */
     text-shadow: 0 0 8px #fff, 0 0 10px #fff !important;
 }
+
+/* Stili per il Grimorio */
+body.grimoire-background {
+    background-image: var(--grimoire-background);
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.grimoire-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.375rem;
+    background-color: var(--light-card-bg);
+    transition: transform 0.2s ease-in-out;
+}
+
+body.dark-mode .grimoire-card {
+    background-color: var(--dark-card-bg);
+}
+
+.grimoire-card:hover {
+    transform: translateY(-5px);
+}
+
+.grimoire-card-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: filter 0.3s ease;
+}
+
+.grimoire-card-body {
+    padding: 1rem;
+}
+
+.grimoire-card-element {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    z-index: 10;
+}
+
+.grimoire-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.grimoire-card:hover .grimoire-card-overlay {
+    opacity: 1;
+}
+
+.grimoire-card:hover .grimoire-card-img {
+    filter: brightness(0.5);
+}
+
+.grimoire-overlay-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.grimoire-overlay-title {
+    font-size: 1rem;
+    font-style: italic;
+}
+
+/* Sfondo per le viste del grimorio */
+#grimoire-view,
+#character-detail-view {
+    background-color: transparent;
+}
+
+/* Rimuove l'effetto di retroilluminazione dai titoli del grimorio */
+#grimoire-view h2,
+#character-detail-view h2 {
+    text-shadow: none !important;
+}

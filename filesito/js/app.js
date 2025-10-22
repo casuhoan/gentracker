@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dataLoaded = false;
     let currentUser = null;
     let isAdmin = false;
+    let grimoireBackground = null;
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
@@ -314,14 +315,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ROUTER E GESTIONE VISTE ---
     const showView = (viewId) => {
+        const body = document.body;
         views.forEach(view => view.classList.remove('active'));
         const activeView = document.getElementById(viewId);
         if (activeView) {
             activeView.classList.add('active');
         }
 
-        if (viewId === 'gallery-view') {
-            updateAppearanceUI();
+        // Reset classes first
+        body.classList.remove('body-has-background', 'grimoire-background');
+        document.documentElement.style.removeProperty('--gallery-background');
+        document.documentElement.style.removeProperty('--grimoire-background');
+
+        // Apply the correct background based on the view
+        if (viewId === 'grimoire-view' || viewId === 'character-detail-view') {
+            // These views get the specific grimoire background
+            applyGrimoireBackground();
+        } else {
+            // All other views get the default gallery background
+            updateAppearanceUI(); 
         }
     };
 
@@ -361,9 +373,13 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 location.hash = '#';
             }
+        } else if (hash.startsWith('#grimoire-character/')) {
+            const charName = decodeURIComponent(hash.substring(20));
+            loadCharacterDetailPage(charName);
         } else {
             const routeMap = {
                 '#': 'gallery-view',
+                '#grimoire': 'grimoire-view',
                 '#new-character': 'character-creation-view',
                 '#new-build': 'build-logger-view',
                 '#manage-builds': 'build-management-view',
@@ -374,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showView(viewId);
 
             if (viewId === 'gallery-view') applyFiltersAndSorting();
+            if (viewId === 'grimoire-view') loadGrimoirePage();
             if (viewId === 'character-creation-view') resetCharacterForm();
             if (viewId === 'build-logger-view') loadCharactersForBuildLogger();
             if (viewId === 'build-management-view') loadBuildManagement();
@@ -405,6 +422,129 @@ document.addEventListener('DOMContentLoaded', () => {
             currentUser = null;
             isAdmin = false;
             updateLoginUI();
+        }
+    };
+
+    // --- SEZIONE: GRIMORIO ---
+    const initGrimoireControls = () => {
+        const elementFiltersContainer = document.getElementById('grimoire-element-filters');
+        if (!elementFiltersContainer) return;
+
+        elementFiltersContainer.innerHTML = ''; // Clear previous filters
+
+        elementsData.forEach(element => {
+            const elId = `grimoire-filter-${createSafeId(element.name)}`;
+            const iconPath = element.icon ? `data/icons/elements/${element.icon}` : '';
+
+            const label = document.createElement('label');
+            label.className = 'element-filter-label';
+            label.setAttribute('for', elId);
+            label.title = element.name; // Tooltip with element name
+
+            label.innerHTML = `
+                <input class="form-check-input element-filter-checkbox" type="checkbox" value="${element.name}" id="${elId}" checked>
+                <img src="${iconPath}" class="element-filter-icon" alt="${element.name}">
+            `;
+            elementFiltersContainer.appendChild(label);
+        });
+
+        document.getElementById('grimoire-name-filter').addEventListener('input', applyGrimoireFiltersAndSorting);
+        document.getElementById('grimoire-sort-select').addEventListener('change', applyGrimoireFiltersAndSorting);
+        elementFiltersContainer.addEventListener('change', applyGrimoireFiltersAndSorting);
+    };
+
+    const applyGrimoireFiltersAndSorting = () => {
+        let filteredCharacters = [...characterLibrary];
+        const nameFilter = document.getElementById('grimoire-name-filter').value.toLowerCase();
+        if (nameFilter) {
+            filteredCharacters = filteredCharacters.filter(char => char.nome.toLowerCase().includes(nameFilter));
+        }
+
+        const selectedElements = Array.from(document.querySelectorAll('#grimoire-element-filters input:checked')).map(cb => cb.value);
+        if (selectedElements.length > 0) {
+            filteredCharacters = filteredCharacters.filter(char => selectedElements.includes(char.elemento));
+        }
+
+        const sortValue = document.getElementById('grimoire-sort-select').value;
+        const sortFunctions = {
+            'nameAsc': (a, b) => a.nome.localeCompare(b.nome),
+            'nameDesc': (a, b) => b.nome.localeCompare(a.nome),
+            'elementAsc': (a, b) => a.elemento.localeCompare(b.elemento) || a.nome.localeCompare(b.nome),
+            'rarityAsc': (a, b) => (a.rarita === '4-star' ? 4 : 5) - (b.rarita === '4-star' ? 4 : 5) || a.nome.localeCompare(b.nome),
+            'rarityDesc': (a, b) => (b.rarita === '4-star' ? 4 : 5) - (a.rarita === '4-star' ? 4 : 5) || a.nome.localeCompare(b.nome),
+        };
+        if (sortFunctions[sortValue]) {
+            filteredCharacters.sort(sortFunctions[sortValue]);
+        }
+
+        renderGrimoire(filteredCharacters);
+    };
+
+    const renderGrimoire = (characters) => {
+        const grid = document.getElementById('grimoire-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        if (characters.length === 0) {
+            grid.innerHTML = '<div class="col-12 text-center"><p>Nessun personaggio trovato con i filtri attuali.</p></div>';
+            return;
+        }
+
+        characters.forEach(char => {
+            const element = elementsData.find(e => e.name === char.elemento);
+            const elementIcon = element ? `data/icons/elements/${element.icon}` : '';
+
+            const card = document.createElement('div');
+            card.className = 'col';
+            card.innerHTML = `
+                <a href="#grimoire-character/${encodeURIComponent(char.nome)}" class="text-decoration-none">
+                    <div class="grimoire-card">
+                        <img src="data/${char.immagine}" class="grimoire-card-img" alt="${char.nome}">
+                        <img src="${elementIcon}" class="grimoire-card-element" alt="${char.elemento}">
+                        <div class="grimoire-card-body">
+                            <h5 class="card-title text-center">${char.nome}</h5>
+                        </div>
+                        <div class="grimoire-card-overlay">
+                            <div class="grimoire-overlay-name">${char.nome}</div>
+                            <div class="grimoire-overlay-title">${char.titolo || ''}</div>
+                        </div>
+                    </div>
+                </a>
+            `;
+            grid.appendChild(card);
+        });
+    };
+
+    const loadGrimoirePage = () => {
+        applyGrimoireFiltersAndSorting();
+        applyGrimoireBackground();
+    };
+
+    const loadCharacterDetailPage = (characterName) => {
+        const char = characterLibrary.find(c => c.nome === characterName);
+        if (!char) {
+            location.hash = '#grimoire';
+            return;
+        }
+
+        const nameElement = document.getElementById('character-detail-name');
+        if (nameElement) {
+            nameElement.textContent = char.nome;
+        }
+        // Qui in futuro andranno caricate tutte le altre informazioni
+
+        showView('character-detail-view');
+        applyGrimoireBackground();
+    };
+
+    const applyGrimoireBackground = () => {
+        const body = document.body;
+        if (grimoireBackground && grimoireBackground !== 'none') {
+            document.documentElement.style.setProperty('--grimoire-background', `url(data/backgrounds/${grimoireBackground})`);
+            body.classList.add('grimoire-background');
+        } else {
+            document.documentElement.style.removeProperty('--grimoire-background');
+            body.classList.remove('grimoire-background');
         }
     };
 
@@ -471,6 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 'rarityDesc': (a, b) => (b.profile.rarity === '4-star' ? 4 : 5) - (a.profile.rarity === '4-star' ? 4 : 5) || a.profile.name.localeCompare(b.profile.name),
                 'buildAsc': (a, b) => a.buildScore - b.buildScore || a.profile.name.localeCompare(b.profile.name),
                 'buildDesc': (a, b) => b.buildScore - a.buildScore || a.profile.name.localeCompare(b.profile.name),
+                'elementAsc': (a, b) => a.profile.element.localeCompare(b.profile.element) || a.profile.name.localeCompare(b.profile.name),
             };
             if (sortFunctions[sortValue]) filteredCharacters.sort(sortFunctions[sortValue]);
         }
@@ -1262,6 +1403,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.status === 'success') {
             showToast(result.message);
             loadBackgroundManagement();
+            e.target.reset();
+        } else {
+            showErrorAlert(result.message);
+        }
+    });
+
+    document.getElementById('upload-grimoire-background-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        formData.append('action', 'upload_grimoire_background');
+        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+        const result = await response.json();
+        if (result.status === 'success') {
+            showToast(result.message);
+            grimoireBackground = result.background_file;
+            applyGrimoireBackground();
             e.target.reset();
         } else {
             showErrorAlert(result.message);
@@ -2091,9 +2248,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const init = async () => {
         try {
             // Fetch all essential data in parallel for faster startup
-            const [charLibResponse, elementsResponse] = await Promise.all([
+            const [charLibResponse, elementsResponse, settingsResponse] = await Promise.all([
                 fetch('data/characters_list.json?v=' + new Date().getTime()), // Cache-busting for library
-                fetch('php/api.php?action=get_elements')
+                fetch('php/api.php?action=get_elements'),
+                fetch('php/api.php?action=get_settings')
             ]);
 
             if (!charLibResponse.ok) throw new Error('Failed to load characters_list.json');
@@ -2105,14 +2263,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Could not load elements data.');
             }
 
+            if (settingsResponse.ok) {
+                const settings = await settingsResponse.json();
+                grimoireBackground = settings.grimoire_background || null;
+            } else {
+                console.error('Could not load settings data.');
+            }
+
             initCharacterLibrarySelect();
         } catch (error) {
             console.error('Failed to load essential library data:', error);
-            showErrorAlert('Impossibile caricare dati essenziali (personaggi/elementi). Alcune funzionalità potrebbero non essere disponibili.');
+            showErrorAlert('Impossibile caricare dati essenziali (personaggi/elementi/impostazioni). Alcune funzionalità potrebbero non essere disponibili.');
         }
 
         initCharacterCreationForm();
         initGalleryControls();
+        initGrimoireControls();
         window.addEventListener('hashchange', handleRouteChange);
         await handleRouteChange();
         initTheme();

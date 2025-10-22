@@ -158,6 +158,9 @@
                         <a class="nav-link" href="#" id="nav-gallery">Galleria Personaggi</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="#grimoire" id="nav-grimoire">Libreria</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#new-character" id="nav-add-character">Aggiungi Personaggio</a>
                     </li>
                     <li class="nav-item">
@@ -376,6 +379,15 @@
                             <div id="background-management-grid" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
                                 <!-- Admin background management grid -->
                             </div>
+                            <hr>
+                            <h4>Sfondo Libreria</h4>
+                            <p class="text-muted small">Carica uno sfondo per la pagina della libreria e i dettagli dei personaggi.</p>
+                            <form id="upload-grimoire-background-form" class="mb-4">
+                                <div class="input-group">
+                                    <input type="file" class="form-control" name="grimoire_background_image" accept="image/*" required>
+                                    <button class="btn btn-primary" type="submit">Carica Sfondo Libreria</button>
+                                </div>
+                            </form>
                         </div>
                         <!-- Pannello Schema Utenti -->
                         <div class="tab-pane fade" id="v-pills-schema" role="tabpanel" aria-labelledby="v-pills-schema-tab">
@@ -701,10 +713,11 @@
                 <div class="col-lg-3 col-md-12">
                     <label for="sort-select" class="form-label">Ordina per</label>
                     <select id="sort-select" class="form-select">
-                        <option value="buildDesc">Buildati Meglio</option>
-                        <option value="buildAsc">Buildati Peggio</option>
+                        <option value="buildDesc">Build migliori</option>
+                        <option value="buildAsc">Build peggiori</option>
                         <option value="nameAsc">Nome (A-Z)</option>
                         <option value="nameDesc">Nome (Z-A)</option>
+                        <option value="elementAsc">Elemento</option>
                         <option value="constDesc">Costellazione (6-0)</option>
                         <option value="constAsc">Costellazione (0-6)</option>
                         <option value="rarityDesc">Rarità (5-4)</option>
@@ -793,11 +806,53 @@
                             <th>Azioni</th>
                         </tr>
                     </thead>
-                    <tbody id="user-table-body">
+            <div id="user-table-body">
                         <!-- User list will be loaded here -->
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Sezione per il Grimorio -->
+        <div id="grimoire-view" class="view">
+            <h2>Libreria dei Personaggi</h2>
+            <p class="text-muted small mb-4">Esplora tutti i personaggi disponibili nel gioco. Clicca su un personaggio per vedere i suoi dettagli.</p>
+            
+            <div id="grimoire-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
+                <div class="col-lg-4 col-md-6">
+                    <label for="grimoire-name-filter" class="form-label">Filtra per Nome</label>
+                    <div class="search-input-container">
+                        <i class="bi bi-search"></i>
+                        <input type="search" id="grimoire-name-filter" class="form-control" placeholder="Cerca personaggio...">
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-6">
+                    <label class="form-label">Filtra per Elemento</label>
+                    <div id="grimoire-element-filters" class="d-flex flex-wrap gap-2">
+                        <!-- Checkbox degli elementi per il grimorio -->
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-12">
+                    <label for="grimoire-sort-select" class="form-label">Ordina per</label>
+                    <select id="grimoire-sort-select" class="form-select">
+                        <option value="nameAsc">Nome (A-Z)</option>
+                        <option value="nameDesc">Nome (Z-A)</option>
+                        <option value="elementAsc">Elemento</option>
+                        <option value="rarityDesc">Rarità (5-4)</option>
+                        <option value="rarityAsc">Rarità (4-5)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="grimoire-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-6 g-4">
+                <!-- Le card dei personaggi del grimorio verranno inserite qui -->
+            </div>
+        </div>
+
+        <!-- Sezione Dettaglio Personaggio del Grimorio -->
+        <div id="character-detail-view" class="view">
+            <h2 id="character-detail-name"></h2>
+            <!-- I dettagli del personaggio verranno aggiunti qui -->
         </div>
     </main>
 

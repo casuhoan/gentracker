@@ -1,0 +1,22 @@
+{
+    "profile": {
+        "name": "Albedo2",
+        "splashart": "uploads\/user_68ecf2d75bd41664668239_albedo2.webp",
+        "element": "",
+        "role": [
+            "Sub DPS"
+        ],
+        "tracked_stats": [
+            "Crit Rate (%)"
+        ],
+        "ideal_stats": {
+            "Crit Rate (%)": 2
+        },
+        "acquisition_date": "2025-10-22",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": []
+}

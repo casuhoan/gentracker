@@ -78,6 +78,10 @@ function get_elements_file() {
     return __DIR__ . '/../data/elements.json';
 }
 
+function get_settings_file() {
+    return __DIR__ . '/../data/settings.json';
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -1200,13 +1204,53 @@ function update_library_character() {
     }
 }
 
+function get_settings() {
+    $settings_file = get_settings_file();
+    if (!file_exists($settings_file)) {
+        echo json_encode(['grimoire_background' => null]);
+        return;
+    }
+    echo file_get_contents($settings_file);
+}
+
+function upload_grimoire_background() {
+    if (!isset($_FILES['grimoire_background_image']) || $_FILES['grimoire_background_image']['error'] != 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Nessun file caricato o errore nel caricamento.']);
+        return;
+    }
+
+    $bg_dir = get_backgrounds_dir();
+    if (!is_dir($bg_dir)) {
+        mkdir($bg_dir, 0777, true);
+    }
+
+    $file_name = basename($_FILES['grimoire_background_image']['name']);
+    $target_file = $bg_dir . $file_name;
+
+    if (move_uploaded_file($_FILES['grimoire_background_image']['tmp_name'], $target_file)) {
+        $settings_file = get_settings_file();
+        $settings = [];
+        if (file_exists($settings_file)) {
+            $settings = json_decode(file_get_contents($settings_file), true);
+            if (!is_array($settings)) { // Gestisce file vuoto o corrotto
+                $settings = [];
+            }
+        }
+        $settings['grimoire_background'] = $file_name;
+        file_put_contents($settings_file, json_encode($settings, JSON_PRETTY_PRINT));
+        echo json_encode(['status' => 'success', 'message' => 'Sfondo della libreria caricato con successo.', 'background_file' => $file_name]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Errore durante il salvataggio dello sfondo.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
 
-$public_actions = ['login', 'logout', 'check_session', 'get_elements'];
+$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background'];
 
 if (in_array($action, $public_actions)) {
     $action();
