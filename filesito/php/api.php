@@ -1404,6 +1404,53 @@ function update_character_description() {
     }
 }
 
+function sync_library_images() {
+    $src_dir = __DIR__ . '/../librarydata/immaginimini';
+    $dst_dir = __DIR__ . '/../data/library';
+
+    if (!is_dir($src_dir)) {
+        echo json_encode(['status' => 'error', 'message' => 'La cartella di origine (librarydata/immaginimini) non esiste.']);
+        return;
+    }
+    if (!is_dir($dst_dir)) {
+        mkdir($dst_dir, 0777, true);
+    }
+
+    // Copy all files from src_dir to dst_dir
+    $files = glob($src_dir . '/*');
+    foreach ($files as $file) {
+        $file_to_go = $dst_dir . '/' . basename($file);
+        copy($file, $file_to_go);
+    }
+
+    // Update characters_list.json
+    $characters_file = __DIR__ . '/../data/characters_list.json';
+    if (!file_exists($characters_file)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il file characters_list.json non esiste.']);
+        return;
+    }
+
+    $characters = json_decode(file_get_contents($characters_file), true);
+    if (!is_array($characters)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il file characters_list.json è corrotto.']);
+        return;
+    }
+
+    foreach ($characters as &$character) {
+        if (isset($character['nome'])) {
+            $nome = $character['nome'];
+            $character['icon'] = 'library/' . $nome . '_Icon.webp';
+            $character['banner'] = 'library/' . $nome . '_Card.webp';
+        }
+    }
+
+    if (file_put_contents($characters_file, json_encode($characters, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        echo json_encode(['status' => 'success', 'message' => 'Immagini della libreria sincronizzate con successo.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file characters_list.json.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = $_REQUEST['action'] ?? '';
@@ -1412,7 +1459,7 @@ $action = $_REQUEST['action'] ?? '';
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images'];
 
 if (in_array($action, $public_actions)) {
     $action();

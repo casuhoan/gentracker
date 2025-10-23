@@ -643,6 +643,43 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    const syncLibraryImagesBtn = document.getElementById('sync-library-images-btn');
+    if (syncLibraryImagesBtn) {
+        syncLibraryImagesBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Sincronizzare le immagini della libreria?',
+                text: "Questa azione aggiornerà le icone e i banner dei personaggi e copierà i file di immagine. Sei sicuro?",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sì, sincronizza!',
+                cancelButtonText: 'Annulla'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('action', 'sync_library_images');
+                        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                        const res = await response.json();
+                        if (res.status === 'success') {
+                            showToast('Sincronizzazione delle immagini completata con successo.');
+                            // Optionally, refresh the library view
+                            if (typeof loadLibraryManagement === 'function') {
+                                loadLibraryManagement();
+                            }
+                        } else {
+                            showErrorAlert(res.message || 'Errore durante la sincronizzazione delle immagini.');
+                        }
+                    } catch (error) {
+                        showErrorAlert('Errore di comunicazione con il server.');
+                    }
+                }
+            });
+        });
+    }
+
     document.getElementById('library-character-table-body')?.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn-edit-lib-char')) {
             document.getElementById('edit-library-character-form').reset();

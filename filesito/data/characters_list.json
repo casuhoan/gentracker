@@ -6,13 +6,15 @@
         "elemento": "Geo",
         "arma": "Sword",
         "rarita": "5-star",
-        "icon": "library\/character_Albedo_icon.webp",
-        "banner": "library\/character_Albedo_banner.webp",
+        "icon": "library\/Albedo_Icon.webp",
+        "banner": "library\/Albedo_Card.webp",
         "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO."
     },
     {
         "nome": "Alhaitham",
-        "immagine": "Character_Alhaitham_Full_Wish.webp"
+        "immagine": "Character_Alhaitham_Full_Wish.webp",
+        "icon": "library\/Alhaitham_Icon.webp",
+        "banner": "library\/Alhaitham_Card.webp"
     },
     {
         "nome": "Aloy",
@@ -20,31 +22,45 @@
         "titolo": "",
         "elemento": "Cryo",
         "arma": "",
-        "rarita": "5-star"
+        "rarita": "5-star",
+        "icon": "library\/Aloy_Icon.webp",
+        "banner": "library\/Aloy_Card.webp"
     },
     {
         "nome": "Amber",
-        "immagine": "Character_Amber_Full_Wish.webp"
+        "immagine": "Character_Amber_Full_Wish.webp",
+        "icon": "library\/Amber_Icon.webp",
+        "banner": "library\/Amber_Card.webp"
     },
     {
         "nome": "Arataki Itto",
-        "immagine": "a057_gacha_splash.webp"
+        "immagine": "a057_gacha_splash.webp",
+        "icon": "library\/Arataki Itto_Icon.webp",
+        "banner": "library\/Arataki Itto_Card.webp"
     },
     {
         "nome": "Arlecchino",
-        "immagine": "Character_Arlecchino_Full_Wish.webp"
+        "immagine": "Character_Arlecchino_Full_Wish.webp",
+        "icon": "library\/Arlecchino_Icon.webp",
+        "banner": "library\/Arlecchino_Card.webp"
     },
     {
         "nome": "Ayaka",
-        "immagine": "Character_Kamisato_Ayaka_Full_Wish.webp"
+        "immagine": "Character_Kamisato_Ayaka_Full_Wish.webp",
+        "icon": "library\/Ayaka_Icon.webp",
+        "banner": "library\/Ayaka_Card.webp"
     },
     {
         "nome": "Ayato",
-        "immagine": "Character_Kamisato_Ayato_Full_Wish.webp"
+        "immagine": "Character_Kamisato_Ayato_Full_Wish.webp",
+        "icon": "library\/Ayato_Icon.webp",
+        "banner": "library\/Ayato_Card.webp"
     },
     {
         "nome": "Baizhu",
-        "immagine": "Character_Baizhu_Full_Wish.webp"
+        "immagine": "Character_Baizhu_Full_Wish.webp",
+        "icon": "library\/Baizhu_Icon.webp",
+        "banner": "library\/Baizhu_Card.webp"
     },
     {
         "nome": "Barbara",
@@ -52,347 +68,519 @@
         "titolo": "",
         "elemento": "Hydro",
         "arma": "",
-        "rarita": "5-star"
+        "rarita": "5-star",
+        "icon": "library\/Barbara_Icon.webp",
+        "banner": "library\/Barbara_Card.webp"
     },
     {
         "nome": "Beidou",
-        "immagine": "Character_Beidou_Full_Wish.webp"
+        "immagine": "Character_Beidou_Full_Wish.webp",
+        "icon": "library\/Beidou_Icon.webp",
+        "banner": "library\/Beidou_Card.webp"
     },
     {
         "nome": "Bennett",
-        "immagine": "a032_gacha_splash.webp"
+        "immagine": "a032_gacha_splash.webp",
+        "icon": "library\/Bennett_Icon.webp",
+        "banner": "library\/Bennett_Card.webp"
     },
     {
         "nome": "Candace",
-        "immagine": "Character_Candace_Full_Wish.webp"
+        "immagine": "Character_Candace_Full_Wish.webp",
+        "icon": "library\/Candace_Icon.webp",
+        "banner": "library\/Candace_Card.webp"
     },
     {
         "nome": "Charlotte",
-        "immagine": "Character_Charlotte_Full_Wish.webp"
+        "immagine": "Character_Charlotte_Full_Wish.webp",
+        "icon": "library\/Charlotte_Icon.webp",
+        "banner": "library\/Charlotte_Card.webp"
     },
     {
         "nome": "Chasca",
-        "immagine": "Character_Chasca_Full_Wish.webp"
+        "immagine": "Character_Chasca_Full_Wish.webp",
+        "icon": "library\/Chasca_Icon.webp",
+        "banner": "library\/Chasca_Card.webp"
     },
     {
         "nome": "Chevreuse",
-        "immagine": "Character_Chevreuse_Full_Wish.webp"
+        "immagine": "Character_Chevreuse_Full_Wish.webp",
+        "icon": "library\/Chevreuse_Icon.webp",
+        "banner": "library\/Chevreuse_Card.webp"
     },
     {
         "nome": "Chiori",
-        "immagine": "Character_Chiori_Full_Wish.webp"
+        "immagine": "Character_Chiori_Full_Wish.webp",
+        "icon": "library\/Chiori_Icon.webp",
+        "banner": "library\/Chiori_Card.webp"
     },
     {
         "nome": "Chongyun",
-        "immagine": "Chongyun_Wish.webp"
+        "immagine": "Chongyun_Wish.webp",
+        "icon": "library\/Chongyun_Icon.webp",
+        "banner": "library\/Chongyun_Card.webp"
     },
     {
         "nome": "Citlali",
-        "immagine": "Character_Citlali_Full_Wish.webp"
+        "immagine": "Character_Citlali_Full_Wish.webp",
+        "icon": "library\/Citlali_Icon.webp",
+        "banner": "library\/Citlali_Card.webp"
     },
     {
         "nome": "Clorinde",
-        "immagine": "Character_Clorinde_Full_Wish.webp"
+        "immagine": "Character_Clorinde_Full_Wish.webp",
+        "icon": "library\/Clorinde_Icon.webp",
+        "banner": "library\/Clorinde_Card.webp"
     },
     {
         "nome": "Collei",
-        "immagine": "Character_Collei_Full_Wish.webp"
+        "immagine": "Character_Collei_Full_Wish.webp",
+        "icon": "library\/Collei_Icon.webp",
+        "banner": "library\/Collei_Card.webp"
     },
     {
         "nome": "Cyno",
-        "immagine": "Character_Cyno_Full_Wish.webp"
+        "immagine": "Character_Cyno_Full_Wish.webp",
+        "icon": "library\/Cyno_Icon.webp",
+        "banner": "library\/Cyno_Card.webp"
     },
     {
         "nome": "Dahlia",
-        "immagine": "tumblr_2c5cdf4c06d8f487b5be77f0f850fafe_4a9f8770_540.png"
+        "immagine": "tumblr_2c5cdf4c06d8f487b5be77f0f850fafe_4a9f8770_540.png",
+        "icon": "library\/Dahlia_Icon.webp",
+        "banner": "library\/Dahlia_Card.webp"
     },
     {
         "nome": "Dehya",
-        "immagine": "Character_Dehya_Full_Wish.webp"
+        "immagine": "Character_Dehya_Full_Wish.webp",
+        "icon": "library\/Dehya_Icon.webp",
+        "banner": "library\/Dehya_Card.webp"
     },
     {
         "nome": "Diluc",
-        "immagine": "Character_Diluc_Full_Wish.webp"
+        "immagine": "Character_Diluc_Full_Wish.webp",
+        "icon": "library\/Diluc_Icon.webp",
+        "banner": "library\/Diluc_Card.webp"
     },
     {
         "nome": "Diona",
-        "immagine": "Character_Diona_Full_Wish.webp"
+        "immagine": "Character_Diona_Full_Wish.webp",
+        "icon": "library\/Diona_Icon.webp",
+        "banner": "library\/Diona_Card.webp"
     },
     {
         "nome": "Dori",
-        "immagine": "Character_Dori_Full_Wish.webp"
+        "immagine": "Character_Dori_Full_Wish.webp",
+        "icon": "library\/Dori_Icon.webp",
+        "banner": "library\/Dori_Card.webp"
     },
     {
         "nome": "Emilie",
-        "immagine": "a099_gacha_splash.webp"
+        "immagine": "a099_gacha_splash.webp",
+        "icon": "library\/Emilie_Icon.webp",
+        "banner": "library\/Emilie_Card.webp"
     },
     {
         "nome": "Escoffier",
-        "immagine": "Character_Escoffier_Full_Wish.webp"
+        "immagine": "Character_Escoffier_Full_Wish.webp",
+        "icon": "library\/Escoffier_Icon.webp",
+        "banner": "library\/Escoffier_Card.webp"
     },
     {
         "nome": "Eula",
-        "immagine": "Character_Eula_Full_Wish.webp"
+        "immagine": "Character_Eula_Full_Wish.webp",
+        "icon": "library\/Eula_Icon.webp",
+        "banner": "library\/Eula_Card.webp"
     },
     {
         "nome": "Faruzan",
-        "immagine": "Character_Faruzan_Full_Wish.webp"
+        "immagine": "Character_Faruzan_Full_Wish.webp",
+        "icon": "library\/Faruzan_Icon.webp",
+        "banner": "library\/Faruzan_Card.webp"
     },
     {
         "nome": "Fischl",
-        "immagine": "Character_Fischl_Full_Wish.webp"
+        "immagine": "Character_Fischl_Full_Wish.webp",
+        "icon": "library\/Fischl_Icon.webp",
+        "banner": "library\/Fischl_Card.webp"
     },
     {
         "nome": "Freminet",
-        "immagine": "Character_Freminet_Full_Wish.webp"
+        "immagine": "Character_Freminet_Full_Wish.webp",
+        "icon": "library\/Freminet_Icon.webp",
+        "banner": "library\/Freminet_Card.webp"
     },
     {
         "nome": "Furina",
-        "immagine": "Character_Furina_Full_Wish.webp"
+        "immagine": "Character_Furina_Full_Wish.webp",
+        "icon": "library\/Furina_Icon.webp",
+        "banner": "library\/Furina_Card.webp"
     },
     {
         "nome": "Gaming",
-        "immagine": "Character_Gaming_Full_Wish.webp"
+        "immagine": "Character_Gaming_Full_Wish.webp",
+        "icon": "library\/Gaming_Icon.webp",
+        "banner": "library\/Gaming_Card.webp"
     },
     {
         "nome": "Ganyu",
-        "immagine": "Character_Ganyu_Full_Wish.webp"
+        "immagine": "Character_Ganyu_Full_Wish.webp",
+        "icon": "library\/Ganyu_Icon.webp",
+        "banner": "library\/Ganyu_Card.webp"
     },
     {
         "nome": "Gorou",
-        "immagine": "Character_Gorou_Full_Wish.webp"
+        "immagine": "Character_Gorou_Full_Wish.webp",
+        "icon": "library\/Gorou_Icon.webp",
+        "banner": "library\/Gorou_Card.webp"
     },
     {
         "nome": "Hu Tao",
-        "immagine": "Hu_Tao_Wish.webp"
+        "immagine": "Hu_Tao_Wish.webp",
+        "icon": "library\/Hu Tao_Icon.webp",
+        "banner": "library\/Hu Tao_Card.webp"
     },
     {
         "nome": "Iansan",
-        "immagine": "Character_Iansan_Full_Wish.webp"
+        "immagine": "Character_Iansan_Full_Wish.webp",
+        "icon": "library\/Iansan_Icon.webp",
+        "banner": "library\/Iansan_Card.webp"
     },
     {
         "nome": "Ifa",
-        "immagine": "Character_Ifa_Full_Wish.webp"
+        "immagine": "Character_Ifa_Full_Wish.webp",
+        "icon": "library\/Ifa_Icon.webp",
+        "banner": "library\/Ifa_Card.webp"
     },
     {
         "nome": "Ineffa",
-        "immagine": "Character_Ineffa_Full_Wish.webp"
+        "immagine": "Character_Ineffa_Full_Wish.webp",
+        "icon": "library\/Ineffa_Icon.webp",
+        "banner": "library\/Ineffa_Card.webp"
     },
     {
         "nome": "Jean",
-        "immagine": "Character_Jean_Full_Wish.webp"
+        "immagine": "Character_Jean_Full_Wish.webp",
+        "icon": "library\/Jean_Icon.webp",
+        "banner": "library\/Jean_Card.webp"
     },
     {
         "nome": "Kachina",
-        "immagine": "Character_Kachina_Full_Wish.webp"
+        "immagine": "Character_Kachina_Full_Wish.webp",
+        "icon": "library\/Kachina_Icon.webp",
+        "banner": "library\/Kachina_Card.webp"
     },
     {
         "nome": "Kaedehara Kazuha",
-        "immagine": "Kaedehara_Kazuha_Wish.webp"
+        "immagine": "Kaedehara_Kazuha_Wish.webp",
+        "icon": "library\/Kaedehara Kazuha_Icon.webp",
+        "banner": "library\/Kaedehara Kazuha_Card.webp"
     },
     {
         "nome": "Kaeya",
-        "immagine": "tumblr_90053974f7071f7278ebbd044d8d1ce2_2beff3b7_1280.png"
+        "immagine": "tumblr_90053974f7071f7278ebbd044d8d1ce2_2beff3b7_1280.png",
+        "icon": "library\/Kaeya_Icon.webp",
+        "banner": "library\/Kaeya_Card.webp"
     },
     {
         "nome": "Kaveh",
-        "immagine": "Character_Kaveh_Full_Wish.webp"
+        "immagine": "Character_Kaveh_Full_Wish.webp",
+        "icon": "library\/Kaveh_Icon.webp",
+        "banner": "library\/Kaveh_Card.webp"
     },
     {
         "nome": "Keqing",
-        "immagine": "Character_Keqing_Full_Wish.webp"
+        "immagine": "Character_Keqing_Full_Wish.webp",
+        "icon": "library\/Keqing_Icon.webp",
+        "banner": "library\/Keqing_Card.webp"
     },
     {
         "nome": "Kinich",
-        "immagine": "Character_Kinich_Full_Wish.webp"
+        "immagine": "Character_Kinich_Full_Wish.webp",
+        "icon": "library\/Kinich_Icon.webp",
+        "banner": "library\/Kinich_Card.webp"
     },
     {
         "nome": "Kirara",
-        "immagine": "Character_Kirara_Full_Wish.webp"
+        "immagine": "Character_Kirara_Full_Wish.webp",
+        "icon": "library\/Kirara_Icon.webp",
+        "banner": "library\/Kirara_Card.webp"
     },
     {
         "nome": "Klee",
-        "immagine": "Character_Klee_Full_Wish.webp"
+        "immagine": "Character_Klee_Full_Wish.webp",
+        "icon": "library\/Klee_Icon.webp",
+        "banner": "library\/Klee_Card.webp"
     },
     {
         "nome": "Kujou Sara",
-        "immagine": "Character_Kujou_Sara_Full_Wish.webp"
+        "immagine": "Character_Kujou_Sara_Full_Wish.webp",
+        "icon": "library\/Kujou Sara_Icon.webp",
+        "banner": "library\/Kujou Sara_Card.webp"
     },
     {
         "nome": "Kuki Shinobu",
-        "immagine": "Character_Kuki_Shinobu_Full_Wish.webp"
+        "immagine": "Character_Kuki_Shinobu_Full_Wish.webp",
+        "icon": "library\/Kuki Shinobu_Icon.webp",
+        "banner": "library\/Kuki Shinobu_Card.webp"
     },
     {
         "nome": "Lan Yan",
-        "immagine": "Character_Lan_Yan_Full_Wish.webp"
+        "immagine": "Character_Lan_Yan_Full_Wish.webp",
+        "icon": "library\/Lan Yan_Icon.webp",
+        "banner": "library\/Lan Yan_Card.webp"
     },
     {
         "nome": "Lauma",
-        "immagine": "Character_Lauma_Full_Wish.webp"
+        "immagine": "Character_Lauma_Full_Wish.webp",
+        "icon": "library\/Lauma_Icon.webp",
+        "banner": "library\/Lauma_Card.webp"
     },
     {
         "nome": "Layla",
-        "immagine": "Character_Layla_Full_Wish.webp"
+        "immagine": "Character_Layla_Full_Wish.webp",
+        "icon": "library\/Layla_Icon.webp",
+        "banner": "library\/Layla_Card.webp"
     },
     {
         "nome": "Lisa",
-        "immagine": "Character_Lisa_Full_Wish.webp"
+        "immagine": "Character_Lisa_Full_Wish.webp",
+        "icon": "library\/Lisa_Icon.webp",
+        "banner": "library\/Lisa_Card.webp"
     },
     {
         "nome": "Lynette",
-        "immagine": "Character_Lynette_Full_Wish.webp"
+        "immagine": "Character_Lynette_Full_Wish.webp",
+        "icon": "library\/Lynette_Icon.webp",
+        "banner": "library\/Lynette_Card.webp"
     },
     {
         "nome": "Lyney",
-        "immagine": "Character_Lyney_Full_Wish.webp"
+        "immagine": "Character_Lyney_Full_Wish.webp",
+        "icon": "library\/Lyney_Icon.webp",
+        "banner": "library\/Lyney_Card.webp"
     },
     {
         "nome": "Mavuika",
-        "immagine": "Character_Mavuika_Full_Wish.webp"
+        "immagine": "Character_Mavuika_Full_Wish.webp",
+        "icon": "library\/Mavuika_Icon.webp",
+        "banner": "library\/Mavuika_Card.webp"
     },
     {
         "nome": "Mika",
-        "immagine": "Character_Mika_Full_Wish.webp"
+        "immagine": "Character_Mika_Full_Wish.webp",
+        "icon": "library\/Mika_Icon.webp",
+        "banner": "library\/Mika_Card.webp"
     },
     {
         "nome": "Mona",
-        "immagine": "Character_Mona_Full_Wish.webp"
+        "immagine": "Character_Mona_Full_Wish.webp",
+        "icon": "library\/Mona_Icon.webp",
+        "banner": "library\/Mona_Card.webp"
     },
     {
         "nome": "Mualani",
-        "immagine": "Character_Mualani_Full_Wish.webp"
+        "immagine": "Character_Mualani_Full_Wish.webp",
+        "icon": "library\/Mualani_Icon.webp",
+        "banner": "library\/Mualani_Card.webp"
     },
     {
         "nome": "Nahida",
-        "immagine": "Character_Nahida_Full_Wish.webp"
+        "immagine": "Character_Nahida_Full_Wish.webp",
+        "icon": "library\/Nahida_Icon.webp",
+        "banner": "library\/Nahida_Card.webp"
     },
     {
         "nome": "Navia",
-        "immagine": "Character_Navia_Full_Wish.webp"
+        "immagine": "Character_Navia_Full_Wish.webp",
+        "icon": "library\/Navia_Icon.webp",
+        "banner": "library\/Navia_Card.webp"
     },
     {
         "nome": "Neuvillette",
-        "immagine": "Character_Neuvillette_Full_Wish.webp"
+        "immagine": "Character_Neuvillette_Full_Wish.webp",
+        "icon": "library\/Neuvillette_Icon.webp",
+        "banner": "library\/Neuvillette_Card.webp"
     },
     {
         "nome": "Nilou",
-        "immagine": "Character_Nilou_Full_Wish.webp"
+        "immagine": "Character_Nilou_Full_Wish.webp",
+        "icon": "library\/Nilou_Icon.webp",
+        "banner": "library\/Nilou_Card.webp"
     },
     {
         "nome": "Ningguang",
-        "immagine": "Character_Ningguang_Full_Wish.webp"
+        "immagine": "Character_Ningguang_Full_Wish.webp",
+        "icon": "library\/Ningguang_Icon.webp",
+        "banner": "library\/Ningguang_Card.webp"
     },
     {
         "nome": "Noelle",
-        "immagine": "Character_Noelle_Full_Wish.webp"
+        "immagine": "Character_Noelle_Full_Wish.webp",
+        "icon": "library\/Noelle_Icon.webp",
+        "banner": "library\/Noelle_Card.webp"
     },
     {
         "nome": "Ororon",
-        "immagine": "Character_Ororon_Full_Wish.webp"
+        "immagine": "Character_Ororon_Full_Wish.webp",
+        "icon": "library\/Ororon_Icon.webp",
+        "banner": "library\/Ororon_Card.webp"
     },
     {
         "nome": "Qiqi",
-        "immagine": "Qiqi_Wish.webp"
+        "immagine": "Qiqi_Wish.webp",
+        "icon": "library\/Qiqi_Icon.webp",
+        "banner": "library\/Qiqi_Card.webp"
     },
     {
         "nome": "Raiden Shogun",
-        "immagine": "Raiden_Shogun_Wish.webp"
+        "immagine": "Raiden_Shogun_Wish.webp",
+        "icon": "library\/Raiden Shogun_Icon.webp",
+        "banner": "library\/Raiden Shogun_Card.webp"
     },
     {
         "nome": "Razor",
-        "immagine": "Character_Razor_Full_Wish.webp"
+        "immagine": "Character_Razor_Full_Wish.webp",
+        "icon": "library\/Razor_Icon.webp",
+        "banner": "library\/Razor_Card.webp"
     },
     {
         "nome": "Rosaria",
-        "immagine": "Character_Rosaria_Full_Wish.webp"
+        "immagine": "Character_Rosaria_Full_Wish.webp",
+        "icon": "library\/Rosaria_Icon.webp",
+        "banner": "library\/Rosaria_Card.webp"
     },
     {
         "nome": "Sangonomiya Kokomi",
-        "immagine": "Character_Sangonomiya_Kokomi_Full_Wish.webp"
+        "immagine": "Character_Sangonomiya_Kokomi_Full_Wish.webp",
+        "icon": "library\/Sangonomiya Kokomi_Icon.webp",
+        "banner": "library\/Sangonomiya Kokomi_Card.webp"
     },
     {
         "nome": "Sayu",
-        "immagine": "Character_Sayu_Full_Wish.webp"
+        "immagine": "Character_Sayu_Full_Wish.webp",
+        "icon": "library\/Sayu_Icon.webp",
+        "banner": "library\/Sayu_Card.webp"
     },
     {
         "nome": "Sethos",
-        "immagine": "Character_Sethos_Full_Wish.webp"
+        "immagine": "Character_Sethos_Full_Wish.webp",
+        "icon": "library\/Sethos_Icon.webp",
+        "banner": "library\/Sethos_Card.webp"
     },
     {
         "nome": "Shenhe",
-        "immagine": "Character_Shenhe_Full_Wish.webp"
+        "immagine": "Character_Shenhe_Full_Wish.webp",
+        "icon": "library\/Shenhe_Icon.webp",
+        "banner": "library\/Shenhe_Card.webp"
     },
     {
         "nome": "Shikanoin Heizou",
-        "immagine": "Character_Shikanoin_Heizou_Full_Wish.webp"
+        "immagine": "Character_Shikanoin_Heizou_Full_Wish.webp",
+        "icon": "library\/Shikanoin Heizou_Icon.webp",
+        "banner": "library\/Shikanoin Heizou_Card.webp"
     },
     {
         "nome": "Sigewinne",
-        "immagine": "Character_Sigewinne_Full_Wish.webp"
+        "immagine": "Character_Sigewinne_Full_Wish.webp",
+        "icon": "library\/Sigewinne_Icon.webp",
+        "banner": "library\/Sigewinne_Card.webp"
     },
     {
         "nome": "Skirk",
-        "immagine": "Character_Skirk_Full_Wish.webp"
+        "immagine": "Character_Skirk_Full_Wish.webp",
+        "icon": "library\/Skirk_Icon.webp",
+        "banner": "library\/Skirk_Card.webp"
     },
     {
         "nome": "Sucrose",
-        "immagine": "Character_Sucrose_Full_Wish.webp"
+        "immagine": "Character_Sucrose_Full_Wish.webp",
+        "icon": "library\/Sucrose_Icon.webp",
+        "banner": "library\/Sucrose_Card.webp"
     },
     {
         "nome": "Tartaglia",
-        "immagine": "Character_Tartaglia_Full_Wish.webp"
+        "immagine": "Character_Tartaglia_Full_Wish.webp",
+        "icon": "library\/Tartaglia_Icon.webp",
+        "banner": "library\/Tartaglia_Card.webp"
     },
     {
         "nome": "Thoma",
-        "immagine": "Character_Thoma_Full_Wish.webp"
+        "immagine": "Character_Thoma_Full_Wish.webp",
+        "icon": "library\/Thoma_Icon.webp",
+        "banner": "library\/Thoma_Card.webp"
     },
     {
         "nome": "Tighnari",
-        "immagine": "Character_Tighnari_Full_Wish.webp"
+        "immagine": "Character_Tighnari_Full_Wish.webp",
+        "icon": "library\/Tighnari_Icon.webp",
+        "banner": "library\/Tighnari_Card.webp"
     },
     {
         "nome": "Traveler",
-        "immagine": "mk6xynsl5gt91.webp"
+        "immagine": "mk6xynsl5gt91.webp",
+        "icon": "library\/Traveler_Icon.webp",
+        "banner": "library\/Traveler_Card.webp"
     },
     {
         "nome": "Varesa",
-        "immagine": "Character_Varesa_Full_Wish.webp"
+        "immagine": "Character_Varesa_Full_Wish.webp",
+        "icon": "library\/Varesa_Icon.webp",
+        "banner": "library\/Varesa_Card.webp"
     },
     {
         "nome": "Venti",
-        "immagine": "Character_Venti_Full_Wish.webp"
+        "immagine": "Character_Venti_Full_Wish.webp",
+        "icon": "library\/Venti_Icon.webp",
+        "banner": "library\/Venti_Card.webp"
     },
     {
         "nome": "Wanderer",
-        "immagine": "Character_Wanderer_Full_Wish.webp"
+        "immagine": "Character_Wanderer_Full_Wish.webp",
+        "icon": "library\/Wanderer_Icon.webp",
+        "banner": "library\/Wanderer_Card.webp"
     },
     {
         "nome": "Wriothesley",
-        "immagine": "Character_Wriothesley_Full_Wish.webp"
+        "immagine": "Character_Wriothesley_Full_Wish.webp",
+        "icon": "library\/Wriothesley_Icon.webp",
+        "banner": "library\/Wriothesley_Card.webp"
     },
     {
         "nome": "Xiangling",
-        "immagine": "Character_Xiangling_Full_Wish.webp"
+        "immagine": "Character_Xiangling_Full_Wish.webp",
+        "icon": "library\/Xiangling_Icon.webp",
+        "banner": "library\/Xiangling_Card.webp"
     },
     {
         "nome": "Xianyun",
-        "immagine": "Character_Xianyun_Full_Wish.webp"
+        "immagine": "Character_Xianyun_Full_Wish.webp",
+        "icon": "library\/Xianyun_Icon.webp",
+        "banner": "library\/Xianyun_Card.webp"
     },
     {
         "nome": "Xiao",
-        "immagine": "Character_Xiao_Full_Wish.webp"
+        "immagine": "Character_Xiao_Full_Wish.webp",
+        "icon": "library\/Xiao_Icon.webp",
+        "banner": "library\/Xiao_Card.webp"
     },
     {
         "nome": "Xilonen",
-        "immagine": "Character_Xilonen_Full_Wish.webp"
+        "immagine": "Character_Xilonen_Full_Wish.webp",
+        "icon": "library\/Xilonen_Icon.webp",
+        "banner": "library\/Xilonen_Card.webp"
     },
     {
         "nome": "Xingqiu",
-        "immagine": "Character_Xingqiu_Full_Wish.webp"
+        "immagine": "Character_Xingqiu_Full_Wish.webp",
+        "icon": "library\/Xingqiu_Icon.webp",
+        "banner": "library\/Xingqiu_Card.webp"
     },
     {
         "nome": "Xinyan",
-        "immagine": "Character_Xinyan_Full_Wish.webp"
+        "immagine": "Character_Xinyan_Full_Wish.webp",
+        "icon": "library\/Xinyan_Icon.webp",
+        "banner": "library\/Xinyan_Card.webp"
     },
     {
         "nome": "XXX",
@@ -400,38 +588,56 @@
         "titolo": "XXX",
         "elemento": "Anemo",
         "arma": "XXXX",
-        "rarita": "5-star"
+        "rarita": "5-star",
+        "icon": "library\/XXX_Icon.webp",
+        "banner": "library\/XXX_Card.webp"
     },
     {
         "nome": "Yae Miko",
-        "immagine": "Character_Yae_Miko_Full_Wish.webp"
+        "immagine": "Character_Yae_Miko_Full_Wish.webp",
+        "icon": "library\/Yae Miko_Icon.webp",
+        "banner": "library\/Yae Miko_Card.webp"
     },
     {
         "nome": "Yanfei",
-        "immagine": "Character_Yanfei_Full_Wish.webp"
+        "immagine": "Character_Yanfei_Full_Wish.webp",
+        "icon": "library\/Yanfei_Icon.webp",
+        "banner": "library\/Yanfei_Card.webp"
     },
     {
         "nome": "Yaoyao",
-        "immagine": "Character_Yaoyao_Full_Wish.webp"
+        "immagine": "Character_Yaoyao_Full_Wish.webp",
+        "icon": "library\/Yaoyao_Icon.webp",
+        "banner": "library\/Yaoyao_Card.webp"
     },
     {
         "nome": "Yelan",
-        "immagine": "Character_Yelan_Full_Wish.webp"
+        "immagine": "Character_Yelan_Full_Wish.webp",
+        "icon": "library\/Yelan_Icon.webp",
+        "banner": "library\/Yelan_Card.webp"
     },
     {
         "nome": "Yoimiya",
-        "immagine": "Character_Yoimiya_Full_Wish.webp"
+        "immagine": "Character_Yoimiya_Full_Wish.webp",
+        "icon": "library\/Yoimiya_Icon.webp",
+        "banner": "library\/Yoimiya_Card.webp"
     },
     {
         "nome": "Yumemizuki Mizuki",
-        "immagine": "Character_Yumemizuki_Mizuki_Full_Wish.webp"
+        "immagine": "Character_Yumemizuki_Mizuki_Full_Wish.webp",
+        "icon": "library\/Yumemizuki Mizuki_Icon.webp",
+        "banner": "library\/Yumemizuki Mizuki_Card.webp"
     },
     {
         "nome": "Yun Jin",
-        "immagine": "Character_Yun Jin_Full_Wish.webp"
+        "immagine": "Character_Yun Jin_Full_Wish.webp",
+        "icon": "library\/Yun Jin_Icon.webp",
+        "banner": "library\/Yun Jin_Card.webp"
     },
     {
         "nome": "Zhongli",
-        "immagine": "Character_Zhongli_Full_Wish.webp"
+        "immagine": "Character_Zhongli_Full_Wish.webp",
+        "icon": "library\/Zhongli_Icon.webp",
+        "banner": "library\/Zhongli_Card.webp"
     }
 ]
