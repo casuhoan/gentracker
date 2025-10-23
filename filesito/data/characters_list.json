@@ -1,7 +1,14 @@
 [
     {
         "nome": "Albedo",
-        "immagine": "Albedo_Wish.webp"
+        "immagine": "Albedo_Wish.webp",
+        "titolo": "Titolo personaggio",
+        "elemento": "Geo",
+        "arma": "Sword",
+        "rarita": "5-star",
+        "icon": "library\/character_Albedo_icon.webp",
+        "banner": "library\/character_Albedo_banner.webp",
+        "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO."
     },
     {
         "nome": "Alhaitham",
@@ -9,7 +16,11 @@
     },
     {
         "nome": "Aloy",
-        "immagine": "Character_Aloy_Full_Wish.webp"
+        "immagine": "Character_Aloy_Full_Wish.webp",
+        "titolo": "",
+        "elemento": "Cryo",
+        "arma": "",
+        "rarita": "5-star"
     },
     {
         "nome": "Amber",
@@ -37,7 +48,11 @@
     },
     {
         "nome": "Barbara",
-        "immagine": "Character_Barbara_Full_Wish.webp"
+        "immagine": "Character_Barbara_Full_Wish.webp",
+        "titolo": "",
+        "elemento": "Hydro",
+        "arma": "",
+        "rarita": "5-star"
     },
     {
         "nome": "Beidou",
@@ -378,6 +393,14 @@
     {
         "nome": "Xinyan",
         "immagine": "Character_Xinyan_Full_Wish.webp"
+    },
+    {
+        "nome": "XXX",
+        "immagine": "library\/character_XXX_wish.webp",
+        "titolo": "XXX",
+        "elemento": "Anemo",
+        "arma": "XXXX",
+        "rarita": "5-star"
     },
     {
         "nome": "Yae Miko",

@@ -1,0 +1,32 @@
+{
+    "profile": {
+        "name": "XXXn",
+        "splashart": "uploads\/user_68ecf2d75bd41664668239_xxx.webp",
+        "element": "Anemo",
+        "role": [
+            "Support"
+        ],
+        "tracked_stats": [
+            "Elemental Mastery"
+        ],
+        "ideal_stats": {
+            "Elemental Mastery": 4
+        },
+        "acquisition_date": "2025-10-23",
+        "constellation": 2,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-10-23",
+            "stats": {
+                "Elemental Mastery": "532"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        }
+    ]
+}

@@ -206,7 +206,10 @@
     <main class="container mt-4 mb-5">
         <!-- Sezione Impostazioni -->
         <div id="settings-view" class="view">
-            <h2>Impostazioni</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Impostazioni</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="In questa pagina puoi modificare le impostazioni del tuo profilo, cambiare la password e personalizzare l'aspetto del sito. Gli amministratori hanno accesso a pannelli aggiuntivi per la gestione della libreria, degli utenti e del sito."><i class="bi bi-question-circle"></i></button>
+            </div>
             <div class="row">
                 <!-- Menu Laterale -->
                 <div class="col-md-3">
@@ -313,7 +316,23 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="library-char-weapon" class="form-label">Arma</label>
-                                        <input type="text" class="form-control" id="library-char-weapon" name="weapon">
+                                        <select class="form-select" id="library-char-weapon" name="weapon">
+                                            <option value="Sword">Sword</option>
+                                            <option value="Polearm">Polearm</option>
+                                            <option value="Catalyst">Catalyst</option>
+                                            <option value="Bow">Bow</option>
+                                            <option value="Claymore">Claymore</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-icon" class="form-label">Icona</label>
+                                        <input type="file" class="form-control" id="library-char-icon" name="icon" accept="image/*">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-banner" class="form-label">Banner</label>
+                                        <input type="file" class="form-control" id="library-char-banner" name="banner" accept="image/*">
                                     </div>
                                 </div>
                                 <div class="row align-items-center">
@@ -439,7 +458,10 @@
 
         <!-- Sezione per creare un nuovo personaggio -->
         <div id="character-creation-view" class="view">
-            <h2 id="character-form-title">Crea Personaggio</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 id="character-form-title" class="mb-0">Crea Personaggio</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Usa questo modulo per aggiungere un nuovo personaggio al tuo roster personale. Seleziona un personaggio dalla libreria per pre-compilare i dati di base, poi personalizza il resto come preferisci."><i class="bi bi-question-circle"></i></button>
+            </div>
             <form id="character-form" enctype="multipart/form-data">
                 <input type="hidden" name="default_image_path" id="default_image_path">
                 
@@ -536,7 +558,10 @@
 
         <!-- Sezione per MODIFICARE un personaggio -->
         <div id="character-edit-view" class="view">
-            <h2>Modifica Personaggio: <span id="edit-char-title-name" class="text-primary"></span></h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Modifica Personaggio: <span id="edit-char-title-name" class="text-primary"></span></h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Modifica i dettagli del tuo personaggio, incluse le statistiche ideali e le informazioni generali. Puoi anche cambiare l'immagine o cancellare il personaggio."><i class="bi bi-question-circle"></i></button>
+            </div>
             <form id="character-edit-form" enctype="multipart/form-data">
                 <input type="hidden" name="original_name" id="edit-original-name">
                 <input type="hidden" name="base_char_name" id="edit-base-char-name"> 
@@ -623,7 +648,10 @@
 
         <!-- Sezione per registrare una nuova build -->
         <div id="build-logger-view" class="view">
-            <h2>Registra Nuova Build</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Registra Nuova Build</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Seleziona un personaggio dal menu a tendina e inserisci le sue statistiche attuali per registrare una nuova 'build'. Questo ti permette di tracciare i tuoi progressi nel tempo."><i class="bi bi-question-circle"></i></button>
+            </div>
             <p class="text-muted small">Registra i progressi dei tuoi personaggi. Seleziona un personaggio e inserisci le sue statistiche attuali per salvarle come una nuova build.</p>
             <form id="build-form">
                 <div class="row">
@@ -665,7 +693,10 @@
         <!-- Sezione per la galleria personaggi -->
         <div id="gallery-view" class="view">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2>Galleria Personaggi</h2>
+                <div class="d-flex align-items-center">
+                    <h2 class="mb-0">Galleria Personaggi</h2>
+                    <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Questa è la tua galleria personale. Clicca su un personaggio per vedere e confrontare le sue build. Usa i filtri e l'ordinamento per trovare rapidamente i personaggi che cerchi."><i class="bi bi-question-circle"></i></button>
+                </div>
                 <button class="btn btn-sm btn-outline-secondary" id="gallery-settings-toggle-btn" title="Impostazioni Galleria">
                     <i class="bi bi-gear-fill"></i>
                 </button>
@@ -737,8 +768,14 @@
                 <div>
                     <button class="btn btn-outline-secondary btn-sm" id="back-to-gallery-btn">&larr; Galleria</button>
                 </div>
-                <h2 id="dashboard-title" class="mb-0">Confronto Build</h2>
-                <button class="btn btn-outline-secondary btn-sm" id="edit-character-btn">Modifica Personaggio</button>
+                <div class="d-flex align-items-center">
+                    <h2 id="dashboard-title" class="mb-0">Confronto Build</h2>
+                    <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="In questa pagina puoi confrontare due build diverse dello stesso personaggio. Seleziona le build dai menu a tendina per vedere le differenze e confrontarle con le statistiche ideali che hai impostato."><i class="bi bi-question-circle"></i></button>
+                </div>
+                <div>
+                    <button class="btn btn-info btn-sm" id="character-info-btn">Informazioni sul personaggio</button>
+                    <button class="btn btn-outline-secondary btn-sm" id="edit-character-btn">Modifica Personaggio</button>
+                </div>
             </div>
             <div class="row mb-4">
                 <div class="col-md-6">
@@ -774,7 +811,10 @@
 
         <!-- Sezione per la gestione delle build -->
         <div id="build-management-view" class="view">
-            <h2>Gestisci Build Esistenti</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Gestisci Build Esistenti</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Seleziona un personaggio per vedere la lista di tutte le sue build registrate. Da qui puoi modificare o eliminare le build passate."><i class="bi bi-question-circle"></i></button>
+            </div>
             <p class="text-muted small">Visualizza, modifica o elimina le build salvate per ogni personaggio. Seleziona un personaggio per vedere il suo storico.</p>
             <div class="col-md-6 mb-3">
                 <label for="manage-char-select" class="form-label">Seleziona Personaggio</label>
@@ -786,7 +826,10 @@
 
         <!-- Sezione per la gestione utenti -->
         <div id="user-management-view" class="view">
-            <h2>Gestione Utenti</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Gestione Utenti</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Questa pagina è riservata agli amministratori. Da qui puoi aggiungere, modificare o eliminare gli utenti del sito."><i class="bi bi-question-circle"></i></button>
+            </div>
             <div class="mb-3 d-flex justify-content-between align-items-center">
                 <div class="input-group w-25">
                     <input type="text" class="form-control" id="user-search" placeholder="Cerca utente...">
@@ -815,7 +858,10 @@
 
         <!-- Sezione per il Grimorio -->
         <div id="grimoire-view" class="view">
-            <h2>Libreria dei Personaggi</h2>
+            <div class="d-flex align-items-center mb-3">
+                <h2 class="mb-0">Libreria dei Personaggi</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Esplora la libreria di tutti i personaggi disponibili. Clicca su un personaggio per vederne i dettagli, come la descrizione e le abilità."><i class="bi bi-question-circle"></i></button>
+            </div>
             <p class="text-muted small mb-4">Esplora tutti i personaggi disponibili nel gioco. Clicca su un personaggio per vedere i suoi dettagli.</p>
             
             <div id="grimoire-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
@@ -851,8 +897,7 @@
 
         <!-- Sezione Dettaglio Personaggio del Grimorio -->
         <div id="character-detail-view" class="view">
-            <h2 id="character-detail-name"></h2>
-            <!-- I dettagli del personaggio verranno aggiunti qui -->
+            <!-- Il contenuto verrà generato da grimoire.js -->
         </div>
     </main>
 
@@ -882,6 +927,13 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/grimoire.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/character.js"></script>
+    <script src="js/build.js"></script>
+    <script src="js/settings.js"></script>
     <script src="js/app.js"></script>
     <script src="js/user-management.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
@@ -1037,7 +1089,13 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="edit-library-char-weapon" class="form-label">Arma</label>
-                                <input type="text" class="form-control" id="edit-library-char-weapon" name="weapon">
+                                <select class="form-select" id="edit-library-char-weapon" name="weapon">
+                                    <option value="Sword">Sword</option>
+                                    <option value="Polearm">Polearm</option>
+                                    <option value="Catalyst">Catalyst</option>
+                                    <option value="Bow">Bow</option>
+                                    <option value="Claymore">Claymore</option>
+                                </select>
                             </div>
                         </div>
                         <div class="row align-items-center">
@@ -1056,6 +1114,18 @@
                                 <label for="edit-library-char-image" class="form-label">Nuova Immagine (Opzionale)</label>
                                 <input class="form-control" type="file" id="edit-library-char-image" name="splashart" accept="image/*">
                                 <img id="edit-library-current-image" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-icon" class="form-label">Nuova Icona (Opzionale)</label>
+                                <input class="form-control" type="file" id="edit-library-char-icon" name="icon" accept="image/*">
+                                <img id="edit-library-current-icon" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="edit-library-char-banner" class="form-label">Nuovo Banner (Opzionale)</label>
+                                <input class="form-control" type="file" id="edit-library-char-banner" name="banner" accept="image/*">
+                                <img id="edit-library-current-banner" src="" class="img-thumbnail mt-2" style="max-width: 100px;">
                             </div>
                         </div>
                     </div>

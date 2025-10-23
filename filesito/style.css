@@ -134,9 +134,7 @@ body:not(.body-has-background).dark-mode #build-management-view h2 {
     color: var(--dark-color) !important;
 }
 
-body.body-has-background.dark-mode #dashboard-view .form-label {
-    color: var(--dark-color) !important;
-}
+
 
 body:not(.body-has-background):not(.dark-mode) #dashboard-title,
 body:not(.body-has-background):not(.dark-mode) #dashboard-view .form-label,
@@ -936,6 +934,16 @@ body.body-has-background #character-creation-view hr + h5,
 body.body-has-background #build-logger-view h5 {
     color: #0056b3 !important; /* Blu scuro richiesto */
     text-shadow: 0 0 8px #fff, 0 0 10px #fff !important;
+}
+
+body.body-has-background.dark-mode #dashboard-view .form-label {
+    color: #212529 !important; /* Force black text on dashboard labels even in dark mode */
+}
+
+body.dark-mode #character-info-btn {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+    color: white;
 }
 
 /* Stili per il Grimorio */
