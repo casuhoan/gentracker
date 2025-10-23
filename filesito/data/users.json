@@ -7,5 +7,12 @@
         "background": "Natlan.webp",
         "id": "user_68ecf2d75bd41664668239",
         "opacity": "yes"
+    },
+    {
+        "id": "user_68fa180324a17002070337",
+        "username": "utente",
+        "passwordHash": "$2y$12$kKrRFiOf1a2BOcY6NsWF6.XHqHo19ulRDImwgzHj\/AabsFabkJEIG",
+        "role": "user",
+        "avatar": ""
     }
 ]

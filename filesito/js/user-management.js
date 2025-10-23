@@ -72,17 +72,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userTableBody) return;
         userTableBody.innerHTML = list.length === 0
             ? '<tr><td colspan="4" class="text-center">Nessun utente trovato.</td></tr>'
-            : list.map(user => `
+            : list.map(user => {
+                const isCurrentUser = window.currentUser && window.currentUser.username === user.username;
+                const isAdminUser = user.role === 'admin';
+
+                let actionsHtml = '';
+                if (!isCurrentUser) {
+                    actionsHtml = `<button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>`;
+                    if (!isAdminUser) {
+                        actionsHtml += ` <button class="btn btn-sm btn-danger btn-delete-user" data-username="${user.username}">Elimina</button>`;
+                    }
+                }
+
+                return `
                 <tr>
-                    <td><input type="checkbox" class="user-checkbox" data-username="${user.username}"></td>
+                    <td><input type="checkbox" class="user-checkbox" data-username="${user.username}" ${isCurrentUser || isAdminUser ? 'disabled' : ''}></td>
                     <td>${user.username}</td>
                     <td>${user.role}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>
-                        <button class="btn btn-sm btn-danger btn-delete-user" data-username="${user.username}">Elimina</button>
+                        ${actionsHtml}
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
     };
 
     // --- Event Handlers ---
@@ -92,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleSelectAll = (e) => {
-        document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = e.target.checked);
+        document.querySelectorAll('.user-checkbox:not([disabled])').forEach(cb => cb.checked = e.target.checked);
     };
 
     const handleDeleteSelected = () => {
