@@ -143,9 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `
             <p>In base al totale eccesso, viene aggiunto un bonus al punteggio:</p>
             <ul>
-                <li>> 75%: +6%</li>
-                <li>> 50%: +4%</li>
-                <li>> 25%: +2%</li>
+                <li>> 100%: +4%</li>
+                <li>> 75%: +3%</li>
+                <li>> 50%: +2%</li>
+                <li>> 25%: +1%</li>
             </ul>
             <p>Bonus applicato: <strong>+${details.bonusScore}%</strong></p>
             <hr>
