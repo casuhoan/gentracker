@@ -125,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // C5-C6 is 0, so no change needed for these cases
 
             // Signature Weapon for 4-star
-            if (signatureWeapon === 'No') {
+            if (signatureWeapon === '4 Stelle') {
                 futureModifiers -= 1;
                 details.modifierBreakdown.signatureWeaponModifier = -1;
-            } else if (signatureWeapon === 'Sì') {
+            } else if (signatureWeapon === 'Best in the slot') {
                 futureModifiers += 1;
                 details.modifierBreakdown.signatureWeaponModifier = 1;
             }
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // C0-C1 is 0, so no change needed
 
             // Signature Weapon for 5-star
-            if (signatureWeapon === 'Sì') {
+            if (signatureWeapon === 'Best in the slot') {
                 futureModifiers += 1;
                 details.modifierBreakdown.signatureWeaponModifier = 1;
             }

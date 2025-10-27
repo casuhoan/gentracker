@@ -189,9 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         <li>Costellazione C0-C2: **-2%**</li>
                         <li>Costellazione C3-C4: **-1%**</li>
                         <li>Costellazione C5-C6: **+0%**</li>
-                        <li>Arma Signature "No": **-1%**</li>
+                        <li>Arma Signature "4 Stelle": **-1%**</li>
                         <li>Arma Signature "Buona": **+0%**</li>
-                        <li>Arma Signature "Sì": **+1%**</li>
+                        <li>Arma Signature "Best in the slot": **+1%**</li>
                     </ul>
                 </ul>
             `;
@@ -203,8 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <li>Costellazione C0-C1: **+0%**</li>
                         <li>Costellazione C2-C5: **+1%**</li>
                         <li>Costellazione C6: **+5%**</li>
-                        <li>Arma Signature "No" o "Buona": **+0%**</li>
-                        <li>Arma Signature "Sì": **+1%**</li>
+                        <li>Arma Signature "4 Stelle" o "Buona": **+0%**</li>
+                        <li>Arma Signature "Best in the slot": **+1%**</li>
                     </ul>
                 </ul>
             `;

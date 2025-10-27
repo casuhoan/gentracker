@@ -453,6 +453,7 @@ body:not(.dark-mode) #gallery-view #gallery-controls {
 .gallery-card {
     position: relative;
     overflow: hidden; /* Nasconde parti degli overlay che escono dalla card */
+    border-radius: 0.375rem;
 }
 
 .gallery-card .card-body {
@@ -829,8 +830,8 @@ body.dark-mode .table td {
     min-width: 0;
     word-wrap: break-word;
     background-clip: border-box;
-    /*border: 1px solid rgba(0, 0, 0, 0.175);
-    border-radius: 0.375rem;*/
+    border: 1px solid rgba(0, 0, 0, 0.175);
+    border-radius: 0.375rem;
     height: 100%;
     text-align: center;
 }

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements: ["Pyro", "Geo", "Cryo", "Dendro", "Hydro", "Anemo", "Electro"],
         roles: ["Healer", "Support", "Main DPS", "Sub DPS", "Shielder"],
         stats: ["HP", "Atk", "Def", "Energy Recharge (%)", "Elemental Mastery", "Crit Rate (%)", "Crit Damage (%)"],
-        signatureOptions: ["Sì", "Buona", "No"],
+        signatureOptions: ["Best in the slot", "Buona", "4 Stelle"],
         talentOptions: ["Sì", "Vicino", "No"]
     };
 
