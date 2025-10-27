@@ -20,12 +20,24 @@
             "Goblet Elementale": "No"
         },
         "acquisition_date": "2025-10-24",
-        "constellation": 0,
+        "constellation": 4,
         "signature_weapon": "Sì",
         "talents": "Sì",
         "rarity": "5-star"
     },
     "builds": [
+        {
+            "date": "2025-10-27",
+            "stats": {
+                "Atk": "4000",
+                "Energy Recharge (%)": "300",
+                "Crit Rate (%)": "100",
+                "Crit Damage (%)": "400"
+            },
+            "constellation": 4,
+            "signature_weapon": "Best in the slot",
+            "talents": "Sì"
+        },
         {
             "date": "2025-10-24",
             "stats": {

@@ -97,12 +97,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Part 2: Calculate Bonus Score
         let bonusScore = 0;
-        if (totalExcessPercentage > 75) {
-            bonusScore = 6;
-        } else if (totalExcessPercentage > 50) {
+        if(totalExcessPercentage>100){
             bonusScore = 4;
-        } else if (totalExcessPercentage > 25) {
+        }else if (totalExcessPercentage > 75) {
+            bonusScore = 3;
+        } else if (totalExcessPercentage > 50) {
             bonusScore = 2;
+        } else if (totalExcessPercentage > 25) {
+            bonusScore = 1;
         }
         details.bonusScore = bonusScore;
 

@@ -184,7 +184,10 @@ const getStatusColorClass = (type, value, rarity = '4-star') => {
                 if (value >= 6) return 'rarity-5-c6'; if (value === 5) return 'rarity-5-c5'; if (value === 4) return 'rarity-5-c4'; if (value === 3) return 'rarity-5-c3'; if (value === 2) return 'rarity-5-c2'; if (value === 1) return 'rarity-5-c1'; return 'rarity-5-c0';
             } else { if (value >= 6) return 'text-success'; if (value >= 2) return 'text-warning'; return 'text-danger'; }
         case 'signature_weapon':
-            if (value === 'Sì') return 'text-success'; if (value === 'Buona') return 'text-info'; return 'text-danger';
+            if (value === 'Best in the slot') return 'text-success';
+            if (value === 'Buona') return 'text-info';
+            if (value === '4 Stelle') return 'text-danger';
+            return '';
         case 'talents':
             if (value === 'Sì') return 'text-success'; if (value === 'Vicino') return 'text-warning'; return 'text-danger';
         default: return '';
