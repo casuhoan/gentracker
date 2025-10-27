@@ -522,7 +522,11 @@ function save_character() {
     if(isset($_POST['ideal_stats']) && is_array($_POST['ideal_stats'])){
         foreach($_POST['ideal_stats'] as $stat => $value){
             if(!empty($value)){
-                $ideal_stats[$stat] = floatval($value);
+                if ($stat === 'Goblet Elementale') {
+                    $ideal_stats[$stat] = $value; // Save as string
+                } else {
+                    $ideal_stats[$stat] = floatval($value);
+                }
             }
         }
     }
@@ -612,7 +616,15 @@ function update_character() {
     if(isset($_POST['constellation'])) $data['profile']['constellation'] = intval($_POST['constellation']);
     if(isset($_POST['ideal_stats']) && is_array($_POST['ideal_stats'])) {
         $ideal_stats = [];
-        foreach($_POST['ideal_stats'] as $stat => $val) if($val !== '') $ideal_stats[$stat] = floatval($val);
+        foreach($_POST['ideal_stats'] as $stat => $val) {
+            if($val !== '') {
+                if ($stat === 'Goblet Elementale') {
+                    $ideal_stats[$stat] = $val; // Save as string
+                } else {
+                    $ideal_stats[$stat] = floatval($val);
+                }
+            }
+        }
         $data['profile']['ideal_stats'] = $ideal_stats;
     }
 
@@ -1439,8 +1451,9 @@ function sync_library_images() {
     foreach ($characters as &$character) {
         if (isset($character['nome'])) {
             $nome = $character['nome'];
-            $character['icon'] = 'library/' . $nome . '_Icon.webp';
-            $character['banner'] = 'library/' . $nome . '_Card.webp';
+            $safe_nome = str_replace(' ', '_', $nome);
+            $character['icon'] = 'library/' . $safe_nome . '_Icon.webp';
+            $character['banner'] = 'library/' . $safe_nome . '_Card.webp';
         }
     }
 
@@ -1453,7 +1466,15 @@ function sync_library_images() {
 
 
 // --- ROUTER ---
-$action = $_REQUEST['action'] ?? '';
+$action = '';
+if (isset($_REQUEST['action'])) {
+    $action = $_REQUEST['action'];
+} else {
+    $json_data = json_decode(file_get_contents('php://input'), true);
+    if (isset($json_data['action'])) {
+        $action = $json_data['action'];
+    }
+}
 
 
 

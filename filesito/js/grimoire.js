@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         grid.innerHTML = '';
         if (characters.length === 0) {
-            grid.innerHTML = '<div class="col-12 text-center"><p>Nessun personaggio trovato con i filtri attuali.</p></div>';
+            grid.innerHTML = '<div class="col-12 text-center grimoire-no-results"><p>Nessun personaggio trovato con i filtri attuali.</p></div>';
             return;
         }
 

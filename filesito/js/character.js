@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CHARACTER FORM FUNCTIONS ---
@@ -51,7 +50,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
         });
 
+        // Handle Goblet Elementale
+        const editGobletCheckbox = document.getElementById('edit-track-goblet-elementale');
+        const editGobletContainer = document.getElementById('edit-ideal-goblet-elementale-container');
+        const editGobletSelect = document.getElementById('edit-ideal-goblet-elementale');
+        if (profile.ideal_stats && profile.ideal_stats['Goblet Elementale']) {
+            editGobletCheckbox.checked = true;
+            editGobletContainer.style.display = 'block';
+            editGobletSelect.value = profile.ideal_stats['Goblet Elementale'];
+        } else {
+            editGobletCheckbox.checked = false;
+            editGobletContainer.style.display = 'none';
+            editGobletSelect.value = 'No';
+        }
+
         const deleteBtn = document.getElementById('delete-character-btn');
+        deleteBtn.style.display = 'inline-block';
         deleteBtn.onclick = () => handleDeleteCharacter(profile.name);
     };
 
@@ -387,6 +401,22 @@ document.addEventListener('DOMContentLoaded', () => {
         setTodayAcquisitionBtn.addEventListener('click', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('acquisition_date').value = today;
+        });
+    }
+
+    const gobletCheckbox = document.getElementById('track-goblet-elementale');
+    const gobletContainer = document.getElementById('ideal-goblet-elementale-container');
+    if (gobletCheckbox && gobletContainer) {
+        gobletCheckbox.addEventListener('change', (e) => {
+            gobletContainer.style.display = e.target.checked ? 'block' : 'none';
+        });
+    }
+
+    const editGobletCheckbox = document.getElementById('edit-track-goblet-elementale');
+    const editGobletContainer = document.getElementById('edit-ideal-goblet-elementale-container');
+    if (editGobletCheckbox && editGobletContainer) {
+        editGobletCheckbox.addEventListener('change', (e) => {
+            editGobletContainer.style.display = e.target.checked ? 'block' : 'none';
         });
     }
 });

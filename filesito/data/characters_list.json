@@ -35,8 +35,12 @@
     {
         "nome": "Arataki Itto",
         "immagine": "a057_gacha_splash.webp",
-        "icon": "library\/Arataki Itto_Icon.webp",
-        "banner": "library\/Arataki Itto_Card.webp"
+        "icon": "library\/Arataki_Itto_Icon.webp",
+        "banner": "library\/Arataki_Itto_Card.webp",
+        "titolo": "Itto",
+        "elemento": "Geo",
+        "arma": "Claymore",
+        "rarita": "5-star"
     },
     {
         "nome": "Arlecchino",
@@ -237,8 +241,8 @@
     {
         "nome": "Hu Tao",
         "immagine": "Hu_Tao_Wish.webp",
-        "icon": "library\/Hu Tao_Icon.webp",
-        "banner": "library\/Hu Tao_Card.webp"
+        "icon": "library\/Hu_Tao_Icon.webp",
+        "banner": "library\/Hu_Tao_Card.webp"
     },
     {
         "nome": "Iansan",
@@ -273,8 +277,8 @@
     {
         "nome": "Kaedehara Kazuha",
         "immagine": "Kaedehara_Kazuha_Wish.webp",
-        "icon": "library\/Kaedehara Kazuha_Icon.webp",
-        "banner": "library\/Kaedehara Kazuha_Card.webp"
+        "icon": "library\/Kaedehara_Kazuha_Icon.webp",
+        "banner": "library\/Kaedehara_Kazuha_Card.webp"
     },
     {
         "nome": "Kaeya",
@@ -315,20 +319,20 @@
     {
         "nome": "Kujou Sara",
         "immagine": "Character_Kujou_Sara_Full_Wish.webp",
-        "icon": "library\/Kujou Sara_Icon.webp",
-        "banner": "library\/Kujou Sara_Card.webp"
+        "icon": "library\/Kujou_Sara_Icon.webp",
+        "banner": "library\/Kujou_Sara_Card.webp"
     },
     {
         "nome": "Kuki Shinobu",
         "immagine": "Character_Kuki_Shinobu_Full_Wish.webp",
-        "icon": "library\/Kuki Shinobu_Icon.webp",
-        "banner": "library\/Kuki Shinobu_Card.webp"
+        "icon": "library\/Kuki_Shinobu_Icon.webp",
+        "banner": "library\/Kuki_Shinobu_Card.webp"
     },
     {
         "nome": "Lan Yan",
         "immagine": "Character_Lan_Yan_Full_Wish.webp",
-        "icon": "library\/Lan Yan_Icon.webp",
-        "banner": "library\/Lan Yan_Card.webp"
+        "icon": "library\/Lan_Yan_Icon.webp",
+        "banner": "library\/Lan_Yan_Card.webp"
     },
     {
         "nome": "Lauma",
@@ -435,8 +439,8 @@
     {
         "nome": "Raiden Shogun",
         "immagine": "Raiden_Shogun_Wish.webp",
-        "icon": "library\/Raiden Shogun_Icon.webp",
-        "banner": "library\/Raiden Shogun_Card.webp"
+        "icon": "library\/Raiden_Shogun_Icon.webp",
+        "banner": "library\/Raiden_Shogun_Card.webp"
     },
     {
         "nome": "Razor",
@@ -453,8 +457,8 @@
     {
         "nome": "Sangonomiya Kokomi",
         "immagine": "Character_Sangonomiya_Kokomi_Full_Wish.webp",
-        "icon": "library\/Sangonomiya Kokomi_Icon.webp",
-        "banner": "library\/Sangonomiya Kokomi_Card.webp"
+        "icon": "library\/Sangonomiya_Kokomi_Icon.webp",
+        "banner": "library\/Sangonomiya_Kokomi_Card.webp"
     },
     {
         "nome": "Sayu",
@@ -477,8 +481,8 @@
     {
         "nome": "Shikanoin Heizou",
         "immagine": "Character_Shikanoin_Heizou_Full_Wish.webp",
-        "icon": "library\/Shikanoin Heizou_Icon.webp",
-        "banner": "library\/Shikanoin Heizou_Card.webp"
+        "icon": "library\/Shikanoin_Heizou_Icon.webp",
+        "banner": "library\/Shikanoin_Heizou_Card.webp"
     },
     {
         "nome": "Sigewinne",
@@ -595,8 +599,8 @@
     {
         "nome": "Yae Miko",
         "immagine": "Character_Yae_Miko_Full_Wish.webp",
-        "icon": "library\/Yae Miko_Icon.webp",
-        "banner": "library\/Yae Miko_Card.webp"
+        "icon": "library\/Yae_Miko_Icon.webp",
+        "banner": "library\/Yae_Miko_Card.webp"
     },
     {
         "nome": "Yanfei",
@@ -625,14 +629,14 @@
     {
         "nome": "Yumemizuki Mizuki",
         "immagine": "Character_Yumemizuki_Mizuki_Full_Wish.webp",
-        "icon": "library\/Yumemizuki Mizuki_Icon.webp",
-        "banner": "library\/Yumemizuki Mizuki_Card.webp"
+        "icon": "library\/Yumemizuki_Mizuki_Icon.webp",
+        "banner": "library\/Yumemizuki_Mizuki_Card.webp"
     },
     {
         "nome": "Yun Jin",
         "immagine": "Character_Yun Jin_Full_Wish.webp",
-        "icon": "library\/Yun Jin_Icon.webp",
-        "banner": "library\/Yun Jin_Card.webp"
+        "icon": "library\/Yun_Jin_Icon.webp",
+        "banner": "library\/Yun_Jin_Card.webp"
     },
     {
         "nome": "Zhongli",

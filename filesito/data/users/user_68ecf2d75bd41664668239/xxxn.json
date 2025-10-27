@@ -10,7 +10,8 @@
             "Elemental Mastery"
         ],
         "ideal_stats": {
-            "Elemental Mastery": 4
+            "Elemental Mastery": 4,
+            "Goblet Elementale": "No"
         },
         "acquisition_date": "2025-10-23",
         "constellation": 2,

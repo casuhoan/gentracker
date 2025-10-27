@@ -30,6 +30,134 @@ document.addEventListener('DOMContentLoaded', () => {
         elementFiltersContainer.addEventListener('change', applyFiltersAndSorting);
     };
 
+    window.calculateBuildScore = (profile) => {
+        // Check for necessary data
+        if (!profile.tracked_stats || profile.tracked_stats.length === 0 || !profile.ideal_stats || Object.keys(profile.ideal_stats).length === 0 || !profile.latest_build_stats) {
+            return { score: 0, details: { baseScore: 0, bonusScore: 0, futureModifiers: 0, finalScore: 0, statsBreakdown: [], excessStats: [], modifierBreakdown: {} } };
+        }
+
+        let cappedRatios = [];
+        let totalExcessPercentage = 0;
+        let scoredStatsCount = 0;
+
+        const details = {
+            baseScore: 0,
+            bonusScore: 0,
+            futureModifiers: 0,
+            finalScore: 0,
+            statsBreakdown: [],
+            excessStats: [],
+            modifierBreakdown: {
+                rarity: profile.rarity,
+                constellation: profile.constellation,
+                signatureWeapon: profile.signature_weapon,
+                constellationModifier: 0,
+                signatureWeaponModifier: 0
+            }
+        };
+
+        // Part 1 & 2: Calculate Base Score components and Bonus Value
+        profile.tracked_stats.forEach(statName => {
+            const ideal = parseFloat(profile.ideal_stats[statName]);
+            const actual = parseFloat(profile.latest_build_stats[statName]);
+
+            if (!isNaN(ideal) && ideal > 0 && !isNaN(actual)) {
+                const ratio = actual / ideal;
+                
+                // For Base Score
+                cappedRatios.push(Math.min(ratio, 1.0));
+                details.statsBreakdown.push({
+                    stat: statName,
+                    ideal: ideal,
+                    actual: actual,
+                    ratio: ratio,
+                    cappedRatio: Math.min(ratio, 1.0)
+                });
+                
+                // For Bonus Value
+                if (ratio > 1.0) {
+                    const excess = (ratio - 1.0) * 100;
+                    totalExcessPercentage += excess;
+                    details.excessStats.push({
+                        stat: statName,
+                        excessPercentage: excess
+                    });
+                }
+                scoredStatsCount++;
+            }
+        });
+
+        if (scoredStatsCount === 0) {
+            return { score: 0, details: { baseScore: 0, bonusScore: 0, futureModifiers: 0, finalScore: 0, statsBreakdown: [], excessStats: [], modifierBreakdown: {} } };
+        }
+
+        // Calculate Base Score
+        const baseScore = (cappedRatios.reduce((a, b) => a + b, 0) / scoredStatsCount) * 100;
+        details.baseScore = baseScore;
+
+        // Part 2: Calculate Bonus Score
+        let bonusScore = 0;
+        if (totalExcessPercentage > 75) {
+            bonusScore = 6;
+        } else if (totalExcessPercentage > 50) {
+            bonusScore = 4;
+        } else if (totalExcessPercentage > 25) {
+            bonusScore = 2;
+        }
+        details.bonusScore = bonusScore;
+
+        // Part 4: Modifiers based on Constellation and Signature Weapon
+        let futureModifiers = 0;
+
+        const constellation = profile.constellation || 0; // Use profile.constellation
+        const signatureWeapon = profile.signature_weapon || 'No'; // Use profile.signature_weapon
+        const rarity = profile.rarity || '5-star';
+
+        if (rarity === '4-star') {
+            // Constellation for 4-star
+            if (constellation >= 0 && constellation <= 2) {
+                futureModifiers -= 2;
+                details.modifierBreakdown.constellationModifier = -2;
+            } else if (constellation >= 3 && constellation <= 4) {
+                futureModifiers -= 1;
+                details.modifierBreakdown.constellationModifier = -1;
+            }
+            // C5-C6 is 0, so no change needed for these cases
+
+            // Signature Weapon for 4-star
+            if (signatureWeapon === 'No') {
+                futureModifiers -= 1;
+                details.modifierBreakdown.signatureWeaponModifier = -1;
+            } else if (signatureWeapon === 'Sì') {
+                futureModifiers += 1;
+                details.modifierBreakdown.signatureWeaponModifier = 1;
+            }
+            // 'Buona' is 0, so no change needed
+        } else if (rarity === '5-star') {
+            // Constellation for 5-star
+            if (constellation >= 2 && constellation <= 5) {
+                futureModifiers += 1;
+                details.modifierBreakdown.constellationModifier = 1;
+            }
+            // C0-C1 is 0, so no change needed
+
+            // Signature Weapon for 5-star
+            if (signatureWeapon === 'Sì') {
+                futureModifiers += 1;
+                details.modifierBreakdown.signatureWeaponModifier = 1;
+            }
+            // 'No' and 'Buona' are 0, so no change needed
+        }
+        details.futureModifiers = futureModifiers;
+
+        // Final Score
+        details.finalScore = baseScore + bonusScore + futureModifiers;
+
+        return { score: details.finalScore, details: details };
+    }
+    console.log('calculateBuildScore defined in gallery.js. Type:', typeof window.calculateBuildScore);
+    console.log('calculateBuildScore defined in gallery.js. Type:', typeof window.calculateBuildScore);
+
     window.applyFiltersAndSorting = () => {
         let filteredCharacters = [...sourceCharacterData];
         const nameFilterInput = document.getElementById('name-filter');
@@ -43,16 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedElements.length > 0) {
             filteredCharacters = filteredCharacters.filter(char => selectedElements.includes(char.profile.element));
         }
+        
         filteredCharacters.forEach(char => {
-            const { ideal_stats = {}, tracked_stats = [], latest_build_stats = {} } = char.profile;
-            if (tracked_stats.length === 0 || Object.keys(ideal_stats).length === 0) { char.buildScore = 0; return; }
-            let totalRatio = 0, scoredStatsCount = 0;
-            tracked_stats.forEach(statName => {
-                const ideal = parseFloat(ideal_stats[statName]), actual = parseFloat(latest_build_stats[statName]);
-                if (!isNaN(ideal) && ideal > 0 && !isNaN(actual)) { totalRatio += Math.min(actual / ideal, 1.1); scoredStatsCount++; }
-            });
-            char.buildScore = (scoredStatsCount > 0) ? (totalRatio / scoredStatsCount) * 100 : 0;
+            const { score, details } = calculateBuildScore(char.profile);
+            char.buildScore = score;
+            char.buildScoreDetails = details; // Store details for later use
         });
+
         const sortSelect = document.getElementById('sort-select');
         if (sortSelect) {
             const sortValue = sortSelect.value;

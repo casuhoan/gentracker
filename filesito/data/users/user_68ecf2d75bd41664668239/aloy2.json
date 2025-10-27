@@ -1,0 +1,54 @@
+{
+    "profile": {
+        "name": "Aloy2",
+        "splashart": "uploads\/user_68ecf2d75bd41664668239_aloy2.webp",
+        "element": "Cryo",
+        "role": [
+            "Support"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Energy Recharge (%)",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Crit Rate (%)": 100,
+            "Atk": 2000,
+            "Energy Recharge (%)": 200,
+            "Crit Damage (%)": 300,
+            "Goblet Elementale": "No"
+        },
+        "acquisition_date": "2025-10-24",
+        "constellation": 0,
+        "signature_weapon": "Sì",
+        "talents": "Sì",
+        "rarity": "5-star"
+    },
+    "builds": [
+        {
+            "date": "2025-10-24",
+            "stats": {
+                "Atk": "2500",
+                "Energy Recharge (%)": "250",
+                "Crit Rate (%)": "90",
+                "Crit Damage (%)": "270"
+            },
+            "constellation": 0,
+            "signature_weapon": "Sì",
+            "talents": "Sì"
+        },
+        {
+            "date": "2025-10-24",
+            "stats": {
+                "Atk": "1900",
+                "Energy Recharge (%)": "150",
+                "Crit Rate (%)": "70",
+                "Crit Damage (%)": "230"
+            },
+            "constellation": 0,
+            "signature_weapon": "No",
+            "talents": "No"
+        }
+    ]
+}

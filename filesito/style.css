@@ -211,11 +211,11 @@ body.body-has-background #dashboard-view .card-body ul li * {
 }
 
 /* Darker blue for specific headings when background is active */
-body.body-has-background main h5 {
+body.body-has-background main h5:not(.card-title) {
     color: #003366 !important; /* Darker blue */
 }
 
-body.body-has-background.dark-mode main h5 {
+body.body-has-background.dark-mode main h5:not(.card-title) {
     color: #6ea8fe !important; /* Keep light blue for dark mode */
 }
 
@@ -954,16 +954,49 @@ body.grimoire-background {
     background-attachment: fixed;
 }
 
+/* Modifiche richieste dall'utente per il Grimorio */
+
+/* 1. Sfondo sezione filtri con opacità e senza bordo */
+#grimoire-controls {
+    background-color: rgba(248, 249, 250, 0.7); /* Sfondo chiaro con opacità 70% */
+    border-radius: .375rem;
+    padding: 1rem;
+    border: none !important;
+}
+
+body.dark-mode #grimoire-controls {
+    background-color: rgba(52, 58, 64, 0.7); /* Sfondo scuro con opacità 70% */
+}
+
+/* 2. Sfondo card con opacità */
 .grimoire-card {
     position: relative;
     overflow: hidden;
     border-radius: 0.375rem;
-    background-color: var(--light-card-bg);
+    background-color: rgba(255, 255, 255, 0.5); /* Sfondo card chiaro con opacità 50% */
     transition: transform 0.2s ease-in-out;
 }
 
 body.dark-mode .grimoire-card {
-    background-color: var(--dark-card-bg);
+    background-color: rgba(52, 58, 64, 0.5); /* Sfondo card scuro con opacità 50% */
+}
+
+/* 3. Stile del font per il nome del personaggio */
+.grimoire-card-body h5 {
+    color: var(--light-color);
+}
+
+body.dark-mode .grimoire-card-body h5 {
+    color: var(--dark-color);
+}
+
+/* 4. Colore per l'icona del pulsante di aiuto */
+#grimoire-view .help-btn i {
+    color: #212529; /* Colore scuro per tema chiaro */
+}
+
+body.dark-mode #grimoire-view .help-btn i {
+    color: #dee2e6; /* Colore chiaro per tema scuro */
 }
 
 .grimoire-card:hover {
@@ -1035,4 +1068,28 @@ body.dark-mode .grimoire-card {
 #grimoire-view h2,
 #character-detail-view h2 {
     text-shadow: none !important;
+}
+
+.grimoire-no-results {
+    padding-top: 100px;
+    padding-bottom: 100px;
+    min-height: 300px;
+}
+
+.grimoire-no-results p {
+    color: #000000;
+}
+
+body.dark-mode .grimoire-no-results p {
+    color: #FFFFFF;
+}
+
+#settings-view .help-btn {
+    display: none !important;
+}
+
+/* Fix title color on edit character page with background */
+body.body-has-background #character-edit-view h2 {
+    color: #000000 !important; /* Force black color */
+    text-shadow: 0 0 6px #fff, 0 0 8px #fff; /* Enhance glow for readability */
 }

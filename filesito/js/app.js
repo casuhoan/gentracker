@@ -227,6 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(typeof initTheme === 'function') initTheme();
         if(typeof initGallerySettings === 'function') initGallerySettings();
         if(typeof updateLoginUI === 'function') updateLoginUI();
+        console.log('App initialization complete.');
+        console.log('window.calculateBuildScore is type:', typeof window.calculateBuildScore);
     };
 
     document.querySelector('main').addEventListener('click', (e) => {
