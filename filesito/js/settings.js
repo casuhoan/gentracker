@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     // This file should be loaded after app.js, so it can access its variables and functions
 
@@ -816,6 +815,83 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- AVATAR LIBRARY ---
 
+    const chooseAvatarBtn = document.getElementById('choose-avatar-from-library-btn');
+    const avatarLibraryView = document.getElementById('avatar-library-view');
+    const backToSettingsBtn = document.getElementById('back-to-settings-btn');
+    const settingsView = document.getElementById('settings-view');
+
+    if (chooseAvatarBtn) {
+        chooseAvatarBtn.addEventListener('click', () => {
+            settingsView.classList.remove('active');
+            avatarLibraryView.classList.add('active');
+            loadAvatarLibrary();
+        });
+    }
+
+    if (backToSettingsBtn) {
+        backToSettingsBtn.addEventListener('click', () => {
+            avatarLibraryView.classList.remove('active');
+            settingsView.classList.add('active');
+        });
+    }
+
+    const loadAvatarLibrary = () => {
+        const grid = document.getElementById('avatar-library-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        characterLibrary.forEach(char => {
+            if (char.icon) {
+                const col = document.createElement('div');
+                col.className = 'col';
+                col.innerHTML = `
+                    <div class="card h-100 text-center p-2 avatar-select-card" data-icon-path="data/${char.icon}">
+                        <img src="data/${char.icon}" class="card-img-top" style="width: 80px; height: 80px; object-fit: contain; margin: 0 auto;">
+                        <div class="card-body p-1">
+                            <h6 class="card-title" style="font-size: 0.8rem;">${char.nome}</h6>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(col);
+            }
+        });
+    };
+
+    const avatarGrid = document.getElementById('avatar-library-grid');
+    if (avatarGrid) {
+        avatarGrid.addEventListener('click', async (e) => {
+            const card = e.target.closest('.avatar-select-card');
+            if (!card) return;
+
+            const avatarPath = card.dataset.iconPath;
+
+            const formData = new FormData();
+            formData.append('action', 'update_user');
+            formData.append('original_username', currentUser.username);
+            formData.append('username', currentUser.username);
+            formData.append('avatar_path', avatarPath);
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Avatar aggiornato con successo!');
+                    // Update currentUser and UI
+                    currentUser.avatar = avatarPath;
+                    updateLoginUI(); // This updates the navbar avatar
+                    document.getElementById('settings-avatar-preview').src = avatarPath; // Update settings page preview
+                    // Go back to settings view
+                    backToSettingsBtn.click();
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Impossibile comunicare con il server.');
+            }
+        });
+    }
 
 });

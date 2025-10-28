@@ -235,6 +235,7 @@
                                     <img id="settings-avatar-preview" src="uploads/default_avatar.png" alt="Avatar Preview" class="rounded-circle mb-2">
                                     <div>
                                         <label for="settings-avatar-input" class="btn btn-sm btn-outline-primary mt-2">Carica nuova immagine</label>
+                                        <button type="button" id="choose-avatar-from-library-btn" class="btn btn-sm btn-outline-secondary mt-2">Scegli dalla Libreria</button>
                                         <input type="file" class="d-none" id="settings-avatar-input" name="avatar" accept="image/*">
                                     </div>
                                 </div>
@@ -469,6 +470,17 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Sezione Selezione Avatar dalla Libreria -->
+        <div id="avatar-library-view" class="view">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Scegli un Avatar dalla Libreria</h2>
+                <button id="back-to-settings-btn" class="btn btn-secondary">Indietro</button>
+            </div>
+            <div id="avatar-library-grid" class="row row-cols-2 row-cols-sm-4 row-cols-md-6 row-cols-lg-8 g-3">
+                <!-- Icone caricate da JS -->
             </div>
         </div>
 

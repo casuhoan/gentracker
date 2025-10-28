@@ -923,7 +923,17 @@ function update_user() {
             }
 
             // Gestione Avatar
-            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
+            if (isset($_POST['avatar_path']) && !empty($_POST['avatar_path'])) {
+                $new_avatar_path = $_POST['avatar_path'];
+                // Basic validation: ensure the path starts with 'data/' to prevent arbitrary file paths
+                if (strpos($new_avatar_path, 'data/') === 0 && file_exists(__DIR__ . '/../' . $new_avatar_path)) {
+                    // If old avatar was a custom upload, delete it
+                    if (!empty($user['avatar']) && strpos($user['avatar'], 'uploads/') === 0 && file_exists(__DIR__ . '/../' . $user['avatar'])) {
+                        unlink(__DIR__ . '/../' . $user['avatar']);
+                    }
+                    $user['avatar'] = $new_avatar_path;
+                }
+            } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
                 $upload_dir = __DIR__ . '/../uploads/';
                 // Cancella il vecchio avatar se esiste
                 if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
