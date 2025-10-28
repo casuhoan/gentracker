@@ -1198,3 +1198,9 @@ body.dark-mode .grimoire-view-icon .grimoire-card {
     transform: translateY(-5px);
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
+
+.tooltip-keyword {
+    font-style: italic;
+    cursor: help;
+    border-bottom: 1px dotted;
+}

@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-keywords-tab')?.classList.remove('d-none');
         }
     };
 
@@ -183,6 +184,83 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- KEYWORD MANAGEMENT ---
+
+    let keywordColors = [];
+    let keywordTooltips = [];
+
+    const keywordColorsTable = document.getElementById('keyword-colors-table-body');
+    const keywordTooltipsTable = document.getElementById('keyword-tooltips-table-body');
+    const saveKeywordsBtn = document.getElementById('save-keyword-settings-btn');
+
+    const colorOptions = {
+        "Rosso": "#dc3545",
+        "Blu": "#0d6efd",
+        "Verde": "#198754",
+        "Giallo": "#ffc107",
+        "Ciano": "#0dcaf0",
+        "Viola": "#6f42c1",
+        "Arancione": "#fd7e14",
+        "Rosa": "#d63384",
+        "Grigio": "#6c757d",
+        "Nero": "#000000"
+    };
+
+    const populateColorSelect = () => {
+        const select = document.getElementById('keyword-color-select');
+        if (!select) return;
+        select.innerHTML = '';
+        for (const [name, hex] of Object.entries(colorOptions)) {
+            const option = document.createElement('option');
+            option.value = hex;
+            option.innerHTML = `<span style="color:${hex};">&9632;</span> ${name}`;
+            select.appendChild(option);
+        }
+    };
+
+    const renderKeywordTables = () => {
+        if (keywordColorsTable) {
+            keywordColorsTable.innerHTML = '';
+            keywordColors.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.keyword}</td>
+                    <td><span style="color:${item.color}; font-weight:bold;">${item.color}</span></td>
+                    <td><button class="btn btn-sm btn-danger delete-keyword-color-btn" data-index="${index}">&times;</button></td>
+                `;
+                keywordColorsTable.appendChild(row);
+            });
+        }
+        if (keywordTooltipsTable) {
+            keywordTooltipsTable.innerHTML = '';
+            keywordTooltips.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><em>${item.keyword}</em></td>
+                    <td>${item.description.substring(0, 50)}...</td>
+                    <td><button class="btn btn-sm btn-danger delete-keyword-tooltip-btn" data-index="${index}">&times;</button></td>
+                `;
+                keywordTooltipsTable.appendChild(row);
+            });
+        }
+    };
+
+    const loadKeywordManagement = async () => {
+        try {
+            const response = await fetch('php/api.php?action=get_keyword_settings');
+            const data = await response.json();
+            if (data.status === 'success') {
+                keywordColors = data.colors;
+                keywordTooltips = data.tooltips;
+                populateColorSelect();
+                renderKeywordTables();
+            } else {
+                showErrorAlert('Impossibile caricare le impostazioni delle parole chiave.');
+            }
+        } catch (error) {
+            showErrorAlert('Errore di comunicazione con il server.');
+        }
+    };
 
     // --- EVENT LISTENERS ---
 
@@ -191,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
     document.getElementById('v-pills-elements-tab')?.addEventListener('shown.bs.tab', loadElementsManagement);
+    document.getElementById('v-pills-keywords-tab')?.addEventListener('shown.bs.tab', loadKeywordManagement);
 
     document.getElementById('v-pills-elements')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -890,6 +969,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 showErrorAlert('Impossibile comunicare con il server.');
+            }
+        });
+    }
+
+    document.getElementById('v-pills-keywords')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (e.target.id === 'keyword-color-form') {
+            const keywordInput = document.getElementById('keyword-color-input');
+            const colorSelect = document.getElementById('keyword-color-select');
+            const keyword = keywordInput.value.trim();
+            if (keyword) {
+                keywordColors.push({ keyword: keyword, color: colorSelect.value });
+                renderKeywordTables();
+                keywordInput.value = '';
+            }
+        } else if (e.target.id === 'keyword-tooltip-form') {
+            const keywordInput = document.getElementById('keyword-tooltip-input');
+            const descInput = document.getElementById('keyword-tooltip-desc');
+            const keyword = keywordInput.value.trim();
+            const description = descInput.value.trim();
+            if (keyword && description) {
+                keywordTooltips.push({ keyword: keyword, description: description });
+                renderKeywordTables();
+                keywordInput.value = '';
+                descInput.value = '';
+            }
+        }
+    });
+
+    document.getElementById('v-pills-keywords')?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-keyword-color-btn')) {
+            const index = parseInt(e.target.dataset.index);
+            keywordColors.splice(index, 1);
+            renderKeywordTables();
+        }
+        if (e.target.classList.contains('delete-keyword-tooltip-btn')) {
+            const index = parseInt(e.target.dataset.index);
+            keywordTooltips.splice(index, 1);
+            renderKeywordTables();
+        }
+    });
+
+    if (saveKeywordsBtn) {
+        saveKeywordsBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('php/api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save_keyword_settings',
+                        colors: keywordColors,
+                        tooltips: keywordTooltips
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    window.keywordSettings = null; // Invalidate cache
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore durante il salvataggio.');
             }
         });
     }

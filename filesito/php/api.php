@@ -86,6 +86,14 @@ function get_character_schema_file() {
     return __DIR__ . '/../data/character_schema.json';
 }
 
+function get_keyword_colors_file() {
+    return __DIR__ . '/../data/keyword_colors.json';
+}
+
+function get_keyword_tooltips_file() {
+    return __DIR__ . '/../data/keyword_tooltips.json';
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -1484,6 +1492,50 @@ function sync_library_images() {
     }
 }
 
+function get_keyword_settings() {
+    $colors_file = get_keyword_colors_file();
+    if (!file_exists($colors_file)) {
+        file_put_contents($colors_file, '[]');
+    }
+
+    $tooltips_file = get_keyword_tooltips_file();
+    if (!file_exists($tooltips_file)) {
+        file_put_contents($tooltips_file, '[]');
+    }
+
+    $colors = json_decode(file_get_contents($colors_file), true);
+    $tooltips = json_decode(file_get_contents($tooltips_file), true);
+
+    echo json_encode([
+        'status' => 'success',
+        'colors' => is_array($colors) ? $colors : [],
+        'tooltips' => is_array($tooltips) ? $tooltips : []
+    ]);
+}
+
+function save_keyword_settings() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $colors = $data['colors'] ?? null;
+    $tooltips = $data['tooltips'] ?? null;
+
+    if ($colors === null || $tooltips === null) {
+        echo json_encode(['status' => 'error', 'message' => 'Dati mancanti.']);
+        return;
+    }
+
+    $colors_file = get_keyword_colors_file();
+    $tooltips_file = get_keyword_tooltips_file();
+
+    $save_colors = file_put_contents($colors_file, json_encode($colors, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    $save_tooltips = file_put_contents($tooltips_file, json_encode($tooltips, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    if ($save_colors !== false && $save_tooltips !== false) {
+        echo json_encode(['status' => 'success', 'message' => 'Impostazioni parole chiave salvate.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Errore durante il salvataggio delle impostazioni.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = '';
@@ -1500,7 +1552,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings'];
 
 if (in_array($action, $public_actions)) {
     $action();

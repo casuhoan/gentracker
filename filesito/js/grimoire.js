@@ -1,6 +1,116 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+
+    const getKeywordSettings = async () => {
+        if (window.keywordSettings === null) {
+            console.log("Fetching keyword settings...");
+            try {
+                const response = await fetch('php/api.php?action=get_keyword_settings');
+                const data = await response.json();
+                if (data.status === 'success') {
+                    window.keywordSettings = data;
+                } else {
+                    window.keywordSettings = { colors: [], tooltips: [] };
+                }
+            } catch (e) {
+                console.error("Failed to fetch keyword settings:", e);
+                window.keywordSettings = { colors: [], tooltips: [] };
+            }
+        }
+        return window.keywordSettings;
+    };
+
+    const formatDescription = async (text) => {
+        if (!text) return 'Nessuna descrizione disponibile.';
+
+        const settings = await getKeywordSettings();
+        let formattedText = text;
+
+        if (!settings || (!settings.colors.length && !settings.tooltips.length && !characterLibrary.length)) {
+            return text.replace(/\n/g, '<br>');
+        }
+        
+        // Create a list of all replacements to be made
+        const replacements = [];
+
+        // 1. Find all character name matches
+        const charNames = characterLibrary.map(c => c.nome).sort((a, b) => b.length - a.length);
+        charNames.forEach(name => {
+            const regex = new RegExp(`\\b(${name})\\b`, 'g');
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                replacements.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    html: `<strong>${match[0]}</strong>`
+                });
+            }
+        });
+
+        // 2. Find all tooltip matches
+        if (settings.tooltips) {
+            settings.tooltips.forEach(item => {
+                const regex = new RegExp(`\\b(${item.keyword})\\b`, 'gi');
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    replacements.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        html: `<span class="tooltip-keyword" data-bs-toggle="tooltip" title="${item.description}"><em>${match[0]}</em></span>`
+                    });
+                }
+            });
+        }
+
+        // 3. Find all color matches
+        if (settings.colors) {
+            settings.colors.forEach(item => {
+                const regex = new RegExp(`\\b(${item.keyword})\\b`, 'g');
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    replacements.push({
+                        start: match.index,
+                        end: match.index + match[0].length,
+                        html: `<span style="color: ${item.color};">${match[0]}</span>`
+                    });
+                }
+            });
+        }
+
+        // Filter out overlapping matches, keeping the longest one
+        const filteredReplacements = replacements.filter((r1, i1) => {
+            return !replacements.some((r2, i2) => {
+                if (i1 === i2) return false;
+                // Check for overlap
+                if (r1.start < r2.end && r1.end > r2.start) {
+                    // If they overlap, discard the shorter one
+                    const len1 = r1.end - r1.start;
+                    const len2 = r2.end - r2.start;
+                    if (len1 < len2) return true;
+                    // If they have the same length, discard the one that appears later in the array (lower precedence)
+                    if (len1 === len2 && i1 > i2) return true;
+                }
+                return false;
+            });
+        });
+
+        // Sort by start index
+        filteredReplacements.sort((a, b) => a.start - b.start);
+
+        // Build the new string
+        let lastIndex = 0;
+        let result = '';
+        filteredReplacements.forEach(rep => {
+            result += text.substring(lastIndex, rep.start);
+            result += rep.html;
+            lastIndex = rep.end;
+        });
+        result += text.substring(lastIndex);
+
+        return result.replace(/\n/g, '<br>');
+    };
+
     // --- GRIMOIRE FUNCTIONS ---
 
     window.initGrimoireControls = () => {
@@ -110,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyGrimoireBackground();
     };
 
-    window.loadCharacterDetailPage = (characterName) => {
+    window.loadCharacterDetailPage = async (characterName) => { // Make async
         const char = characterLibrary.find(c => c.nome === characterName);
         const detailView = document.getElementById('character-detail-view');
 
@@ -132,8 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Convert newlines in description to <br> for display
-        const displayDescription = char.description ? char.description.replace(/\n/g, '<br>') : 'Nessuna descrizione disponibile.';
+        // Format description with keywords
+        const displayDescription = await formatDescription(char.description);
 
         detailView.innerHTML = `
             <div class="container-fluid">
@@ -199,6 +309,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showView('character-detail-view');
         applyGrimoireBackground();
 
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(detailView.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
         document.getElementById('back-to-grimoire').addEventListener('click', () => {
             location.hash = '#grimoire';
         });
@@ -238,7 +354,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         showToast('Descrizione salvata!');
                         // Update local data to avoid full reload
                         char.description = newDescription;
-                        displayContainer.querySelector('p').innerHTML = newDescription.replace(/\n/g, '<br>');
+                        // Re-format and display the new description
+                        const formatted = await formatDescription(newDescription);
+                        displayContainer.querySelector('p').innerHTML = formatted;
                         // Toggle back to display mode
                         cancelBtn.click();
                     } else {

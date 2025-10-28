@@ -222,6 +222,7 @@
                         <a class="nav-link d-none" id="v-pills-backgrounds-tab" data-bs-toggle="pill" href="#v-pills-backgrounds" role="tab" aria-controls="v-pills-backgrounds" aria-selected="false"><i class="bi bi-images me-2"></i>Gestione Sfondi</a>
                         <a class="nav-link d-none" id="v-pills-schema-tab" data-bs-toggle="pill" href="#v-pills-schema" role="tab" aria-controls="v-pills-schema" aria-selected="false"><i class="bi bi-diagram-3-fill me-2"></i>Schema Utenti</a>
                         <a class="nav-link d-none" id="v-pills-elements-tab" data-bs-toggle="pill" href="#v-pills-elements" role="tab" aria-controls="v-pills-elements" aria-selected="false"><i class="bi bi-gem me-2"></i>Gestione Elementi</a>
+                        <a class="nav-link d-none" id="v-pills-keywords-tab" data-bs-toggle="pill" href="#v-pills-keywords" role="tab" aria-controls="v-pills-keywords" aria-selected="false"><i class="bi bi-tags-fill me-2"></i>Gestione Parole Chiave</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -466,8 +467,75 @@
                             </form>
                             <hr>
                             <h5>Elementi Esistenti</h5>
-                            <div id="elements-list-container" class="list-group"></div>
                         </div>
+
+                        <!-- Pannello Gestione Parole Chiave -->
+<div class="tab-pane fade" id="v-pills-keywords" role="tabpanel" aria-labelledby="v-pills-keywords-tab">
+    <h4>Gestione Parole Chiave per le Descrizioni</h4>
+    <p class="text-muted small">Aggiungi parole chiave per colorare automaticamente il testo o per mostrare un fumetto con una spiegazione al passaggio del mouse.</p>
+    
+    <hr>
+    <h5>Colorazione Parole Chiave</h5>
+    <form id="keyword-color-form" class="mb-3 row g-3 align-items-end">
+        <div class="col-md-4">
+            <label for="keyword-color-input" class="form-label">Parola Chiave</label>
+            <input type="text" id="keyword-color-input" class="form-control">
+        </div>
+        <div class="col-md-4">
+            <label for="keyword-color-select" class="form-label">Colore</label>
+            <select id="keyword-color-select" class="form-select"></select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary w-100">Aggiungi Colore</button>
+        </div>
+    </form>
+    <div class="table-responsive mb-4">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Parola</th>
+                    <th>Colore</th>
+                    <th>Azione</th>
+                </tr>
+            </thead>
+            <tbody id="keyword-colors-table-body">
+                <!-- Righe inserite da JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+    <h5>Tooltip Parole Chiave</h5>
+    <form id="keyword-tooltip-form" class="mb-3">
+        <div class="mb-2">
+            <label for="keyword-tooltip-input" class="form-label">Parola o Frase Chiave</label>
+            <input type="text" id="keyword-tooltip-input" class="form-control">
+        </div>
+        <div class="mb-2">
+            <label for="keyword-tooltip-desc" class="form-label">Descrizione (per il fumetto)</label>
+            <textarea id="keyword-tooltip-desc" class="form-control" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Aggiungi Tooltip</button>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Parola/Frase</th>
+                    <th>Descrizione</th>
+                    <th>Azione</th>
+                </tr>
+            </thead>
+            <tbody id="keyword-tooltips-table-body">
+                <!-- Righe inserite da JS -->
+            </tbody>
+        </table>
+    </div>
+    <hr class="my-4">
+    <div class="text-end">
+        <button class="btn btn-success" id="save-keyword-settings-btn"><i class="bi bi-save me-2"></i>Salva Tutte le Impostazioni</button>
+    </div>
+</div>
                     </div>
                 </div>
             </div>

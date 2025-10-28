@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentUser = null;
     window.isAdmin = false;
     window.grimoireBackground = null;
+    window.keywordSettings = null;
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
