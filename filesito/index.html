@@ -283,6 +283,21 @@
                             </div>
 
                             <hr class="my-4">
+                            <h4>Visualizzazione Libreria</h4>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="grimoire-view-radios" id="grimoire-view-icon" value="icon">
+                                <label class="form-check-label" for="grimoire-view-icon">Icone Personaggi</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="grimoire-view-radios" id="grimoire-view-banner" value="banner">
+                                <label class="form-check-label" for="grimoire-view-banner">Banner Personaggi</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="grimoire-view-radios" id="grimoire-view-splash" value="splash">
+                                <label class="form-check-label" for="grimoire-view-splash">Splash Art Personaggi</label>
+                            </div>
+
+                            <hr class="my-4">
                             <h4>Sfondo Galleria</h4>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="enable-background-switch">
@@ -351,6 +366,10 @@
                                             <label class="form-check-label" for="lib-rarity-5">5 Stelle</label>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="library-char-wip" name="wip">
+                                    <label class="form-check-label" for="library-char-wip">Work in Progress (Visibile solo agli Admin)</label>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Aggiungi alla Libreria</button>
                             </form>
@@ -465,6 +484,8 @@
             </div>
             <form id="character-form" enctype="multipart/form-data">
                 <input type="hidden" name="default_image_path" id="default_image_path">
+                <input type="hidden" name="icon" id="character-icon">
+                <input type="hidden" name="banner" id="character-banner">
                 
                 <div class="row mb-3">
                     <!-- Colonna sinistra per input e descrizione -->
@@ -583,6 +604,8 @@
                 <input type="hidden" name="original_name" id="edit-original-name">
                 <input type="hidden" name="base_char_name" id="edit-base-char-name"> 
                 <input type="hidden" name="default_image_path" id="edit-default-image-path">
+                <input type="hidden" name="icon" id="edit-character-icon">
+                <input type="hidden" name="banner" id="edit-character-banner">
 
                 <div class="row mb-3">
                     <div class="col-md-9" id="character-edit-left-col">
@@ -1127,6 +1150,89 @@
             </div>
 
         </div>
+
+<!-- Modale Modifica Personaggio Libreria -->
+<div class="modal fade" id="edit-library-character-modal" tabindex="-1" aria-labelledby="editLibraryCharacterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLibraryCharacterModalLabel">Modifica Personaggio della Libreria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="edit-library-character-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-library-original-name" name="original_name">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit-library-char-name" class="form-label">Nome Personaggio</label>
+                            <input type="text" class="form-control" id="edit-library-char-name" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit-library-char-title" class="form-label">Titolo</label>
+                            <input type="text" class="form-control" id="edit-library-char-title" name="title">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit-library-char-element" class="form-label">Elemento</label>
+                            <select class="form-select" id="edit-library-char-element" name="element" required></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit-library-char-weapon" class="form-label">Arma</label>
+                            <select class="form-select" id="edit-library-char-weapon" name="weapon">
+                                <option value="Sword">Sword</option>
+                                <option value="Polearm">Polearm</option>
+                                <option value="Catalyst">Catalyst</option>
+                                <option value="Bow">Bow</option>
+                                <option value="Claymore">Claymore</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Rarità</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="rarity" id="edit-lib-rarity-4" value="4-star">
+                            <label class="form-check-label" for="edit-lib-rarity-4">4 Stelle</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="rarity" id="edit-lib-rarity-5" value="5-star">
+                            <label class="form-check-label" for="edit-lib-rarity-5">5 Stelle</label>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="edit-library-char-wip" name="wip">
+                        <label class="form-check-label" for="edit-library-char-wip">Work in Progress (Visibile solo agli Admin)</label>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <h6>Icona Corrente</h6>
+                            <img id="edit-library-current-icon" class="img-thumbnail mb-2" style="max-width: 100px;">
+                            <label for="edit-library-char-icon" class="form-label">Carica Nuova Icona</label>
+                            <input type="file" class="form-control" id="edit-library-char-icon" name="icon" accept="image/*">
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>Banner Corrente</h6>
+                            <img id="edit-library-current-banner" class="img-thumbnail mb-2" style="max-width: 150px;">
+                            <label for="edit-library-char-banner" class="form-label">Carica Nuovo Banner</label>
+                            <input type="file" class="form-control" id="edit-library-char-banner" name="banner" accept="image/*">
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>Splashart Corrente</h6>
+                            <img id="edit-library-current-image" class="img-thumbnail mb-2" style="max-width: 150px;">
+                            <label for="edit-library-char-image" class="form-label">Carica Nuovo Splashart</label>
+                            <input type="file" class="form-control" id="edit-library-char-image" name="splashart" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva e Sincronizza Modifiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
     </body>
 

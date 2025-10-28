@@ -285,7 +285,8 @@ function check_session() {
             'role' => $found_user['role'],
             'avatar' => $found_user['avatar'] ?? '',
             'background' => $found_user['background'] ?? 'disattivato',
-            'opacity' => $found_user['opacity'] ?? 'no'
+            'opacity' => $found_user['opacity'] ?? 'no',
+            'grimoire_view' => $found_user['grimoire_view'] ?? 'splash'
         ]);
     } else {
         // Se l'ID utente in sessione non esiste più, distruggi la sessione
@@ -910,6 +911,9 @@ function update_user() {
             if (isset($_POST['opacity'])) {
                 $user['opacity'] = $_POST['opacity'];
             }
+            if (isset($_POST['grimoire_view'])) {
+                $user['grimoire_view'] = $_POST['grimoire_view'];
+            }
             if (!empty($_POST['password'])) {
                 $user['passwordHash'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
@@ -1132,6 +1136,7 @@ function add_character_to_library() {
         'elemento' => $_POST['element'] ?? '',
         'arma' => $_POST['weapon'] ?? '',
         'rarita' => $_POST['rarity'] ?? '5-star',
+        'wip' => isset($_POST['wip']),
     ];
     $library[] = $new_char;
 
@@ -1204,6 +1209,7 @@ function update_library_character() {
     $updated_char_data['elemento'] = $_POST['element'] ?? '';
     $updated_char_data['arma'] = $_POST['weapon'] ?? '';
     $updated_char_data['rarita'] = $_POST['rarity'] ?? '5-star';
+    $updated_char_data['wip'] = isset($_POST['wip']);
 
     $upload_dir = __DIR__ . '/../data/library/';
     if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);

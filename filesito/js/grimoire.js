@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.applyGrimoireFiltersAndSorting = () => {
-        let filteredCharacters = [...characterLibrary];
+        let filteredCharacters = characterLibrary.filter(char => !char.wip || isAdmin);
         const nameFilter = document.getElementById('grimoire-name-filter').value.toLowerCase();
         if (nameFilter) {
             filteredCharacters = filteredCharacters.filter(char => char.nome.toLowerCase().includes(nameFilter));
@@ -61,6 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('grimoire-grid');
         if (!grid) return;
 
+        // Set class based on view mode
+        const grimoireView = currentUser.grimoire_view || 'splash';
+        grid.classList.remove('grimoire-view-icon', 'grimoire-view-banner', 'grimoire-view-splash');
+        grid.classList.add(`grimoire-view-${grimoireView}`);
+
         grid.innerHTML = '';
         if (characters.length === 0) {
             grid.innerHTML = '<div class="col-12 text-center grimoire-no-results"><p>Nessun personaggio trovato con i filtri attuali.</p></div>';
@@ -68,6 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         characters.forEach(char => {
+            const grimoireView = currentUser.grimoire_view || 'splash';
+            let imageUrl = `data/${char.immagine}`;
+            if (grimoireView === 'icon') {
+                imageUrl = char.icon ? `data/${char.icon}` : 'uploads/default_avatar.png';
+            } else if (grimoireView === 'banner') {
+                imageUrl = char.banner ? `data/${char.banner}` : 'uploads/default_avatar.png';
+            }
+
             const element = elementsData.find(e => e.name === char.elemento);
             const elementIcon = element ? `data/icons/elements/${element.icon}` : '';
 
@@ -76,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             card.innerHTML = `
                 <a href="#grimoire-character/${encodeURIComponent(char.nome)}" class="text-decoration-none">
                     <div class="grimoire-card">
-                        <img src="data/${char.immagine}" class="grimoire-card-img" alt="${char.nome}">
+                        <img src="${imageUrl}" class="grimoire-card-img" alt="${char.nome}">
                         <img src="${elementIcon}" class="grimoire-card-element" alt="${char.elemento}">
                         <div class="grimoire-card-body">
                             <h5 class="card-title text-center">${char.nome}</h5>

@@ -28,5 +28,10 @@
         "name": "card_opacity",
         "default": "off",
         "editable": true
+    },
+    {
+        "name": "grimoire_view",
+        "default": "splash",
+        "editable": true
     }
 ]

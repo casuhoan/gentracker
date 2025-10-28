@@ -6,7 +6,8 @@
         "avatar": "uploads\/user_68ecf2d75bd41664668239_avatar.webp",
         "background": "Natlan.webp",
         "id": "user_68ecf2d75bd41664668239",
-        "opacity": "yes"
+        "opacity": "yes",
+        "grimoire_view": "icon"
     },
     {
         "id": "user_68fa180324a17002070337",

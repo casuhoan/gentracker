@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseChar = characterLibrary.find(c => profile.name.includes(c.nome));
         document.getElementById('edit-base-char-name').value = baseChar ? baseChar.nome : profile.name;
 
+        document.getElementById('edit-character-icon').value = profile.icon || '';
+        document.getElementById('edit-character-banner').value = profile.banner || '';
+
         const previewContainer = document.getElementById('character-edit-preview-container');
         const previewImage = document.getElementById('character-edit-preview-image');
         if (profile.splashart && profile.splashart !== '') {
@@ -250,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const elementDisplay = document.getElementById('character-element-display');
             const rarityDisplay = document.getElementById('character-rarity-display');
             const defaultImagePathInput = document.getElementById('default_image_path');
+            const iconInput = document.getElementById('character-icon');
+            const bannerInput = document.getElementById('character-banner');
 
             if (selectedCharName) {
                 const characterFromLibrary = characterLibrary.find(c => c.nome === selectedCharName);
@@ -259,6 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (previewImage) previewImage.src = imagePath;
                     if (previewContainer) previewContainer.classList.remove('empty');
                     if (defaultImagePathInput) defaultImagePathInput.value = imagePath;
+                    if (iconInput) iconInput.value = characterFromLibrary.icon || '';
+                    if (bannerInput) bannerInput.value = characterFromLibrary.banner || '';
 
                     if (elementDisplay) {
                         const element = elementsData.find(e => e.name === characterFromLibrary.elemento);

@@ -122,7 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     role: result.role, 
                     avatar: result.avatar, 
                     background: result.background,
-                    card_opacity: (result.opacity === 'yes' ? 'on' : 'off')
+                    card_opacity: (result.opacity === 'yes' ? 'on' : 'off'),
+                    grimoire_view: result.grimoire_view || 'splash'
                 };
                 isAdmin = (result.role === 'admin');
             } else {

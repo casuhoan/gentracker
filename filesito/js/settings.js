@@ -37,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
             opacitySwitch.checked = (currentUser.card_opacity === 'on');
         }
 
+        const grimoireView = currentUser.grimoire_view || 'splash';
+        const grimoireViewRadio = document.getElementById(`grimoire-view-${grimoireView}`);
+        if (grimoireViewRadio) grimoireViewRadio.checked = true;
+
         if (isAdmin) {
             document.getElementById('v-pills-sync-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
@@ -256,7 +260,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const bgSwitch = e.target.closest('#enable-background-switch');
-        const container = document.getElementById('background-selector-container');
+
+        // Handle Grimoire View Radios
+        let grimoireViewRadio = e.target.closest('input[name="grimoire-view-radios"]');
+        if (!grimoireViewRadio && e.target.tagName === 'LABEL') {
+            const inputId = e.target.getAttribute('for');
+            if (inputId && inputId.startsWith('grimoire-view-')) {
+                grimoireViewRadio = document.getElementById(inputId);
+            }
+        }
+
+        if (grimoireViewRadio) {
+            // Use setTimeout to ensure the radio button's checked state is updated
+            setTimeout(async () => {
+                const radios = document.querySelectorAll('input[name="grimoire-view-radios"]');
+                let selectedValue;
+                radios.forEach(radio => {
+                    if (radio.checked) {
+                        selectedValue = radio.value;
+                    }
+                });
+
+                if (selectedValue && currentUser.grimoire_view !== selectedValue) {
+                    const formData = new FormData();
+                    formData.append('action', 'update_user');
+                    formData.append('original_username', currentUser.username);
+                    formData.append('username', currentUser.username);
+                    formData.append('grimoire_view', selectedValue);
+
+                    try {
+                        const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            currentUser.grimoire_view = selectedValue;
+                            showToast('Visualizzazione libreria aggiornata!');
+                            if (typeof applyGrimoireFiltersAndSorting === 'function' && document.getElementById('grimoire-view').classList.contains('active')) {
+                                applyGrimoireFiltersAndSorting();
+                            }
+                        } else {
+                            showErrorAlert(result.message);
+                        }
+                    } catch (error) {
+                        showErrorAlert('Errore di comunicazione con il server.');
+                    }
+                }
+            }, 0);
+            return;
+        }
 
         if (bgSwitch) {
             const isEnabled = bgSwitch.checked;
@@ -698,6 +748,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rarityRadio = document.querySelector(`#edit-library-character-modal input[name="rarity"][value="${charData.rarita || '5-star'}"]`);
             if(rarityRadio) rarityRadio.checked = true;
 
+            document.getElementById('edit-library-char-wip').checked = charData.wip || false;
+
             const currentImage = document.getElementById('edit-library-current-image');
             currentImage.src = charData.immagine ? `data/${charData.immagine}` : '';
 
@@ -763,5 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+
 
 });

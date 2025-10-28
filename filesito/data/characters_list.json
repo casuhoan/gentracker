@@ -14,7 +14,12 @@
         "nome": "Alhaitham",
         "immagine": "Character_Alhaitham_Full_Wish.webp",
         "icon": "library\/Alhaitham_Icon.webp",
-        "banner": "library\/Alhaitham_Card.webp"
+        "banner": "library\/Alhaitham_Card.webp",
+        "titolo": "XXX",
+        "elemento": "Electro",
+        "arma": "Sword",
+        "rarita": "5-star",
+        "wip": true
     },
     {
         "nome": "Aloy",
