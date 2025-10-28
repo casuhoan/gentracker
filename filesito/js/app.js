@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roles: ["Healer", "Support", "Main DPS", "Sub DPS", "Shielder"],
         stats: ["HP", "Atk", "Def", "Energy Recharge (%)", "Elemental Mastery", "Crit Rate (%)", "Crit Damage (%)"],
         signatureOptions: ["Best in the slot", "Buona", "4 Stelle"],
-        talentOptions: ["Sì", "Vicino", "No"]
+        talentOptions: ["Perfetti", "Vicino", "Lontani"]
     };
 
     window.roleColors = {

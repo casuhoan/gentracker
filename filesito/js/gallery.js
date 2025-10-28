@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let futureModifiers = 0;
 
         const constellation = profile.constellation || 0; // Use profile.constellation
-        const signatureWeapon = profile.signature_weapon || 'No'; // Use profile.signature_weapon
+        const signatureWeapon = profile.latest_signature_weapon || profile.signature_weapon || 'No'; // Use profile.signature_weapon
         const rarity = profile.rarity || '5-star';
 
         if (rarity === '4-star') {
@@ -152,8 +152,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         details.futureModifiers = futureModifiers;
 
+        // Part 5: Talent Modifier
+        let talentModifier = 0;
+        const talents = profile.latest_talents || profile.talents;
+        if (talents === 'Lontani' || talents === 'No') {
+            talentModifier = -10;
+        } else if (talents === 'Vicino') {
+            talentModifier = -2;
+        }
+        details.modifierBreakdown.talentModifier = talentModifier;
+
         // Final Score
-        details.finalScore = baseScore + bonusScore + futureModifiers;
+        details.finalScore = baseScore + bonusScore + futureModifiers + talentModifier;
 
         return { score: details.finalScore, details: details };
     }

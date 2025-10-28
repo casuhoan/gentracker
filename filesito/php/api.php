@@ -475,8 +475,12 @@ function get_all_characters() {
                 });
                 $content['profile']['latest_build_stats'] = $content['builds'][0]['stats'];
                 $content['profile']['latest_constellation'] = $content['builds'][0]['constellation'];
+                $content['profile']['latest_talents'] = $content['builds'][0]['talents'] ?? $content['profile']['talents'] ?? '';
+                $content['profile']['latest_signature_weapon'] = $content['builds'][0]['signature_weapon'] ?? $content['profile']['signature_weapon'] ?? '';
             } else {
                 $content['profile']['latest_constellation'] = $content['profile']['constellation'] ?? 0;
+                $content['profile']['latest_talents'] = $content['profile']['talents'] ?? '';
+                $content['profile']['latest_signature_weapon'] = $content['profile']['signature_weapon'] ?? '';
             }
             $characters[] = $content;
         }

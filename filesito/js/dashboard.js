@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         html += '<ul class="list-group list-group-flush">';
         html += `<li class="list-group-item d-flex justify-content-between align-items-center">Costellazione <strong class="${getStatusColorClass('constellation', build.constellation, rarity)}">${build.constellation}</strong></li>`;
         const signatureWeaponText = build.signature_weapon === 'Sì' ? 'Best in the slot' : build.signature_weapon;
-        html += `<li class="list-group-item d-flex justify-content-between align-items-center">Signature <strong class="${getStatusColorClass('signature_weapon', build.signature_weapon)}">${signatureWeaponText}</strong></li>`;
+        html += `<li class="list-group-item d-flex justify-content-between align-items-center">Signature <strong class="${getStatusColorClass('signature_weapon', signatureWeaponText)}">${signatureWeaponText}</strong></li>`;
         html += '</ul>';
         html += `<div class="text-center mt-3"><button class="btn btn-sm btn-info show-build-score-info-btn" data-build-display-id="${displayId}" data-build-index="${buildIndex}">Dettagli Score</button></div>`;
         container.innerHTML = html;
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = html;
     };
 
-    const displayBuildScoreInfoModal = (details) => {
+    const displayBuildScoreInfoModal = (details, talentsValue) => {
         const modalBody = document.getElementById('build-score-info-body');
         if (!modalBody) return;
 
@@ -171,6 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td>${details.modifierBreakdown.signatureWeapon}</td>
                         <td>${details.modifierBreakdown.signatureWeaponModifier}%</td>
                     </tr>
+                    <tr>
+                        <td>Talenti</td>
+                        <td>${talentsValue}</td>
+                        <td>${details.modifierBreakdown.talentModifier}%</td>
+                    </tr>
                 </tbody>
                 <tfoot>
                     <tr>
@@ -214,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `
             <hr>
             <h5>Calcolo Finale</h5>
-            <p>Punteggio Base (${details.baseScore.toFixed(2)}%) + Bonus Eccesso (${details.bonusScore}%) + Modificatori (${details.futureModifiers}%) = <strong>${details.finalScore.toFixed(2)}%</strong></p>
+            <p>Punteggio Base (${details.baseScore.toFixed(2)}%) + Bonus Eccesso (${details.bonusScore}%) + Modificatori (${details.futureModifiers}%) + Modificatore Talenti (${details.modifierBreakdown.talentModifier}%) = <strong>${details.finalScore.toFixed(2)}%</strong></p>
         `;
 
 
@@ -263,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Calculate score and GET details using the global function from gallery.js
                 const { score, details } = window.calculateBuildScore(tempProfile);
                 
-                displayBuildScoreInfoModal(details);
+                displayBuildScoreInfoModal(details, tempProfile.talents);
             } else {
                 showErrorAlert('Dettagli del Build Score non disponibili per la build selezionata.');
             }
