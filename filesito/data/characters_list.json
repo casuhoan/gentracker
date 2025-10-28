@@ -514,6 +514,17 @@
         "banner": "library\/Tartaglia_Card.webp"
     },
     {
+        "nome": "Test",
+        "immagine": "library\/character_Test_wish.webp",
+        "icon": "library\/character_Test_icon.webp",
+        "banner": "library\/character_Test_banner.webp",
+        "titolo": "Test",
+        "elemento": "Anemo",
+        "arma": "Sword",
+        "rarita": "5-star",
+        "wip": false
+    },
+    {
         "nome": "Thoma",
         "immagine": "Character_Thoma_Full_Wish.webp",
         "icon": "library\/Thoma_Icon.webp",
