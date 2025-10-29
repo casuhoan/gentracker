@@ -56,6 +56,10 @@ function is_admin() {
     return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
 }
 
+function is_moderator() {
+    return isset($_SESSION['role']) && $_SESSION['role'] === 'moderator';
+}
+
 function get_user_data_dir() {
     if (!is_logged_in()) return null;
     // La cartella dati ora è basata sull'ID, non sul nome utente
@@ -844,7 +848,7 @@ function update_build() {
 
 // --- USER & ADMIN FUNCTIONS ---
 function get_all_users() {
-    if (!is_admin()) {
+    if (!is_admin() && !is_moderator()) {
         http_response_code(403); 
         echo json_encode(['status'=>'error','message'=>'Accesso negato.']); 
         return;
@@ -870,9 +874,8 @@ function update_user() {
     $new_username = $_POST['username'] ?? '';
     $user_to_update_id = '';
 
-    // Un admin può modificare altri, un utente solo se stesso.
-    if (is_admin()) {
-        // L'admin trova l'utente da modificare tramite l'username originale
+    // Admin and moderators can edit other users.
+    if (is_admin() || is_moderator()) {
         foreach ($users as $user) {
             if ($user['username'] === $original_username) {
                 $user_to_update_id = $user['id'];
@@ -880,7 +883,7 @@ function update_user() {
             }
         }
     } else {
-        // L'utente normale può modificare solo se stesso, l'ID è in sessione
+        // A normal user can only edit themselves.
         if ($_SESSION['username'] !== $original_username) {
             http_response_code(403);
             echo json_encode(['status' => 'error', 'message' => 'Permesso negato.']);
@@ -895,7 +898,7 @@ function update_user() {
         return;
     }
 
-    // Controlla se il nuovo username è già stato preso da un ALTRO utente
+    // Check if the new username is already taken by ANOTHER user
     if ($original_username !== $new_username) {
         foreach ($users as $u) {
             if ($u['id'] !== $user_to_update_id && $u['username'] === $new_username) {
@@ -911,12 +914,31 @@ function update_user() {
     foreach ($users as &$user) {
         if ($user['id'] === $user_to_update_id) {
             $user_found = true;
-            
-            // Aggiorna i campi
-            $user['username'] = $new_username;
-            if (is_admin() && isset($_POST['role'])) {
-                $user['role'] = $_POST['role'];
+
+            // Moderator cannot edit an admin
+            if (is_moderator() && $user['role'] === 'admin') {
+                http_response_code(403);
+                echo json_encode(['status' => 'error', 'message' => 'Un moderatore non può modificare un amministratore.']);
+                return;
             }
+
+            // Update fields
+            $user['username'] = $new_username;
+
+            // Role update logic
+            if (isset($_POST['role'])) {
+                if (is_admin()) {
+                    $user['role'] = $_POST['role'];
+                } elseif (is_moderator()) {
+                    if ($_POST['role'] === 'admin') {
+                        http_response_code(403);
+                        echo json_encode(['status' => 'error', 'message' => 'Un moderatore non può promuovere un utente ad amministratore.']);
+                        return;
+                    }
+                    $user['role'] = $_POST['role'];
+                }
+            }
+
             if (isset($_POST['background'])) {
                 $user['background'] = $_POST['background'];
             }
@@ -930,12 +952,10 @@ function update_user() {
                 $user['passwordHash'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
 
-            // Gestione Avatar
+            // Avatar management
             if (isset($_POST['avatar_path']) && !empty($_POST['avatar_path'])) {
                 $new_avatar_path = $_POST['avatar_path'];
-                // Basic validation: ensure the path starts with 'data/' to prevent arbitrary file paths
                 if (strpos($new_avatar_path, 'data/') === 0 && file_exists(__DIR__ . '/../' . $new_avatar_path)) {
-                    // If old avatar was a custom upload, delete it
                     if (!empty($user['avatar']) && strpos($user['avatar'], 'uploads/') === 0 && file_exists(__DIR__ . '/../' . $user['avatar'])) {
                         unlink(__DIR__ . '/../' . $user['avatar']);
                     }
@@ -943,12 +963,10 @@ function update_user() {
                 }
             } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
                 $upload_dir = __DIR__ . '/../uploads/';
-                // Cancella il vecchio avatar se esiste
                 if (!empty($user['avatar']) && file_exists(__DIR__ . '/../' . $user['avatar'])) {
                     unlink(__DIR__ . '/../' . $user['avatar']);
                 }
                 $file_extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-                // Nuovo formato nome file: USERID_avatar.ext
                 $file_name = $user['id'] . '_avatar.' . $file_extension;
                 $target_file = $upload_dir . $file_name;
                 if (move_uploaded_file($_FILES['avatar']['tmp_name'], $target_file)) {
@@ -967,10 +985,7 @@ function update_user() {
         return;
     }
 
-    // NON c'è più bisogno di rinominare la cartella dati!
-
     if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
-        // Aggiorna il nome utente in sessione se l'utente ha modificato se stesso
         if ($_SESSION['user_id'] === $user_to_update_id) {
             $_SESSION['username'] = $new_username;
         }
@@ -998,9 +1013,9 @@ function delete_users() {
 }
 
 function register() {
-    if (!is_admin()) {
+    if (!is_admin() && !is_moderator()) {
         http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'Solo gli amministratori possono registrare nuovi utenti.']);
+        echo json_encode(['status' => 'error', 'message' => 'Solo amministratori o moderatori possono registrare nuovi utenti.']);
         return;
     }
 
@@ -1021,13 +1036,18 @@ function register() {
         }
     }
 
+    $role = 'user'; // Default role
+    if (is_admin() && isset($_POST['role'])) {
+        $role = $_POST['role']; // Admins can set any role
+    }
+
     $new_user_id = 'user_' . str_replace('.', '', uniqid('', true));
 
     $users[] = [
-        'id' => $new_user_id, // Aggiungi ID anche alla registrazione
+        'id' => $new_user_id,
         'username' => $username,
         'passwordHash' => password_hash($password, PASSWORD_DEFAULT),
-        'role' => $_POST['role'] ?? 'user',
+        'role' => $role,
         'avatar' => ''
     ];
 
@@ -1405,7 +1425,7 @@ function save_character_schema() {
 }
 
 function update_character_description() {
-    if (!is_admin()) {
+    if (!is_admin() && !is_moderator()) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
         return;
@@ -1553,6 +1573,15 @@ if (isset($_REQUEST['action'])) {
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
 $admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings'];
+$moderator_allowed_actions = [
+    'upload_background',
+    'upload_grimoire_background',
+    'get_keyword_settings',
+    'save_keyword_settings',
+    'get_all_users',
+    'register',
+    'update_character_description'
+];
 
 if (in_array($action, $public_actions)) {
     $action();
@@ -1564,12 +1593,13 @@ if (in_array($action, $public_actions)) {
     }
     $action();
 } elseif (in_array($action, $admin_actions)) {
-    if (!is_admin()) { 
+    if (is_admin() || (is_moderator() && in_array($action, $moderator_allowed_actions))) {
+        $action();
+    } else { 
         http_response_code(403); 
         echo json_encode(['status'=>'error','message'=>'Accesso negato.']); 
         exit; 
     }
-    $action();
 } else {
     http_response_code(400);
     echo json_encode(['status'=>'error','message'=>'Azione non valida.']);

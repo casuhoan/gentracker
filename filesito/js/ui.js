@@ -46,7 +46,7 @@ const updateLoginUI = () => {
         navUserAvatar.src = currentUser.avatar || 'uploads/default_avatar.png';
         navUserAvatar.style.display = 'inline-block';
 
-        if (currentUser.role === 'admin') {
+        if (currentUser.role === 'admin' || currentUser.role === 'moderator') {
             navUserManagementLink.parentElement.style.display = 'block';
         } else {
             navUserManagementLink.parentElement.style.display = 'none';

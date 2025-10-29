@@ -15,5 +15,12 @@
         "passwordHash": "$2y$12$kKrRFiOf1a2BOcY6NsWF6.XHqHo19ulRDImwgzHj\/AabsFabkJEIG",
         "role": "user",
         "avatar": ""
+    },
+    {
+        "id": "user_6901db4152338883900989",
+        "username": "mod",
+        "passwordHash": "$2y$12$I3iEURZ2466jPimPDnBwM.U2VKYBJgHasBk1RVCE0NgGtwfC7KeaO",
+        "role": "moderator",
+        "avatar": ""
     }
 ]

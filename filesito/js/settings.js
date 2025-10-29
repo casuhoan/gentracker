@@ -40,12 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const grimoireViewRadio = document.getElementById(`grimoire-view-${grimoireView}`);
         if (grimoireViewRadio) grimoireViewRadio.checked = true;
 
-        if (isAdmin) {
+        if (window.isAdmin) {
             document.getElementById('v-pills-sync-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
-            document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
+        }
+
+        // Show tabs for both Admin and Moderator
+        if (window.isAdmin || window.isModerator) {
+            document.getElementById('v-pills-backgrounds-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-keywords-tab')?.classList.remove('d-none');
         }
     };

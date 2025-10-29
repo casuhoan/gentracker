@@ -74,19 +74,29 @@ document.addEventListener('DOMContentLoaded', () => {
             ? '<tr><td colspan="4" class="text-center">Nessun utente trovato.</td></tr>'
             : list.map(user => {
                 const isCurrentUser = window.currentUser && window.currentUser.username === user.username;
-                const isAdminUser = user.role === 'admin';
+                const isTargetAdmin = user.role === 'admin';
 
                 let actionsHtml = '';
-                if (!isCurrentUser) {
-                    actionsHtml = `<button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>`;
-                    if (!isAdminUser) {
-                        actionsHtml += ` <button class="btn btn-sm btn-danger btn-delete-user" data-username="${user.username}">Elimina</button>`;
-                    }
+                // Edit button logic
+                let canEdit = (window.isAdmin || window.isModerator) && !isCurrentUser;
+                if (window.isModerator && isTargetAdmin) {
+                    canEdit = false; // Moderators cannot edit admins
                 }
+                if (canEdit) {
+                    actionsHtml += `<button class="btn btn-sm btn-primary btn-edit-user" data-username="${user.username}">Modifica</button>`;
+                }
+
+                // Delete button logic (only for admins)
+                if (window.isAdmin && !isTargetAdmin && !isCurrentUser) {
+                    actionsHtml += ` <button class="btn btn-sm btn-danger btn-delete-user" data-username="${user.username}">Elimina</button>`;
+                }
+
+                // Checkbox logic
+                const canSelect = window.isAdmin && !isTargetAdmin && !isCurrentUser;
 
                 return `
                 <tr>
-                    <td><input type="checkbox" class="user-checkbox" data-username="${user.username}" ${isCurrentUser || isAdminUser ? 'disabled' : ''}></td>
+                    <td><input type="checkbox" class="user-checkbox" data-username="${user.username}" ${!canSelect ? 'disabled' : ''}></td>
                     <td>${user.username}</td>
                     <td>${user.role}</td>
                     <td class="text-end">
@@ -144,7 +154,22 @@ document.addEventListener('DOMContentLoaded', () => {
         editUserForm.reset();
         editUserForm.querySelector('#original-username').value = user.username;
         editUserForm.querySelector('#edit-username').value = user.username;
-        editUserForm.querySelector('#edit-role').value = user.role;
+        
+        const roleSelect = editUserForm.querySelector('#edit-role');
+        roleSelect.value = user.role;
+
+        // Restrict role options for moderators
+        if (window.isModerator) {
+            Array.from(roleSelect.options).forEach(option => {
+                if (option.value === 'admin') {
+                    option.disabled = true;
+                }
+            });
+        } else if (window.isAdmin) {
+            Array.from(roleSelect.options).forEach(option => {
+                option.disabled = false;
+            });
+        }
 
         if (currentAvatarPreview) {
             currentAvatarPreview.src = user.avatar ? user.avatar : '';
@@ -157,6 +182,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const openAddModal = () => {
         if (!addUserForm) return;
         addUserForm.reset();
+
+        const roleSelect = addUserForm.querySelector('#add-role');
+        
+        // Restrict role options for moderators
+        if (window.isModerator) {
+            roleSelect.value = 'user';
+            Array.from(roleSelect.options).forEach(option => {
+                if (option.value === 'admin' || option.value === 'moderator') {
+                    option.disabled = true;
+                }
+            });
+        } else if (window.isAdmin) {
+            roleSelect.value = 'user';
+             Array.from(roleSelect.options).forEach(option => {
+                option.disabled = false;
+            });
+        }
+
         if (addAvatarPreview) {
             addAvatarPreview.src = '';
             addAvatarPreview.style.display = 'none';

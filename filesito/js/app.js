@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dataLoaded = false;
     window.currentUser = null;
     window.isAdmin = false;
+    window.isModerator = false;
     window.grimoireBackground = null;
     window.keywordSettings = null;
 
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('php/api.php?action=check_session');
             const result = await response.json();
             if (result.status === 'success') {
-                currentUser = { 
+                currentUser = {
                     username: result.username, 
                     role: result.role, 
                     avatar: result.avatar, 
@@ -127,9 +128,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     grimoire_view: result.grimoire_view || 'splash'
                 };
                 isAdmin = (result.role === 'admin');
+                isModerator = (result.role === 'moderator');
             } else {
                 currentUser = null;
                 isAdmin = false;
+                isModerator = false;
             }
             if(typeof updateLoginUI === 'function') updateLoginUI();
         } catch (error) {
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const loadUserManagement = async () => {
-        if (!currentUser || currentUser.role !== 'admin') {
+        if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'moderator')) {
             showErrorAlert('Accesso negato. Solo gli amministratori possono gestire gli utenti.');
             location.hash = '#';
             return;
