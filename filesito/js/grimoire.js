@@ -21,8 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return window.keywordSettings;
     };
 
-    const formatDescription = async (text) => {
-        if (!text) return 'Nessuna descrizione disponibile.';
+    const formatDescription = async (text, characterName) => {
+        if (!text) {
+            const charName = characterName || '';
+            return `Questo personaggio non ha ancora una descrizione, se vuoi scriverla o farla scrivere invia pure un ticket ai nostri Amministratori con il testo desiderato tramite questo <a href="#submit-ticket/${encodeURIComponent(charName)}">link</a>.`;
+        }
 
         const settings = await getKeywordSettings();
         let formattedText = text;
@@ -31,10 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return text.replace(/\n/g, '<br>');
         }
         
-        // Create a list of all replacements to be made
         const replacements = [];
 
-        // 1. Find all character name matches
         const charNames = characterLibrary.map(c => c.nome).sort((a, b) => b.length - a.length);
         charNames.forEach(name => {
             const regex = new RegExp(`\\b(${name})\\b`, 'g');
@@ -48,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 2. Find all tooltip matches
         if (settings.tooltips) {
             settings.tooltips.forEach(item => {
                 const regex = new RegExp(`\\b(${item.keyword})\\b`, 'gi');
@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 3. Find all color matches
         if (settings.colors) {
             settings.colors.forEach(item => {
                 const regex = new RegExp(`\\b(${item.keyword})\\b`, 'g');
@@ -78,27 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Filter out overlapping matches, keeping the longest one
         const filteredReplacements = replacements.filter((r1, i1) => {
             return !replacements.some((r2, i2) => {
                 if (i1 === i2) return false;
-                // Check for overlap
                 if (r1.start < r2.end && r1.end > r2.start) {
-                    // If they overlap, discard the shorter one
                     const len1 = r1.end - r1.start;
                     const len2 = r2.end - r2.start;
                     if (len1 < len2) return true;
-                    // If they have the same length, discard the one that appears later in the array (lower precedence)
                     if (len1 === len2 && i1 > i2) return true;
                 }
                 return false;
             });
         });
 
-        // Sort by start index
         filteredReplacements.sort((a, b) => a.start - b.start);
 
-        // Build the new string
         let lastIndex = 0;
         let result = '';
         filteredReplacements.forEach(rep => {
@@ -171,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('grimoire-grid');
         if (!grid) return;
 
-        // Set class based on view mode
         const grimoireView = currentUser.grimoire_view || 'splash';
         grid.classList.remove('grimoire-view-icon', 'grimoire-view-banner', 'grimoire-view-splash');
         grid.classList.add(`grimoire-view-${grimoireView}`);
@@ -220,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyGrimoireBackground();
     };
 
-    window.loadCharacterDetailPage = async (characterName) => { // Make async
+    window.loadCharacterDetailPage = async (characterName) => { 
         const char = characterLibrary.find(c => c.nome === characterName);
         const detailView = document.getElementById('character-detail-view');
 
@@ -242,8 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Format description with keywords
-        const displayDescription = await formatDescription(char.description);
+        const displayDescription = await formatDescription(char.description, characterName);
 
         detailView.innerHTML = `
             <div class="container-fluid">
@@ -255,12 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Colonna Sinistra per Banner -->
                             <div class="col-md-4">
                                 <img src="${bannerUrl}" class="img-fluid rounded" alt="Banner di ${char.nome}">
                             </div>
 
-                            <!-- Colonna Destra per Dettagli -->
                             <div class="col-md-8">
                                 <div class="d-flex align-items-center mb-4">
                                     <img src="${iconUrl}" class="rounded-circle me-4" alt="Icona di ${char.nome}" style="width: 100px; height: 100px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -309,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showView('character-detail-view');
         applyGrimoireBackground();
 
-        // Initialize tooltips
         const tooltipTriggerList = [].slice.call(detailView.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -352,12 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (result.status === 'success') {
                         showToast('Descrizione salvata!');
-                        // Update local data to avoid full reload
                         char.description = newDescription;
-                        // Re-format and display the new description
-                        const formatted = await formatDescription(newDescription);
+                        const formatted = await formatDescription(newDescription, characterName);
                         displayContainer.querySelector('p').innerHTML = formatted;
-                        // Toggle back to display mode
                         cancelBtn.click();
                     } else {
                         showErrorAlert(result.message || 'Errore nel salvataggio della descrizione.');

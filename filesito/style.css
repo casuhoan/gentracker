@@ -94,6 +94,9 @@ body.body-has-background.dark-mode main label {
 }
 
 /* Specific overrides for dashboard title and comparison labels */
+body.body-has-background #ticket-submission-view h2,
+body.body-has-background #ticket-submission-view p,
+body.body-has-background #ticket-submission-view label,
 body.body-has-background #dashboard-title,
 body.body-has-background #dashboard-view .form-label,
 body.body-has-background #character-creation-view h2,

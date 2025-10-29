@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsForm = document.getElementById('settings-form');
     const passwordForm = document.getElementById('password-form');
     const settingsAvatarInput = document.getElementById('settings-avatar-input');
-    const syncLibraryBtn = document.getElementById('v-pills-sync-tab');
+    
     const libraryCharacterForm = document.getElementById('library-character-form');
     const editLibraryCharacterForm = document.getElementById('edit-library-character-form');
 
@@ -41,10 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (grimoireViewRadio) grimoireViewRadio.checked = true;
 
         if (window.isAdmin) {
-            document.getElementById('v-pills-sync-tab')?.classList.remove('d-none');
+            
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-tickets-tab')?.classList.remove('d-none');
         }
 
         // Show tabs for both Admin and Moderator
@@ -188,6 +189,120 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- TICKET MANAGEMENT ---
+
+    const loadTicketManagement = async () => {
+        if (!isAdmin) return;
+
+        try {
+            const response = await fetch('php/api.php?action=get_tickets');
+            const data = await response.json();
+
+            if (data.status !== 'success') {
+                showErrorAlert(data.message || 'Impossibile caricare i ticket.');
+                return;
+            }
+
+            const openTicketsBody = document.getElementById('open-tickets-table-body');
+            const closedTicketsBody = document.getElementById('closed-tickets-table-body');
+
+            openTicketsBody.innerHTML = '';
+            if (data.open_tickets && data.open_tickets.length > 0) {
+                data.open_tickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><small>${ticket.id}</small></td>
+                        <td>${ticket.user}</td>
+                        <td>${ticket.character_name}</td>
+                        <td>${ticket.title}</td>
+                        <td>${new Date(ticket.timestamp).toLocaleString('it-IT')}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-primary btn-view-ticket" 
+                                data-ticket-id="${ticket.id}" 
+                                data-ticket-content="${encodeURIComponent(ticket.content)}" 
+                                data-ticket-title="${ticket.title}" 
+                                data-ticket-user="${ticket.user}"
+                                data-ticket-character-name="${ticket.character_name}">Vedi e Completa</button>
+                        </td>
+                    `;
+                    openTicketsBody.appendChild(row);
+                });
+            } else {
+                openTicketsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nessun ticket aperto.</td></tr>';
+            }
+
+            closedTicketsBody.innerHTML = '';
+            if (data.closed_tickets && data.closed_tickets.length > 0) {
+                data.closed_tickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><small>${ticket.id}</small></td>
+                        <td>${ticket.user}</td>
+                        <td>${ticket.character_name}</td>
+                        <td>${ticket.title}</td>
+                        <td>${new Date(ticket.timestamp).toLocaleString('it-IT')}</td>
+                    `;
+                    closedTicketsBody.appendChild(row);
+                });
+            } else {
+                closedTicketsBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nessun ticket chiuso.</td></tr>';
+            }
+
+        } catch (error) {
+            showErrorAlert('Errore di comunicazione con il server durante il caricamento dei ticket.');
+            console.error('Error loading tickets:', error);
+        }
+    };
+
+    document.getElementById('v-pills-tickets')?.addEventListener('click', (e) => {
+        const viewBtn = e.target.closest('.btn-view-ticket');
+        if (!viewBtn) return;
+
+        const ticketId = viewBtn.dataset.ticketId;
+        const ticketUser = viewBtn.dataset.ticketUser;
+        const ticketTitle = viewBtn.dataset.ticketTitle;
+        const ticketContent = decodeURIComponent(viewBtn.dataset.ticketContent);
+        const ticketCharacterName = viewBtn.dataset.ticketCharacterName;
+
+        Swal.fire({
+            title: `Ticket per ${ticketCharacterName}`,
+            html: `
+                <div class="text-start">
+                    <p class="mb-1"><strong>Inviato da:</strong> ${ticketUser}</p>
+                    <p class="mb-1"><strong>Titolo:</strong> ${ticketTitle}</p>
+                    <p class="mb-2"><strong>ID:</strong> <small>${ticketId}</small></p>
+                    <hr class="my-2">
+                    <p class="mb-1"><strong>Contenuto Suggerito:</strong></p>
+                    <div style="white-space: pre-wrap; background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; max-height: 300px; overflow-y: auto; text-align: left;">${ticketContent.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Completa Ticket',
+            cancelButtonText: 'Annulla',
+            confirmButtonColor: '#198754',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const formData = new FormData();
+                    formData.append('action', 'close_ticket');
+                    formData.append('ticket_id', ticketId);
+
+                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                    const res = await response.json();
+
+                    if (res.status === 'success') {
+                        showToast('Ticket completato con successo!');
+                        loadTicketManagement(); // Refresh the tables
+                    } else {
+                        showErrorAlert(res.message || 'Impossibile completare il ticket.');
+                    }
+                } catch (error) {
+                    showErrorAlert('Errore di comunicazione con il server.');
+                }
+            }
+        });
+    });
+
     // --- KEYWORD MANAGEMENT ---
 
     let keywordColors = [];
@@ -294,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
     document.getElementById('v-pills-elements-tab')?.addEventListener('shown.bs.tab', loadElementsManagement);
     document.getElementById('v-pills-keywords-tab')?.addEventListener('shown.bs.tab', loadKeywordManagement);
+    document.getElementById('v-pills-tickets-tab')?.addEventListener('shown.bs.tab', loadTicketManagement);
 
     document.getElementById('v-pills-elements')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -729,37 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (syncLibraryBtn) {
-        syncLibraryBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            Swal.fire({
-                title: 'Sincronizzare la libreria?',
-                text: "Questa azione copierà i file dalla cartella 'librarydata' alla cartella 'data' sul server. Sei sicuro?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sì, sincronizza!',
-                cancelButtonText: 'Annulla'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const formData = new FormData();
-                        formData.append('action', 'sync_library');
-                        const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                        const res = await response.json();
-                        if (res.status === 'success') {
-                            showToast('Sincronizzazione completata con successo.');
-                        } else {
-                            showErrorAlert(res.message || 'Errore durante la sincronizzazione.');
-                        }
-                    } catch (error) {
-                        showErrorAlert('Errore di comunicazione con il server.');
-                    }
-                }
-            });
-        });
-    }
+
 
     if (libraryCharacterForm) {
         libraryCharacterForm.onsubmit = async (e) => {

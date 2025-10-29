@@ -217,12 +217,13 @@
                         <a class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="true"><i class="bi bi-person-fill-gear me-2"></i>Modifica Profilo</a>
                         <a class="nav-link" id="v-pills-auth-tab" data-bs-toggle="pill" href="#v-pills-auth" role="tab" aria-controls="v-pills-auth" aria-selected="false"><i class="bi bi-shield-lock-fill me-2"></i>Autenticazione</a>
                         <a class="nav-link" id="v-pills-appearance-tab" data-bs-toggle="pill" href="#v-pills-appearance" role="tab" aria-controls="v-pills-appearance" aria-selected="false"><i class="bi bi-palette-fill me-2"></i>Aspetto</a>
-                        <a class="nav-link d-none" id="v-pills-sync-tab" href="#"><i class="bi bi-arrow-repeat me-2"></i>Sincronizza Libreria</a>
+                        
                         <a class="nav-link d-none" id="v-pills-library-tab" data-bs-toggle="pill" href="#v-pills-library" role="tab" aria-controls="v-pills-library" aria-selected="false"><i class="bi bi-book-half me-2"></i>Gestione Libreria</a>
                         <a class="nav-link d-none" id="v-pills-backgrounds-tab" data-bs-toggle="pill" href="#v-pills-backgrounds" role="tab" aria-controls="v-pills-backgrounds" aria-selected="false"><i class="bi bi-images me-2"></i>Gestione Sfondi</a>
                         <a class="nav-link d-none" id="v-pills-schema-tab" data-bs-toggle="pill" href="#v-pills-schema" role="tab" aria-controls="v-pills-schema" aria-selected="false"><i class="bi bi-diagram-3-fill me-2"></i>Schema Utenti</a>
                         <a class="nav-link d-none" id="v-pills-elements-tab" data-bs-toggle="pill" href="#v-pills-elements" role="tab" aria-controls="v-pills-elements" aria-selected="false"><i class="bi bi-gem me-2"></i>Gestione Elementi</a>
                         <a class="nav-link d-none" id="v-pills-keywords-tab" data-bs-toggle="pill" href="#v-pills-keywords" role="tab" aria-controls="v-pills-keywords" aria-selected="false"><i class="bi bi-tags-fill me-2"></i>Gestione Parole Chiave</a>
+                        <a class="nav-link d-none" id="v-pills-tickets-tab" data-bs-toggle="pill" href="#v-pills-tickets" role="tab" aria-controls="v-pills-tickets" aria-selected="false"><i class="bi bi-ticket-detailed-fill me-2"></i>Gestione Ticket</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -537,6 +538,50 @@
         <button class="btn btn-success" id="save-keyword-settings-btn"><i class="bi bi-save me-2"></i>Salva Tutte le Impostazioni</button>
     </div>
 </div>
+                        <!-- Pannello Gestione Ticket -->
+                        <div class="tab-pane fade" id="v-pills-tickets" role="tabpanel" aria-labelledby="v-pills-tickets-tab">
+                            <h4>Gestione Ticket Descrizioni</h4>
+                            <p class="text-muted small">Qui puoi vedere e gestire i ticket inviati dagli utenti per le descrizioni dei personaggi.</p>
+                            
+                            <hr>
+                            <h5>Ticket Aperti</h5>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Utente</th>
+                                            <th>Personaggio</th>
+                                            <th>Titolo</th>
+                                            <th>Data</th>
+                                            <th class="text-end">Azioni</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="open-tickets-table-body">
+                                        <!-- Righe inserite da JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr>
+                            <h5>Ticket Chiusi</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Utente</th>
+                                            <th>Personaggio</th>
+                                            <th>Titolo</th>
+                                            <th>Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="closed-tickets-table-body">
+                                        <!-- Righe inserite da JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1031,6 +1076,27 @@
         <!-- Sezione Dettaglio Personaggio del Grimorio -->
         <div id="character-detail-view" class="view">
             <!-- Il contenuto verrà generato da grimoire.js -->
+        </div>
+
+        <!-- Sezione Invio Ticket -->
+        <div id="ticket-submission-view" class="view">
+            <h2 class="mb-3">Invia un Ticket per la Descrizione</h2>
+            <p class="text-muted small">Usa questo modulo per suggerire una nuova descrizione o una modifica per un personaggio. Il tuo ticket verrà revisionato da un amministratore.</p>
+            <form id="ticket-submission-form">
+                <input type="hidden" id="ticket-character-name" name="character_name">
+                <div class="mb-3">
+                    <label for="ticket-title" class="form-label">Titolo Ticket</label>
+                    <input type="text" class="form-control" id="ticket-title" name="title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="ticket-content" class="form-label">Testo della Descrizione Suggerita</label>
+                    <textarea class="form-control" id="ticket-content" name="content" rows="10" required></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" id="cancel-ticket-submission" class="btn btn-secondary">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Invia Ticket</button>
+                </div>
+            </form>
         </div>
     </main>
 

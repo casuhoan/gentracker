@@ -98,6 +98,26 @@ function get_keyword_tooltips_file() {
     return __DIR__ . '/../data/keyword_tooltips.json';
 }
 
+function get_tickets_dir() {
+    $dir = __DIR__ . '/../data/tickets/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    return $dir;
+}
+
+function get_open_tickets_file() {
+    return get_tickets_dir() . 'ticket_aperti.json';
+}
+
+function get_closed_tickets_file() {
+    return get_tickets_dir() . 'ticket_chiusi.json';
+}
+
+function get_ticket_log_file() {
+    return get_tickets_dir() . 'log.txt';
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -1055,64 +1075,7 @@ function register() {
     echo json_encode(['status' => 'success', 'message' => 'Utente aggiunto con successo.']);
 }
 
-function sync_library() {
-    $src_dir = __DIR__ . '/../librarydata';
-    $dst_dir = __DIR__ . '/../data';
 
-    if (!is_dir($src_dir)) {
-        echo json_encode(['status' => 'error', 'message' => 'La cartella di origine (librarydata) non esiste.']);
-        return;
-    }
-    if (!is_dir($dst_dir)) mkdir($dst_dir, 0777, true);
-
-    // 1. Unione intelligente del file characters_list.json
-    $src_json_file = $src_dir . '/characters_list.json';
-    $dst_json_file = $dst_dir . '/characters_list.json';
-
-    $src_list = file_exists($src_json_file) ? json_decode(file_get_contents($src_json_file), true) : [];
-    $dst_list = file_exists($dst_json_file) ? json_decode(file_get_contents($dst_json_file), true) : [];
-
-    if (!is_array($src_list)) $src_list = [];
-    if (!is_array($dst_list)) $dst_list = [];
-
-    $merged_chars = [];
-    foreach (array_merge($dst_list, $src_list) as $char) {
-        if (isset($char['nome'])) {
-            $merged_chars[$char['nome']] = $char; // Usa il nome come chiave per eliminare duplicati
-        }
-    }
-
-    $final_list = array_values($merged_chars); // Riconverte in un array indicizzato
-    usort($final_list, function($a, $b) {
-        return strcasecmp($a['nome'] ?? '', $b['nome'] ?? '');
-    });
-
-    // Salva la lista unificata in entrambe le posizioni per mantenerle allineate
-    file_put_contents($dst_json_file, json_encode($final_list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-    file_put_contents($src_json_file, json_encode($final_list, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-
-    // 2. Copia incrementale dei file immagine
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($src_dir, RecursiveDirectoryIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::SELF_FIRST
-    );
-
-    foreach ($iterator as $item) {
-        $dest_item_path = $dst_dir . '/' . $iterator->getSubPathName();
-        if ($item->isDir()) {
-            if (!is_dir($dest_item_path)) {
-                mkdir($dest_item_path, 0777, true);
-            }
-        } else {
-            // Copia solo se il file non è il JSON che abbiamo già gestito
-            if ($item->getFilename() !== 'characters_list.json') {
-                copy($item, $dest_item_path);
-            }
-        }
-    }
-
-    echo json_encode(['status' => 'success', 'message' => 'Sincronizzazione incrementale completata con successo.']);
-}
 
 function add_character_to_library() {
     $char_name = $_POST['name'] ?? '';
@@ -1556,6 +1519,125 @@ function save_keyword_settings() {
     }
 }
 
+function submit_ticket() {
+    if (!is_logged_in()) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Devi essere loggato per inviare un ticket.']);
+        return;
+    }
+
+    $title = $_POST['title'] ?? '';
+    $content = $_POST['content'] ?? '';
+    $character_name = $_POST['character_name'] ?? '';
+
+    if (empty($title) || empty($content) || empty($character_name)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Titolo, personaggio e contenuto sono obbligatori.']);
+        return;
+    }
+
+    // Ensure directory and files exist
+    get_tickets_dir();
+    $open_tickets_file = get_open_tickets_file();
+    $closed_tickets_file = get_closed_tickets_file();
+    $log_file = get_ticket_log_file();
+
+    if (!file_exists($open_tickets_file)) file_put_contents($open_tickets_file, '[]');
+    if (!file_exists($closed_tickets_file)) file_put_contents($closed_tickets_file, '[]');
+    if (!file_exists($log_file)) file_put_contents($log_file, '');
+
+    $open_tickets = json_decode(file_get_contents($open_tickets_file), true);
+    $closed_tickets = json_decode(file_get_contents($closed_tickets_file), true);
+
+    // Generate new sequential ID
+    $new_id = count($open_tickets) + count($closed_tickets) + 1;
+
+    $new_ticket = [
+        'id' => $new_id,
+        'user' => $_SESSION['username'],
+        'character_name' => $character_name,
+        'title' => $title,
+        'content' => $content,
+        'timestamp' => date('c') // ISO 8601 format
+    ];
+
+    $open_tickets[] = $new_ticket;
+
+    file_put_contents($open_tickets_file, json_encode($open_tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // Format new log entry
+    $log_entry = sprintf("[#%s] [%s] [%s] %s\n", $new_ticket['id'], date('d/m/Y H:i:s'), $new_ticket['user'], $new_ticket['title']);
+    file_put_contents($log_file, $log_entry, FILE_APPEND);
+
+    echo json_encode(['status' => 'success', 'message' => 'Ticket inviato con successo.']);
+}
+
+function get_tickets() {
+    // Admin check is handled by the router
+    $open_tickets_file = get_open_tickets_file();
+    $closed_tickets_file = get_closed_tickets_file();
+
+    $open_tickets = file_exists($open_tickets_file) ? json_decode(file_get_contents($open_tickets_file), true) : [];
+    $closed_tickets = file_exists($closed_tickets_file) ? json_decode(file_get_contents($closed_tickets_file), true) : [];
+
+    echo json_encode([
+        'status' => 'success',
+        'open_tickets' => is_array($open_tickets) ? array_reverse($open_tickets) : [], // Show newest first
+        'closed_tickets' => is_array($closed_tickets) ? array_reverse($closed_tickets) : [] // Show newest first
+    ]);
+}
+
+function close_ticket() {
+    // Admin check is handled by the router
+    $ticket_id = $_POST['ticket_id'] ?? '';
+
+    if ($ticket_id === '') { // Use strict check for empty string, as '0' could be a valid ID in other contexts
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'ID del ticket mancante.']);
+        return;
+    }
+
+    $ticket_id_to_find = intval($ticket_id);
+
+    $open_tickets_file = get_open_tickets_file();
+    $closed_tickets_file = get_closed_tickets_file();
+
+    if (!file_exists($open_tickets_file) || !file_exists($closed_tickets_file)) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'File dei ticket non trovati.']);
+        return;
+    }
+
+    $open_tickets = json_decode(file_get_contents($open_tickets_file), true);
+    $closed_tickets = json_decode(file_get_contents($closed_tickets_file), true);
+
+    $ticket_to_move = null;
+    $ticket_index = -1;
+
+    foreach ($open_tickets as $index => $ticket) {
+        if (isset($ticket['id']) && $ticket['id'] === $ticket_id_to_find) {
+            $ticket_to_move = $ticket;
+            $ticket_index = $index;
+            break;
+        }
+    }
+
+    if ($ticket_to_move) {
+        // Remove from open tickets
+        array_splice($open_tickets, $ticket_index, 1);
+        // Add to closed tickets
+        $closed_tickets[] = $ticket_to_move;
+
+        file_put_contents($open_tickets_file, json_encode($open_tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($closed_tickets_file, json_encode($closed_tickets, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        echo json_encode(['status' => 'success', 'message' => 'Ticket completato.']);
+    } else {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Ticket non trovato tra quelli aperti.']);
+    }
+}
+
 
 // --- ROUTER ---
 $action = '';
@@ -1571,8 +1653,8 @@ if (isset($_REQUEST['action'])) {
 
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
-$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'sync_library', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings'];
+$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

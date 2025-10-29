@@ -90,6 +90,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#grimoire-character/')) {
             const charName = decodeURIComponent(hash.substring(20));
             if(typeof loadCharacterDetailPage === 'function') loadCharacterDetailPage(charName);
+        } else if (hash.startsWith('#submit-ticket/')) {
+            const charName = decodeURIComponent(hash.substring(15));
+            showView('ticket-submission-view');
+            const titleInput = document.getElementById('ticket-title');
+            const contentInput = document.getElementById('ticket-content');
+            const charNameInput = document.getElementById('ticket-character-name');
+            if (titleInput) {
+                titleInput.value = `Descrizione per ${charName}` || 'Varie';
+            }
+            if (charNameInput) {
+                charNameInput.value = charName;
+            }
+            if (contentInput) {
+                contentInput.value = ''; // Clear previous content on new load
+            }
         } else {
             const routeMap = {
                 '#': 'gallery-view',
@@ -194,6 +209,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- INIZIALIZZAZIONE ---
+
+    const ticketForm = document.getElementById('ticket-submission-form');
+    if (ticketForm) {
+        ticketForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitButton = ticketForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Invio in corso...';
+
+            const formData = new FormData(ticketForm);
+            formData.append('action', 'submit_ticket');
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Ticket inviato con successo! Grazie per il tuo contributo.');
+                    history.back();
+                } else {
+                    showErrorAlert(result.message || 'Si è verificato un errore durante l\'invio del ticket.');
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Invia Ticket';
+            }
+        });
+    }
+
+    const cancelTicketBtn = document.getElementById('cancel-ticket-submission');
+    if (cancelTicketBtn) {
+        cancelTicketBtn.addEventListener('click', () => {
+            history.back(); // Go back to the previous page
+        });
+    }
+
     const init = async () => {
         try {
             const [charLibResponse, elementsResponse, settingsResponse] = await Promise.all([
