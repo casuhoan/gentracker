@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Rosso": "#dc3545",
         "Blu": "#0d6efd",
         "Verde": "#198754",
+        "Verde acqua": "#20c997",
         "Giallo": "#ffc107",
         "Ciano": "#0dcaf0",
         "Viola": "#6f42c1",
@@ -228,11 +229,26 @@ document.addEventListener('DOMContentLoaded', () => {
             keywordColors.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${item.keyword}</td>
-                    <td><span style="color:${item.color}; font-weight:bold;">${item.color}</span></td>
-                    <td><button class="btn btn-sm btn-danger delete-keyword-color-btn" data-index="${index}">&times;</button></td>
+                    <td><input type="text" class="form-control form-control-sm keyword-color-input" data-index="${index}" value="${item.keyword}"></td>
+                    <td><select class="form-select form-select-sm keyword-color-select" data-index="${index}"></select></td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary move-keyword-up-btn" data-type="color" data-index="${index}" ${index === 0 ? 'disabled' : ''}>&uarr;</button>
+                        <button class="btn btn-sm btn-outline-secondary move-keyword-down-btn" data-type="color" data-index="${index}" ${index === keywordColors.length - 1 ? 'disabled' : ''}>&darr;</button>
+                        <button class="btn btn-sm btn-danger delete-keyword-color-btn ms-2" data-index="${index}">&times;</button>
+                    </td>
                 `;
                 keywordColorsTable.appendChild(row);
+
+                const select = row.querySelector('.keyword-color-select');
+                for (const [name, hex] of Object.entries(colorOptions)) {
+                    const option = document.createElement('option');
+                    option.value = hex;
+                    option.textContent = name;
+                    if (hex === item.color) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                }
             });
         }
         if (keywordTooltipsTable) {
@@ -240,9 +256,13 @@ document.addEventListener('DOMContentLoaded', () => {
             keywordTooltips.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><em>${item.keyword}</em></td>
-                    <td>${item.description.substring(0, 50)}...</td>
-                    <td><button class="btn btn-sm btn-danger delete-keyword-tooltip-btn" data-index="${index}">&times;</button></td>
+                    <td><input type="text" class="form-control form-control-sm keyword-tooltip-input" data-index="${index}" value="${item.keyword}"></td>
+                    <td><textarea class="form-control form-control-sm keyword-tooltip-desc" data-index="${index}">${item.description}</textarea></td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-sm btn-outline-secondary move-keyword-up-btn" data-type="tooltip" data-index="${index}" ${index === 0 ? 'disabled' : ''}>&uarr;</button>
+                        <button class="btn btn-sm btn-outline-secondary move-keyword-down-btn" data-type="tooltip" data-index="${index}" ${index === keywordTooltips.length - 1 ? 'disabled' : ''}>&darr;</button>
+                        <button class="btn btn-sm btn-danger delete-keyword-tooltip-btn ms-2" data-index="${index}">&times;</button>
+                    </td>
                 `;
                 keywordTooltipsTable.appendChild(row);
             });
@@ -1012,6 +1032,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = parseInt(e.target.dataset.index);
             keywordTooltips.splice(index, 1);
             renderKeywordTables();
+        }
+        if (e.target.classList.contains('move-keyword-up-btn')) {
+            const index = parseInt(e.target.dataset.index);
+            const type = e.target.dataset.type;
+            if (type === 'color' && index > 0) {
+                [keywordColors[index - 1], keywordColors[index]] = [keywordColors[index], keywordColors[index - 1]];
+                renderKeywordTables();
+            }
+            if (type === 'tooltip' && index > 0) {
+                [keywordTooltips[index - 1], keywordTooltips[index]] = [keywordTooltips[index], keywordTooltips[index - 1]];
+                renderKeywordTables();
+            }
+        }
+        if (e.target.classList.contains('move-keyword-down-btn')) {
+            const index = parseInt(e.target.dataset.index);
+            const type = e.target.dataset.type;
+            if (type === 'color' && index < keywordColors.length - 1) {
+                [keywordColors[index], keywordColors[index + 1]] = [keywordColors[index + 1], keywordColors[index]];
+                renderKeywordTables();
+            }
+            if (type === 'tooltip' && index < keywordTooltips.length - 1) {
+                [keywordTooltips[index], keywordTooltips[index + 1]] = [keywordTooltips[index + 1], keywordTooltips[index]];
+                renderKeywordTables();
+            }
+        }
+    });
+
+    document.getElementById('v-pills-keywords')?.addEventListener('input', (e) => {
+        const index = parseInt(e.target.dataset.index);
+        if (isNaN(index)) return;
+
+        if (e.target.classList.contains('keyword-color-input')) {
+            if(keywordColors[index]) keywordColors[index].keyword = e.target.value;
+        } else if (e.target.classList.contains('keyword-tooltip-input')) {
+            if(keywordTooltips[index]) keywordTooltips[index].keyword = e.target.value;
+        } else if (e.target.classList.contains('keyword-tooltip-desc')) {
+            if(keywordTooltips[index]) keywordTooltips[index].description = e.target.value;
+        }
+    });
+
+    document.getElementById('v-pills-keywords')?.addEventListener('change', (e) => {
+        const index = parseInt(e.target.dataset.index);
+        if (isNaN(index)) return;
+
+        if (e.target.classList.contains('keyword-color-select')) {
+            if(keywordColors[index]) keywordColors[index].color = e.target.value;
         }
     });
 
