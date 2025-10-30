@@ -1,8 +1,32 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('dashboard.js loaded.');
 
+    const statOrder = ["HP", "Atk", "Def", "Elemental Mastery", "Crit Rate (%)", "Crit Damage (%)", "Energy Recharge (%)"];
+
     // --- DASHBOARD FUNCTIONS ---
+
+    const renderCharacterBanner = (charData) => {
+        const profile = charData.profile;
+        const splashartUrl = profile.splashart || '';
+        const element = elementsData.find(e => e.name === profile.element);
+        const elementIconUrl = element && element.icon ? `data/icons/elements/${element.icon}` : '';
+
+        document.getElementById('banner-splash-art').src = splashartUrl;
+        document.getElementById('banner-element').src = elementIconUrl;
+        document.getElementById('banner-char-name').textContent = profile.name;
+        
+        const baseChar = characterLibrary.find(c => profile.name.includes(c.nome));
+        document.getElementById('banner-char-title').textContent = baseChar ? baseChar.titolo : '';
+
+        let rarityHtml = '';
+        if (profile.rarity) {
+            const starCount = profile.rarity === '5-star' ? 5 : 4;
+            for (let i = 0; i < starCount; i++) {
+                rarityHtml += '<i class="bi bi-star-fill"></i>';
+            }
+        }
+        document.getElementById('banner-rarity').innerHTML = rarityHtml;
+    };
 
     window.loadDashboard = (charData) => {
         currentCharacterData = charData;
@@ -22,41 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
         displayBuild(2, 0);
         displayBuild(1, buildOptions.length > 1 ? 1 : -1);
         displayIdealStats();
-
-        // --- Render Character Banner ---
-        const bannerContainer = document.getElementById('banner-container');
-        if (bannerContainer) {
-            const profile = charData.profile;
-            const splashartUrl = profile.splashart || '';
-            const element = elementsData.find(e => e.name === profile.element);
-            const elementIconUrl = element && element.icon ? `data/icons/elements/${element.icon}` : '';
-
-            let rarityHtml = '';
-            if (profile.rarity) {
-                const starCount = profile.rarity === '5-star' ? 5 : 4;
-                for(let i=0; i<starCount; i++) {
-                    rarityHtml += '<i class="bi bi-star-fill"></i>';
-                }
-            }
-
-            const bannerHtml = `
-                <div class="character-banner-container">
-                    <img src="${splashartUrl}" class="banner-splash-art" alt="">
-                    <img src="${elementIconUrl}" class="banner-element" alt="${profile.element}">
-                    <div class="banner-text-content">
-                        <h4>${profile.name}</h4>
-                        <p>${profile.title || ''}</p>
-                        <div class="banner-rarity">${rarityHtml}</div>
-                    </div>
-                </div>
-            `;
-            bannerContainer.innerHTML = bannerHtml;
-        }
+        renderCharacterBanner(charData);
 
         showView('dashboard-view');
 
         document.getElementById('character-info-btn').addEventListener('click', () => {
-            // Find the base character name from the library to ensure the link works even with nicknames
             const baseChar = characterLibrary.find(c => charData.profile.name.includes(c.nome));
             if (baseChar) {
                 location.hash = `#grimoire-character/${encodeURIComponent(baseChar.nome)}`;
@@ -66,15 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayBuild = (displayId, buildIndex) => {
         const container = document.getElementById(`build-display-${displayId}`);
-        if (buildIndex < 0 || !currentCharacterData.builds[buildIndex]) { container.innerHTML = '<p class="text-muted">Nessuna build selezionata.</p>'; return; }
+        if (buildIndex < 0 || !currentCharacterData.builds[buildIndex]) { container.innerHTML = '<p class="text-muted p-3">Nessuna build selezionata.</p>'; return; }
         const build = currentCharacterData.builds[buildIndex];
         const rarity = currentCharacterData.profile.rarity;
         let html = '<ul class="list-group list-group-flush">';
         
-        // Use the global stat order
-        const orderedStats = window.config.stats;
-        orderedStats.forEach(stat => {
-            // Only display the stat if the character is tracking it
+        statOrder.forEach(stat => {
             if (currentCharacterData.profile.tracked_stats.includes(stat)) {
                 const value = build.stats[stat] || 'N/D';
                 html += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong class="${getStatColorForIdeal(stat, value)}">${value}</strong></li>`;
@@ -92,26 +83,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const displayIdealStats = () => {
-        const container = document.getElementById('ideal-stats-list-container');
+        const container = document.getElementById('ideal-stats-display');
         if (!container) return;
 
         const idealStats = currentCharacterData.profile.ideal_stats;
         const trackedStats = currentCharacterData.profile.tracked_stats;
         
-        let statsHtml = '';
-        const orderedStats = window.config.stats;
-
-        orderedStats.forEach(stat => {
-            // Only display the stat if it is being tracked and has an ideal value
+        let statsHtml = '<ul class="list-group list-group-flush">';
+        statOrder.forEach(stat => {
             if (trackedStats.includes(stat) && idealStats.hasOwnProperty(stat)) {
                 statsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong>${idealStats[stat]}</strong></li>`;
             }
         });
+        statsHtml += '</ul>';
 
-        if (statsHtml === '') {
-            container.innerHTML = '<p class="text-muted">Nessuna statistica ideale impostata.</p>';
+        if (statsHtml === '<ul class="list-group list-group-flush"></ul>') {
+            container.innerHTML = '<p class="text-muted p-3">Nessuna statistica ideale impostata.</p>';
         } else {
-            container.innerHTML = '<ul class="list-group list-group-flush">' + statsHtml + '</ul>';
+            container.innerHTML = statsHtml;
         }
     };
 
@@ -298,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('back-to-gallery-btn').addEventListener('click', (e) => { e.preventDefault(); location.hash = '#'; });
     }
 
-    // New delegated event listener for the Build Score Info buttons
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('show-build-score-info-btn')) {
             const buildIndex = parseInt(e.target.dataset.buildIndex);
@@ -306,18 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentCharacterData && currentCharacterData.builds[buildIndex]) {
                 const selectedBuild = currentCharacterData.builds[buildIndex];
                 
-                // Create a temporary profile object for calculateBuildScore
                 const tempProfile = {
-                    ...currentCharacterData.profile, // Copy existing profile data
+                    ...currentCharacterData.profile,
                     latest_build_stats: selectedBuild.stats,
-                    constellation: selectedBuild.constellation, // Use build's constellation
-                    signature_weapon: selectedBuild.signature_weapon, // Use build's signature weapon
-                    talents: selectedBuild.talents // Use build's talents
+                    constellation: selectedBuild.constellation,
+                    signature_weapon: selectedBuild.signature_weapon,
+                    talents: selectedBuild.talents
                 };
                 
-                console.log('Build score button clicked.');
-                console.log('window.calculateBuildScore is type:', typeof window.calculateBuildScore);
-                // Calculate score and GET details using the global function from gallery.js
                 const { score, details } = window.calculateBuildScore(tempProfile);
                 
                 displayBuildScoreInfoModal(details, tempProfile.talents);
