@@ -1,22 +1,22 @@
 [
     {
         "name": "Sword",
-        "icon": ""
+        "icon": "sword.webp"
     },
     {
         "name": "Polearm",
-        "icon": ""
+        "icon": "polearm.webp"
     },
     {
         "name": "Catalyst",
-        "icon": ""
+        "icon": "catalyst.webp"
     },
     {
         "name": "Bow",
-        "icon": ""
+        "icon": "bow.webp"
     },
     {
         "name": "Claymore",
-        "icon": ""
+        "icon": "claymore.webp"
     }
 ]

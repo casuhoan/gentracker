@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-library-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-weapons-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-tickets-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-nations-tab')?.classList.remove('d-none');
         }
@@ -187,6 +188,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 </form>
             `;
             container.appendChild(elementNode);
+        });
+    }
+
+    window.loadWeaponsManagement = async () => {
+        const response = await fetch('php/api.php?action=get_weapons');
+        const weapons = await response.json();
+        const container = document.getElementById('weapons-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+        weapons.forEach(weapon => {
+            const weaponNode = document.createElement('div');
+            weaponNode.className = 'list-group-item d-flex justify-content-between align-items-center';
+            weaponNode.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <img src="${weapon.icon ? 'data/icons/weapons/' + weapon.icon : ''}" class="me-3" style="width: 32px; height: 32px; object-fit: contain;">
+                    <strong>${weapon.name}</strong>
+                </div>
+                <form class="update-weapon-icon-form" style="max-width: 250px;">
+                    <input type="hidden" name="weapon_name" value="${weapon.name}">
+                    <div class="input-group">
+                        <input type="file" name="weapon_icon" class="form-control form-control-sm" required>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Aggiorna</button>
+                    </div>
+                </form>
+            `;
+            container.appendChild(weaponNode);
         });
     }
 
@@ -409,16 +436,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-schema-tab')?.addEventListener('shown.bs.tab', loadUserSchema);
     document.getElementById('v-pills-library-tab')?.addEventListener('shown.bs.tab', loadLibraryManagement);
     document.getElementById('v-pills-elements-tab')?.addEventListener('shown.bs.tab', loadElementsManagement);
+    document.getElementById('v-pills-weapons-tab')?.addEventListener('shown.bs.tab', loadWeaponsManagement);
     document.getElementById('v-pills-keywords-tab')?.addEventListener('shown.bs.tab', loadKeywordManagement);
     document.getElementById('v-pills-tickets-tab')?.addEventListener('shown.bs.tab', loadTicketManagement);
     document.getElementById('v-pills-nations-tab')?.addEventListener('shown.bs.tab', loadNationsManagement);
 
-    document.getElementById('v-pills-elements')?.addEventListener('submit', async (e) => {
+    document.getElementById('v-pills-tabContent')?.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         let action = '';
         let formData = null;
         let successMessage = '';
+        let callback = null;
 
         if (e.target.id === 'add-element-form') {
             action = 'add_element';
@@ -426,10 +455,24 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('element_name', document.getElementById('new-element-name').value);
             formData.append('element_icon', document.getElementById('new-element-icon').files[0]);
             successMessage = 'Elemento aggiunto con successo!';
+            callback = loadElementsManagement;
         } else if (e.target.classList.contains('update-element-icon-form')) {
             action = 'update_element_icon';
             formData = new FormData(e.target);
             successMessage = 'Icona elemento aggiornata!';
+            callback = loadElementsManagement;
+        } else if (e.target.id === 'add-weapon-form') {
+            action = 'add_weapon';
+            formData = new FormData();
+            formData.append('weapon_name', document.getElementById('new-weapon-name').value);
+            formData.append('weapon_icon', document.getElementById('new-weapon-icon').files[0]);
+            successMessage = 'Arma aggiunta con successo!';
+            callback = loadWeaponsManagement;
+        } else if (e.target.classList.contains('update-weapon-icon-form')) {
+            action = 'update_weapon_icon';
+            formData = new FormData(e.target);
+            successMessage = 'Icona arma aggiornata!';
+            callback = loadWeaponsManagement;
         }
 
         if (action && formData) {
@@ -439,8 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
                 if (result.status === 'success') {
                     showToast(successMessage);
-                    loadElementsManagement(); // Refresh the list
-                    if (e.target.id === 'add-element-form') e.target.reset();
+                    if (callback) callback(); 
+                    e.target.reset();
                 } else {
                     showErrorAlert(result.message);
                 }

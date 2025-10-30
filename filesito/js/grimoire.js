@@ -226,6 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const element = elementsData.find(e => e.name === char.elemento);
         const elementIconUrl = element ? `data/icons/elements/${element.icon}` : '';
 
+        const weapon = weaponsData.find(w => w.name === char.arma);
+        const weaponIconUrl = weapon && weapon.icon ? `data/icons/weapons/${weapon.icon}` : '';
+
         let rarityHtml = '';
         if (char.rarita) {
             const starCount = char.rarita === '5-star' ? 5 : 4;
@@ -270,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                     <div class="col-12 col-md-4 mb-3">
                                         <h5>Arma</h5>
-                                        <p>${char.arma || 'N/D'}</p>
+                                        <p class="d-flex align-items-center"><img src="${weaponIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.arma || 'N/D'}</p>
                                     </div>
                                 </div>
 

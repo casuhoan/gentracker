@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.sourceCharacterData = [];
     window.characterLibrary = [];
     window.elementsData = [];
+    window.weaponsData = [];
     window.currentCharacterData = null;
     window.dataLoaded = false;
     window.currentUser = null;
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ROUTER E GESTIONE VISTE ---
     window.showView = (viewId) => {
+        window.scrollTo(0, 0); // Reset scroll position on view change
         const body = document.body;
         views.forEach(view => view.classList.remove('active'));
         const activeView = document.getElementById(viewId);
@@ -249,9 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const init = async () => {
         try {
-            const [charLibResponse, elementsResponse, settingsResponse] = await Promise.all([
+            const [charLibResponse, elementsResponse, weaponsResponse, settingsResponse] = await Promise.all([
                 fetch('data/characters_list.json?v=' + new Date().getTime()),
                 fetch('php/api.php?action=get_elements'),
+                fetch('php/api.php?action=get_weapons'),
                 fetch('php/api.php?action=get_settings')
             ]);
 
@@ -262,6 +265,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 elementsData = await elementsResponse.json();
             } else {
                 console.error('Could not load elements data.');
+            }
+
+            if (weaponsResponse.ok) {
+                weaponsData = await weaponsResponse.json();
+            } else {
+                console.error('Could not load weapons data.');
             }
 
             if (settingsResponse.ok) {

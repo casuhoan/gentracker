@@ -122,6 +122,18 @@ function get_nations_file() {
     return __DIR__ . '/../data/nations.json';
 }
 
+function get_weapons_file() {
+    return __DIR__ . '/../data/weapons.json';
+}
+
+function get_weapon_icons_dir() {
+    $dir = __DIR__ . '/../data/icons/weapons/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    return $dir;
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -243,6 +255,108 @@ function update_element_icon() {
     }
 
     file_put_contents($elements_file, json_encode($elements, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
+// --- WEAPON FUNCTIONS ---
+function get_weapons() {
+    $weapons_file = get_weapons_file();
+    if (!file_exists($weapons_file)) {
+        file_put_contents($weapons_file, '[]');
+    }
+    get_weapon_icons_dir(); // Ensure the directory exists
+    header('Content-Type: application/json');
+    echo file_get_contents($weapons_file);
+}
+
+function add_weapon() {
+    $weapons_file = get_weapons_file();
+    $weapons = json_decode(file_get_contents($weapons_file), true);
+
+    $weapon_name = $_POST['weapon_name'] ?? '';
+    if (empty($weapon_name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il nome dell\'arma è obbligatorio.']);
+        return;
+    }
+
+    foreach ($weapons as $w) {
+        if (strcasecmp($w['name'], $weapon_name) == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Un\'arma con questo nome esiste già.']);
+            return;
+        }
+    }
+
+    $icon_path = '';
+    if (isset($_FILES['weapon_icon']) && $_FILES['weapon_icon']['error'] == 0) {
+        $icons_dir = get_weapon_icons_dir();
+        $file_ext = pathinfo($_FILES['weapon_icon']['name'], PATHINFO_EXTENSION);
+        $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($weapon_name));
+        $file_name = $safe_name . '.' . $file_ext;
+        $target_file = $icons_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['weapon_icon']['tmp_name'], $target_file)) {
+            $icon_path = $file_name;
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'icona.']);
+            return;
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'L\'icona è obbligatoria.']);
+        return;
+    }
+
+    $weapons[] = ['name' => $weapon_name, 'icon' => $icon_path];
+    file_put_contents($weapons_file, json_encode($weapons, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
+function update_weapon_icon() {
+    $weapons_file = get_weapons_file();
+    $weapons = json_decode(file_get_contents($weapons_file), true);
+    
+    $weapon_name = $_POST['weapon_name'] ?? '';
+    if (empty($weapon_name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Nome arma non specificato.']);
+        return;
+    }
+
+    $icon_path = '';
+    if (isset($_FILES['weapon_icon']) && $_FILES['weapon_icon']['error'] == 0) {
+        $icons_dir = get_weapon_icons_dir();
+        $file_ext = pathinfo($_FILES['weapon_icon']['name'], PATHINFO_EXTENSION);
+        $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($weapon_name));
+        $file_name = $safe_name . '.' . $file_ext;
+        $target_file = $icons_dir . $file_name;
+
+        foreach ($weapons as $w) {
+            if ($w['name'] === $weapon_name && !empty($w['icon']) && $w['icon'] !== $file_name) {
+                $old_icon_path = $icons_dir . $w['icon'];
+                if (file_exists($old_icon_path)) {
+                    unlink($old_icon_path);
+                }
+                break;
+            }
+        }
+
+        if (move_uploaded_file($_FILES['weapon_icon']['tmp_name'], $target_file)) {
+            $icon_path = $file_name;
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento della nuova icona.']);
+            return;
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Nessuna icona caricata.']);
+        return;
+    }
+
+    foreach ($weapons as &$w) {
+        if ($w['name'] === $weapon_name) {
+            $w['icon'] = $icon_path;
+            break;
+        }
+    }
+
+    file_put_contents($weapons_file, json_encode($weapons, JSON_PRETTY_PRINT));
     echo json_encode(['status' => 'success']);
 }
 
@@ -1719,9 +1833,9 @@ if (isset($_REQUEST['action'])) {
 
 
 
-$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations'];
+$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'add_weapon', 'update_weapon_icon'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',
