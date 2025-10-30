@@ -647,30 +647,22 @@ function save_character() {
     $default_image_path = $_POST['default_image_path'] ?? '';
     $char_name = $_POST['name'] ?? '';
 
-    // Gestione Immagine - Usa l'ID utente per il nome del file
-    if (!empty($default_image_path)) {
-        $source_file = __DIR__ . '/../' . $default_image_path;
-        if (file_exists($source_file)) {
-            $upload_dir = __DIR__ . '/../uploads/';
-            $file_extension = pathinfo($source_file, PATHINFO_EXTENSION);
-            $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name));
-            // Nuovo formato nome file: USERID_CHARNAME.ext
-            $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
-            $target_file = $upload_dir . $file_name;
-            if (copy($source_file, $target_file)) {
-                $splashart_path = 'uploads/' . $file_name;
-            }
-        }
-    } elseif (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
-        $upload_dir = __DIR__ . '/../uploads/';
+    // Gestione Immagine
+    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        $user_splash_dir = __DIR__ . '/../data/splashart/splashart_' . $_SESSION['user_id'] . '/';
+        if (!is_dir($user_splash_dir)) mkdir($user_splash_dir, 0777, true);
+        
         $file_extension = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($char_name));
-        // Nuovo formato nome file: USERID_CHARNAME.ext
-        $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
-        $target_file = $upload_dir . $file_name;
+        $file_name = $safe_char_name . '_' . time() . '.' . $file_extension; // Add timestamp to avoid collisions
+        $target_file = $user_splash_dir . $file_name;
+
         if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
-            $splashart_path = 'uploads/' . $file_name;
+            $splashart_path = 'data/splashart/splashart_' . $_SESSION['user_id'] . '/' . $file_name;
         }
+    } elseif (!empty($default_image_path)) {
+        // The default image path is already correct from the library, e.g., 'data/splashart/Albedo_Wish.webp'
+        $splashart_path = $default_image_path;
     }
 
     $ideal_stats = [];
@@ -734,36 +726,38 @@ function update_character() {
 
     $data = json_decode(file_get_contents($original_file_path), true);
 
-    // Gestione Immagine - Usa l'ID utente per il nome del file
+    // Gestione Immagine
     $default_image_path = $_POST['default_image_path'] ?? '';
-    if (!empty($default_image_path)) {
-        if(!empty($data['profile']['splashart']) && file_exists(__DIR__.'/../'.$data['profile']['splashart'])) {
-            unlink(__DIR__.'/../'.$data['profile']['splashart']);
-        }
+    $new_splashart_path = $data['profile']['splashart'] ?? ''; // Keep old path by default
 
-        $source_file = __DIR__ . '/../' . $default_image_path;
-        if (file_exists($source_file)) {
-            $upload_dir = __DIR__ . '/../uploads/';
-            $file_extension = pathinfo($source_file, PATHINFO_EXTENSION);
-            $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_name));
-            $file_name = $_SESSION['user_id'] . '_' . $safe_char_name . '.' . $file_extension;
-            $target_file = $upload_dir . $file_name;
-            if (copy($source_file, $target_file)) {
-                $data['profile']['splashart'] = 'uploads/' . $file_name;
+    if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        // New file uploaded
+        $user_splash_dir = __DIR__ . '/../data/splashart/splashart_' . $_SESSION['user_id'] . '/';
+        if (!is_dir($user_splash_dir)) mkdir($user_splash_dir, 0777, true);
+
+        $file_extension = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
+        $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($new_name));
+        $file_name = $safe_char_name . '_' . time() . '.' . $file_extension;
+        $target_file = $user_splash_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
+            // Delete old file if it exists and is different
+            if (!empty($data['profile']['splashart']) && $data['profile']['splashart'] !== 'data/splashart/splashart_' . $_SESSION['user_id'] . '/' . $file_name) {
+                $old_file_path = __DIR__ . '/../' . $data['profile']['splashart'];
+                if (file_exists($old_file_path)) unlink($old_file_path);
             }
+            $new_splashart_path = 'data/splashart/splashart_' . $_SESSION['user_id'] . '/' . $file_name;
         }
-    } elseif (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
-        if(!empty($data['profile']['splashart']) && file_exists(__DIR__.'/../'.$data['profile']['splashart'])) {
-            unlink(__DIR__.'/../'.$data['profile']['splashart']);
+    } elseif (!empty($default_image_path)) {
+        // Default image selected
+        // Delete old custom file if it exists
+        if (!empty($data['profile']['splashart']) && strpos($data['profile']['splashart'], 'splashart_' . $_SESSION['user_id']) !== false) {
+             $old_file_path = __DIR__ . '/../' . $data['profile']['splashart'];
+             if (file_exists($old_file_path)) unlink($old_file_path);
         }
-        $upload_dir = __DIR__ . '/../uploads/';
-        $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
-        $file_name = $_SESSION['user_id'].'_'.preg_replace('/[^a-zA-Z0-9_-]/','_',strtolower($new_name)).'.'.$file_ext;
-        $target_file = $upload_dir . $file_name;
-        if(move_uploaded_file($_FILES['splashart']['tmp_name'], $target_file)) {
-            $data['profile']['splashart'] = 'uploads/'.$file_name;
-        }
+        $new_splashart_path = $default_image_path;
     }
+    $data['profile']['splashart'] = $new_splashart_path;
 
     $data['profile']['name'] = $new_name;
     $fields = ['element','role','tracked_stats','acquisition_date','signature_weapon','talents','rarity', 'nation', 'faction'];
@@ -1215,16 +1209,17 @@ function add_character_to_library() {
         }
     }
 
-    $upload_dir = __DIR__ . '/../data/library/';
-    if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
     $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $char_name);
 
     $splashart_path = '';
     if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        $splashart_dir = __DIR__ . '/../data/splashart/';
+        if(!is_dir($splashart_dir)) mkdir($splashart_dir, 0777, true);
+
         $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_wish.' . $file_ext;
-        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $upload_dir . $file_name)) {
-            $splashart_path = 'library/' . $file_name;
+        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $splashart_dir . $file_name)) {
+            $splashart_path = 'splashart/' . $file_name; // Path relative to /data/
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dello splashart.']);
             return;
@@ -1234,11 +1229,15 @@ function add_character_to_library() {
         return;
     }
 
+    // Icon and Banner still go to /data/library/
+    $library_upload_dir = __DIR__ . '/../data/library/';
+    if(!is_dir($library_upload_dir)) mkdir($library_upload_dir, 0777, true);
+
     $icon_path = '';
     if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
         $file_ext = pathinfo($_FILES['icon']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_icon.' . $file_ext;
-        if (move_uploaded_file($_FILES['icon']['tmp_name'], $upload_dir . $file_name)) {
+        if (move_uploaded_file($_FILES['icon']['tmp_name'], $library_upload_dir . $file_name)) {
             $icon_path = 'library/' . $file_name;
         }
     }
@@ -1247,7 +1246,7 @@ function add_character_to_library() {
     if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
         $file_ext = pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_banner.' . $file_ext;
-        if (move_uploaded_file($_FILES['banner']['tmp_name'], $upload_dir . $file_name)) {
+        if (move_uploaded_file($_FILES['banner']['tmp_name'], $library_upload_dir . $file_name)) {
             $banner_path = 'library/' . $file_name;
         }
     }
@@ -1336,42 +1335,45 @@ function update_library_character() {
     $updated_char_data['rarita'] = $_POST['rarity'] ?? '5-star';
     $updated_char_data['wip'] = isset($_POST['wip']);
 
-    $upload_dir = __DIR__ . '/../data/library/';
-    if(!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
     $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $new_name);
 
     // Handle Splashart
     if (isset($_FILES['splashart']) && $_FILES['splashart']['error'] == 0) {
+        $splashart_dir = __DIR__ . '/../data/splashart/';
+        if(!is_dir($splashart_dir)) mkdir($splashart_dir, 0777, true);
+
         if (!empty($updated_char_data['immagine']) && file_exists(__DIR__ . '/../data/' . $updated_char_data['immagine'])) {
             unlink(__DIR__ . '/../data/' . $updated_char_data['immagine']);
         }
         $file_ext = pathinfo($_FILES['splashart']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_wish.' . $file_ext;
-        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $upload_dir . $file_name)) {
-            $updated_char_data['immagine'] = 'library/' . $file_name;
+        if (move_uploaded_file($_FILES['splashart']['tmp_name'], $splashart_dir . $file_name)) {
+            $updated_char_data['immagine'] = 'splashart/' . $file_name;
         }
     }
 
-    // Handle Icon
+    // Handle Icon and Banner (they still go to /library)
+    $library_upload_dir = __DIR__ . '/../data/library/';
+    if(!is_dir($library_upload_dir)) mkdir($library_upload_dir, 0777, true);
+
     if (isset($_FILES['icon']) && $_FILES['icon']['error'] == 0) {
         if (!empty($updated_char_data['icon']) && file_exists(__DIR__ . '/../data/' . $updated_char_data['icon'])) {
             unlink(__DIR__ . '/../data/' . $updated_char_data['icon']);
         }
         $file_ext = pathinfo($_FILES['icon']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_icon.' . $file_ext;
-        if (move_uploaded_file($_FILES['icon']['tmp_name'], $upload_dir . $file_name)) {
+        if (move_uploaded_file($_FILES['icon']['tmp_name'], $library_upload_dir . $file_name)) {
             $updated_char_data['icon'] = 'library/' . $file_name;
         }
     }
 
-    // Handle Banner
     if (isset($_FILES['banner']) && $_FILES['banner']['error'] == 0) {
         if (!empty($updated_char_data['banner']) && file_exists(__DIR__ . '/../data/' . $updated_char_data['banner'])) {
             unlink(__DIR__ . '/../data/' . $updated_char_data['banner']);
         }
         $file_ext = pathinfo($_FILES['banner']['name'], PATHINFO_EXTENSION);
         $file_name = 'character_' . $safe_char_name . '_banner.' . $file_ext;
-        if (move_uploaded_file($_FILES['banner']['tmp_name'], $upload_dir . $file_name)) {
+        if (move_uploaded_file($_FILES['banner']['tmp_name'], $library_upload_dir . $file_name)) {
             $updated_char_data['banner'] = 'library/' . $file_name;
         }
     }
@@ -1820,6 +1822,93 @@ function delete_nation() {
     echo json_encode(['status' => 'success']);
 }
 
+function organize_splasharts() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $base_data_dir = __DIR__ . '/../data/';
+    $splashart_main_dir = $base_data_dir . 'splashart/';
+    $uploads_dir = __DIR__ . '/../uploads/';
+
+    $report = ['library_files_moved' => 0, 'user_files_moved' => 0, 'library_paths_updated' => 0, 'user_chars_updated' => 0, 'errors' => []];
+
+    try {
+        if (!is_dir($splashart_main_dir)) {
+            if (!mkdir($splashart_main_dir, 0777, true)) throw new Exception('Impossibile creare la cartella principale splashart.');
+        }
+
+        // 1. Move library splasharts (webp files directly in /data/)
+        $library_splasharts = glob($base_data_dir . '*.webp');
+        foreach ($library_splasharts as $file_path) {
+            $filename = basename($file_path);
+            if (rename($file_path, $splashart_main_dir . $filename)) {
+                $report['library_files_moved']++;
+            }
+        }
+
+        // 2. Update characters_list.json
+        $library_file = $base_data_dir . 'characters_list.json';
+        if (file_exists($library_file)) {
+            $library = json_decode(file_get_contents($library_file), true);
+            foreach ($library as &$char) {
+                if (isset($char['immagine']) && strpos($char['immagine'], '/') === false) { // Only update root-level images
+                    $char['immagine'] = 'splashart/' . $char['immagine'];
+                    $report['library_paths_updated']++;
+                }
+            }
+            file_put_contents($library_file, json_encode($library, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+
+        // 3. Process all user files
+        $users_dir = $base_data_dir . 'users/';
+        if (is_dir($users_dir)) {
+            $user_folders = glob($users_dir . '*', GLOB_ONLYDIR);
+            foreach ($user_folders as $user_folder) {
+                $user_id = basename($user_folder);
+                $user_splash_dir = $splashart_main_dir . 'splashart_' . $user_id . '/';
+
+                $char_files = glob($user_folder . '/*.json');
+                foreach ($char_files as $char_file) {
+                    $char_data = json_decode(file_get_contents($char_file), true);
+                    if (!isset($char_data['profile']['splashart']) || empty($char_data['profile']['splashart'])) continue;
+
+                    $old_path = $char_data['profile']['splashart'];
+
+                    if (strpos($old_path, 'uploads/') === 0) { // This is a custom user splashart
+                        if (!is_dir($user_splash_dir)) {
+                            if (!mkdir($user_splash_dir, 0777, true)) continue; // Cannot create user dir, skip
+                        }
+                        $filename = basename($old_path);
+                        $source_file = __DIR__ . '/../' . $old_path;
+                        if (file_exists($source_file)) {
+                            if (rename($source_file, $user_splash_dir . $filename)) {
+                                $report['user_files_moved']++;
+                            }
+                        }
+                        $char_data['profile']['splashart'] = 'data/splashart/splashart_' . $user_id . '/' . $filename;
+                        $report['user_chars_updated']++;
+                    } elseif (strpos($old_path, 'data/') === 0) { // This is a default/library splashart
+                        $filename = basename($old_path);
+                        $char_data['profile']['splashart'] = 'data/splashart/' . $filename;
+                        $report['user_chars_updated']++;
+                    }
+                    file_put_contents($char_file, json_encode($char_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                }
+            }
+        }
+
+        $message = "Operazione completata. File libreria spostati: {$report['library_files_moved']}. File utente spostati: {$report['user_files_moved']}. Personaggi libreria aggiornati: {$report['library_paths_updated']}. Personaggi utente aggiornati: {$report['user_chars_updated']}.";
+        echo json_encode(['status' => 'success', 'message' => $message]);
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+}
+
 // --- ROUTER ---
 $action = '';
 if (isset($_REQUEST['action'])) {
@@ -1835,7 +1924,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'add_weapon', 'update_weapon_icon'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'add_weapon', 'update_weapon_icon', 'organize_splasharts'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

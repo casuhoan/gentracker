@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Arlecchino",
-        "splashart": "uploads\/arlecchino.webp",
+        "splashart": "data\/splashart\/splashart_admin\/arlecchino.webp",
         "element": "Pyro",
         "role": [
             "Main DPS"

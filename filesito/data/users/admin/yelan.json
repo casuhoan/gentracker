@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Yelan",
-        "splashart": "uploads\/yelan.webp",
+        "splashart": "data\/splashart\/splashart_admin\/yelan.webp",
         "element": "Hydro",
         "role": [
             "Main DPS",

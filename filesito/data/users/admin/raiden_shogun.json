@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Raiden Shogun",
-        "splashart": "uploads\/raiden_shogun.webp",
+        "splashart": "data\/splashart\/splashart_admin\/raiden_shogun.webp",
         "element": "Electro",
         "role": [
             "Main DPS",

@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Varesa",
-        "splashart": "uploads\/varesa.webp",
+        "splashart": "data\/splashart\/splashart_admin\/varesa.webp",
         "element": "Electro",
         "role": [
             "Main DPS"

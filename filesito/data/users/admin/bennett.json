@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Bennett",
-        "splashart": "uploads\/bennett.webp",
+        "splashart": "data\/splashart\/splashart_admin\/bennett.webp",
         "element": "Pyro",
         "role": [
             "Healer",

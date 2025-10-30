@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Chevreuse",
-        "splashart": "uploads\/chevreuse.webp",
+        "splashart": "data\/splashart\/splashart_admin\/chevreuse.webp",
         "element": "Pyro",
         "role": [
             "Healer",

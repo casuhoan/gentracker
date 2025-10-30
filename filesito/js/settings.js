@@ -963,6 +963,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const organizeSplashartsBtn = document.getElementById('organize-splasharts-btn');
+    if (organizeSplashartsBtn) {
+        organizeSplashartsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Sei assolutamente sicuro?',
+                html: `Questa azione sposterà <b>tutti</b> i file delle splash art in una nuova cartella <code>/data/splashart/</code> e aggiornerà i percorsi nel file della libreria e in <b>tutti i file dei personaggi di tutti gli utenti</b>. <br><br><strong class="text-danger">Questa operazione è rischiosa e non può essere annullata facilmente.</strong><br>Procedere solo se si è sicuri e si ha un backup.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sì, sposta tutto!',
+                cancelButtonText: 'Annulla'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Spostamento in corso...',
+                        html: 'Questa operazione potrebbe richiedere alcuni istanti. Non chiudere la pagina.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    try {
+                        const response = await fetch('php/api.php', { 
+                            method: 'POST', 
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'organize_splasharts' }) 
+                        });
+                        const res = await response.json();
+                        if (res.status === 'success') {
+                            Swal.fire('Successo!', res.message, 'success');
+                        } else {
+                            Swal.fire('Errore', res.message, 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Errore Critico', 'Errore di comunicazione con il server.', 'error');
+                    }
+                }
+            });
+        });
+    }
+
     document.getElementById('library-character-table-body')?.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn-edit-lib-char')) {
             document.getElementById('edit-library-character-form').reset();

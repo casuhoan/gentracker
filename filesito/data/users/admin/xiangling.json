@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Xiangling",
-        "splashart": "uploads\/xiangling.webp",
+        "splashart": "data\/splashart\/splashart_admin\/xiangling.webp",
         "element": "Pyro",
         "role": [
             "Support",

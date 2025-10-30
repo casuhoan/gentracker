@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Chasca",
-        "splashart": "uploads\/chasca.webp",
+        "splashart": "data\/splashart\/splashart_admin\/chasca.webp",
         "element": "Anemo",
         "role": [
             "Main DPS"

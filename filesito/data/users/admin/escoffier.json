@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Escoffier",
-        "splashart": "uploads\/escoffier.webp",
+        "splashart": "data\/splashart\/splashart_admin\/escoffier.webp",
         "element": "Cryo",
         "role": [
             "Support",

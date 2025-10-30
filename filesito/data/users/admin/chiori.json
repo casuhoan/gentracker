@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Chiori",
-        "splashart": "uploads\/chiori.webp",
+        "splashart": "data\/splashart\/splashart_admin\/chiori.webp",
         "element": "Geo",
         "role": [
             "Sub DPS"

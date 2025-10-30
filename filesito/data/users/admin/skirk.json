@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Skirk",
-        "splashart": "uploads\/skirk.png",
+        "splashart": "data\/splashart\/splashart_admin\/skirk.png",
         "element": "Cryo",
         "role": [
             "Main DPS"

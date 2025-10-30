@@ -1,7 +1,7 @@
 {
     "profile": {
         "name": "Furina",
-        "splashart": "uploads\/furina.webp",
+        "splashart": "data\/splashart\/splashart_admin\/furina.webp",
         "element": "Hydro",
         "role": [
             "Healer",

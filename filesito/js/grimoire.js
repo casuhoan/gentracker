@@ -188,9 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = document.createElement('div');
             card.className = 'col';
+
+            let statusDotHtml = '';
+            if ((isAdmin || isModerator) && grimoireView === 'icon') {
+                const hasDescription = char.description && char.description.trim() !== '';
+                const dotColorClass = hasDescription ? 'dot-green' : 'dot-red';
+                statusDotHtml = `<div class="description-status-dot ${dotColorClass}" title="${hasDescription ? 'Descrizione presente' : 'Descrizione assente'}"></div>`;
+            }
+
             card.innerHTML = `
                 <a href="#grimoire-character/${encodeURIComponent(char.nome)}" class="text-decoration-none">
                     <div class="grimoire-card">
+                        ${statusDotHtml}
                         <img src="${imageUrl}" class="grimoire-card-img" alt="${char.nome}">
                         <img src="${elementIcon}" class="grimoire-card-element" alt="${char.elemento}">
                         <div class="grimoire-card-body">
@@ -300,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <button id="save-description" class="btn btn-primary btn-sm">Salva</button>
                                         </div>
                                     </div>
-                                    ${isAdmin ? '<button id="edit-description-btn" class="btn btn-outline-primary btn-sm" style="position: absolute; top: 0; right: 0;"><i class="bi bi-pencil-fill"></i></button>' : ''}
+                                    ${(isAdmin || isModerator) ? '<button id="edit-description-btn" class="btn btn-outline-primary btn-sm" style="position: absolute; top: 0; right: 0;"><i class="bi bi-pencil-fill"></i></button>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -321,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             location.hash = '#grimoire';
         });
 
-        if (isAdmin) {
+        if (isAdmin || isModerator) {
             const editBtn = document.getElementById('edit-description-btn');
             const saveBtn = document.getElementById('save-description');
             const cancelBtn = document.getElementById('cancel-description-edit');

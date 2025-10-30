@@ -145,6 +145,19 @@
             opacity: 1;
             transform: scale(1.15);
         }
+
+        .description-status-dot {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid white;
+            z-index: 10;
+        }
+        .dot-green { background-color: #28a745; }
+        .dot-red { background-color: #dc3545; }
     </style>
 </head>
 <body>
@@ -380,6 +393,7 @@
                             </form>
                             <hr class="my-4">
                             <button class="btn btn-info mb-3" id="sync-library-images-btn"><i class="bi bi-images me-2"></i>Sincronizza Immagini Libreria</button>
+                            <button class="btn btn-warning mb-3" id="organize-splasharts-btn"><i class="bi bi-folder-symlink me-2"></i>Sposta Splashart</button>
                             <h4>Personaggi Esistenti</h4>
                             <div class="mb-3">
                                 <input type="search" id="library-char-search" class="form-control" placeholder="Cerca nella libreria...">
