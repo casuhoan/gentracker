@@ -22,6 +22,37 @@ document.addEventListener('DOMContentLoaded', () => {
         displayBuild(2, 0);
         displayBuild(1, buildOptions.length > 1 ? 1 : -1);
         displayIdealStats();
+
+        // --- Render Character Banner ---
+        const bannerContainer = document.getElementById('banner-container');
+        if (bannerContainer) {
+            const profile = charData.profile;
+            const splashartUrl = profile.splashart || '';
+            const element = elementsData.find(e => e.name === profile.element);
+            const elementIconUrl = element && element.icon ? `data/icons/elements/${element.icon}` : '';
+
+            let rarityHtml = '';
+            if (profile.rarity) {
+                const starCount = profile.rarity === '5-star' ? 5 : 4;
+                for(let i=0; i<starCount; i++) {
+                    rarityHtml += '<i class="bi bi-star-fill"></i>';
+                }
+            }
+
+            const bannerHtml = `
+                <div class="character-banner-container">
+                    <img src="${splashartUrl}" class="banner-splash-art" alt="">
+                    <img src="${elementIconUrl}" class="banner-element" alt="${profile.element}">
+                    <div class="banner-text-content">
+                        <h4>${profile.name}</h4>
+                        <p>${profile.title || ''}</p>
+                        <div class="banner-rarity">${rarityHtml}</div>
+                    </div>
+                </div>
+            `;
+            bannerContainer.innerHTML = bannerHtml;
+        }
+
         showView('dashboard-view');
 
         document.getElementById('character-info-btn').addEventListener('click', () => {
@@ -39,10 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const build = currentCharacterData.builds[buildIndex];
         const rarity = currentCharacterData.profile.rarity;
         let html = '<ul class="list-group list-group-flush">';
-        for (const stat of currentCharacterData.profile.tracked_stats) {
-            const value = build.stats[stat] || 'N/D';
-            html += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong class="${getStatColorForIdeal(stat, value)}">${value}</strong></li>`;
-        }
+        
+        // Use the global stat order
+        const orderedStats = window.config.stats;
+        orderedStats.forEach(stat => {
+            // Only display the stat if the character is tracking it
+            if (currentCharacterData.profile.tracked_stats.includes(stat)) {
+                const value = build.stats[stat] || 'N/D';
+                html += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong class="${getStatColorForIdeal(stat, value)}">${value}</strong></li>`;
+            }
+        });
+
         html += '</ul><hr class="my-3">';
         html += '<ul class="list-group list-group-flush">';
         html += `<li class="list-group-item d-flex justify-content-between align-items-center">Costellazione <strong class="${getStatusColorClass('constellation', build.constellation, rarity)}">${build.constellation}</strong></li>`;
@@ -54,13 +92,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const displayIdealStats = () => {
-        const container = document.getElementById('ideal-stats-display');
+        const container = document.getElementById('ideal-stats-list-container');
+        if (!container) return;
+
         const idealStats = currentCharacterData.profile.ideal_stats;
-        if (Object.keys(idealStats).length === 0) { container.innerHTML = '<p class="text-muted">Nessuna statistica ideale impostata.</p>'; return; }
-        let html = '<ul class="list-group list-group-flush">';
-        for (const [stat, value] of Object.entries(idealStats)) { html += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong>${value}</strong></li>`; }
-        html += '</ul>';
-        container.innerHTML = html;
+        const trackedStats = currentCharacterData.profile.tracked_stats;
+        
+        let statsHtml = '';
+        const orderedStats = window.config.stats;
+
+        orderedStats.forEach(stat => {
+            // Only display the stat if it is being tracked and has an ideal value
+            if (trackedStats.includes(stat) && idealStats.hasOwnProperty(stat)) {
+                statsHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">${stat} <strong>${idealStats[stat]}</strong></li>`;
+            }
+        });
+
+        if (statsHtml === '') {
+            container.innerHTML = '<p class="text-muted">Nessuna statistica ideale impostata.</p>';
+        } else {
+            container.innerHTML = '<ul class="list-group list-group-flush">' + statsHtml + '</ul>';
+        }
     };
 
     const displayBuildScoreInfoModal = (details, talentsValue) => {

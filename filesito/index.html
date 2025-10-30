@@ -158,6 +158,92 @@
         }
         .dot-green { background-color: #28a745; }
         .dot-red { background-color: #dc3545; }
+
+        /* Character Banner Styles */
+        .character-banner-container {
+            padding: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #212529, #495057);
+            color: white;
+            overflow: hidden; /* Crucial for cropping effect */
+            position: relative;
+            min-height: 180px; /* Adjust as needed */
+        }
+        body.dark-mode .character-banner-container {
+             background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
+
+        .banner-splash-art {
+            position: absolute;
+            right: -20%;
+            top: 0;
+            width: 80%;
+            height: auto;
+            opacity: 0.6;
+            mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 60%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 25%, transparent 60%);
+        }
+
+        .banner-element {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 48px;
+            height: 48px;
+            z-index: 2;
+        }
+        .banner-element::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -10px;
+            width: 60px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: rotate(-45deg);
+            z-index: -1;
+            border-radius: 4px;
+        }
+        body.dark-mode .banner-element::before {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .banner-text-content {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            z-index: 2;
+        }
+        .banner-text-content h4 {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+        }
+        .banner-text-content p {
+            font-style: italic;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+        }
+        .banner-rarity .bi-star-fill {
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Ideal Stats Card to match banner */
+        #dashboard-view .card.border-primary {
+            background: linear-gradient(135deg, #212529, #495057);
+        }
+        #ideal-stats-display {
+            padding: 0;
+        }
+        #ideal-stats-display > .list-group {
+            margin: 1rem;
+        }
+        body.dark-mode #dashboard-view .card.border-primary {
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
     </style>
 </head>
 <body>
@@ -1065,6 +1151,7 @@
                         <div class="card-header bg-primary text-white">Statistiche Ideali</div>
                         <div id="ideal-stats-display" class="card-body"></div>
                     </div>
+                    <div id="character-banner-placeholder" class="mt-4"></div>
                 </div>
             </div>
         </div>
