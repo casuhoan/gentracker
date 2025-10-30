@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-schema-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-elements-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-tickets-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-nations-tab')?.classList.remove('d-none');
         }
 
         // Show tabs for both Admin and Moderator
@@ -410,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-elements-tab')?.addEventListener('shown.bs.tab', loadElementsManagement);
     document.getElementById('v-pills-keywords-tab')?.addEventListener('shown.bs.tab', loadKeywordManagement);
     document.getElementById('v-pills-tickets-tab')?.addEventListener('shown.bs.tab', loadTicketManagement);
+    document.getElementById('v-pills-nations-tab')?.addEventListener('shown.bs.tab', loadNationsManagement);
 
     document.getElementById('v-pills-elements')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1192,4 +1194,100 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+});
+
+// --- NATIONS MANAGEMENT --- 
+
+async function loadNationsManagement() {
+    try {
+        const response = await fetch('php/api.php?action=get_nations');
+        const nations = await response.json();
+        const container = document.getElementById('nations-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (nations && nations.length > 0) {
+            nations.forEach(nation => {
+                const nationNode = document.createElement('div');
+                nationNode.className = 'list-group-item d-flex justify-content-between align-items-center';
+                nationNode.innerHTML = `
+                    <span>${nation.name}</span>
+                    <button class="btn btn-sm btn-danger delete-nation-btn" data-nation-name="${nation.name}">&times;</button>
+                `;
+                container.appendChild(nationNode);
+            });
+        }
+    } catch (error) {
+        showErrorAlert('Impossibile caricare le nazioni.');
+        console.error(error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const addNationForm = document.getElementById('add-nation-form');
+    if (addNationForm) {
+        addNationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nationNameInput = document.getElementById('new-nation-name');
+            const nationName = nationNameInput.value.trim();
+            if (!nationName) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'add_nation');
+                formData.append('name', nationName);
+
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Nazione aggiunta con successo!');
+                    nationNameInput.value = '';
+                    loadNationsManagement();
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        });
+    }
+
+    const nationsListContainer = document.getElementById('nations-list-container');
+    if (nationsListContainer) {
+        nationsListContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('delete-nation-btn')) {
+                const nationName = e.target.dataset.nationName;
+                
+                Swal.fire({
+                    title: 'Sei sicuro?',
+                    text: `Vuoi davvero eliminare la nazione "${nationName}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonText: 'Annulla',
+                    confirmButtonText: 'Sì, elimina!'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const formData = new FormData();
+                            formData.append('action', 'delete_nation');
+                            formData.append('name', nationName);
+
+                            const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                            const res = await response.json();
+
+                            if (res.status === 'success') {
+                                showToast('Nazione eliminata con successo.');
+                                loadNationsManagement();
+                            } else {
+                                showErrorAlert(res.message);
+                            }
+                        } catch (error) {
+                            showErrorAlert('Errore di comunicazione con il server.');
+                        }
+                    }
+                });
+            }
+        });
+    }
 });

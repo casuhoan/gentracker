@@ -224,6 +224,7 @@
                         <a class="nav-link d-none" id="v-pills-elements-tab" data-bs-toggle="pill" href="#v-pills-elements" role="tab" aria-controls="v-pills-elements" aria-selected="false"><i class="bi bi-gem me-2"></i>Gestione Elementi</a>
                         <a class="nav-link d-none" id="v-pills-keywords-tab" data-bs-toggle="pill" href="#v-pills-keywords" role="tab" aria-controls="v-pills-keywords" aria-selected="false"><i class="bi bi-tags-fill me-2"></i>Gestione Parole Chiave</a>
                         <a class="nav-link d-none" id="v-pills-tickets-tab" data-bs-toggle="pill" href="#v-pills-tickets" role="tab" aria-controls="v-pills-tickets" aria-selected="false"><i class="bi bi-ticket-detailed-fill me-2"></i>Gestione Ticket</a>
+                        <a class="nav-link d-none" id="v-pills-nations-tab" data-bs-toggle="pill" href="#v-pills-nations" role="tab" aria-controls="v-pills-nations" aria-selected="false"><i class="bi bi-globe-americas me-2"></i>Gestione Nazioni</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -582,6 +583,27 @@
                                 </table>
                             </div>
                         </div>
+
+                        <!-- Pannello Gestione Nazioni -->
+                        <div class="tab-pane fade" id="v-pills-nations" role="tabpanel" aria-labelledby="v-pills-nations-tab">
+                            <h4>Gestione Nazioni</h4>
+                            <p class="text-muted small">Aggiungi, modifica o elimina le nazioni disponibili per i personaggi.</p>
+                            <form id="add-nation-form" class="mb-4 p-3 border rounded">
+                                <h5>Aggiungi Nuova Nazione</h5>
+                                <div class="row align-items-end">
+                                    <div class="col-md-8">
+                                        <label for="new-nation-name" class="form-label">Nome Nazione</label>
+                                        <input type="text" id="new-nation-name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary w-100">Aggiungi Nazione</button>
+                                    </div>
+                                </div>
+                            </form>
+                            <hr>
+                            <h5>Nazioni Esistenti</h5>
+                            <div id="nations-list-container" class="list-group"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -691,6 +713,14 @@
                 <h5>Altre Informazioni</h5>
                 <div class="row">
                     <div class="col-md-3 mb-3">
+                        <label for="nation" class="form-label">Nazione</label>
+                        <select class="form-select" id="nation" name="nation"></select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="faction" class="form-label">Fazione/Tribe</label>
+                        <input type="text" class="form-control" id="faction" name="faction">
+                    </div>
+                    <div class="col-md-3 mb-3">
                         <label for="acquisition_date" class="form-label">Data di Acquisizione</label>
                         <div class="input-group">
                             <input type="date" class="form-control" id="acquisition_date" name="acquisition_date">
@@ -701,6 +731,8 @@
                         <label for="constellation" class="form-label">Costellazione (0-6)</label>
                         <input type="number" class="form-control" id="constellation" name="constellation" min="0" max="6" value="0">
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3 mb-3">
                         <label for="signature_weapon" class="form-label">Signature Weapon</label>
                         <select class="form-select" id="signature_weapon" name="signature_weapon"></select>
@@ -801,6 +833,14 @@
                 <h5>Altre Informazioni</h5>
                 <div class="row">
                     <div class="col-md-3 mb-3">
+                        <label for="edit-nation" class="form-label">Nazione</label>
+                        <select class="form-select" id="edit-nation" name="nation"></select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="edit-faction" class="form-label">Fazione/Tribe</label>
+                        <input type="text" class="form-control" id="edit-faction" name="faction">
+                    </div>
+                    <div class="col-md-3 mb-3">
                         <label for="edit-acquisition_date" class="form-label">Data di Acquisizione</label>
                         <input type="date" class="form-control" id="edit-acquisition_date" name="acquisition_date">
                     </div>
@@ -808,6 +848,8 @@
                         <label for="edit-constellation" class="form-label">Costellazione (0-6)</label>
                         <input type="number" class="form-control" id="edit-constellation" name="constellation" min="0" max="6">
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3 mb-3">
                         <label for="edit-signature_weapon" class="form-label">Signature Weapon</label>
                         <select class="form-select" id="edit-signature_weapon" name="signature_weapon"></select>

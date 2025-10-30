@@ -274,6 +274,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 </div>
 
+                                <div class="row border-top pt-3">
+                                    <div class="col-6 col-md-4 mb-3">
+                                        <h5>Nazione</h5>
+                                        <p>${char.nazione || 'N/D'}</p>
+                                    </div>
+                                    <div class="col-6 col-md-4 mb-3">
+                                        <h5>Fazione/Tribe</h5>
+                                        <p>${char.fazione || 'N/D'}</p>
+                                    </div>
+                                </div>
+
                                 <div class="mt-4 position-relative">
                                     <h5 class="border-bottom pb-2 mb-3">Descrizione</h5>
                                     <div id="description-display-container">

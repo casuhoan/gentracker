@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('edit-constellation').value = profile.constellation;
         document.getElementById('edit-signature_weapon').value = profile.signature_weapon;
         document.getElementById('edit-talents').value = profile.talents;
+        document.getElementById('edit-nation').value = profile.nation || '';
+        document.getElementById('edit-faction').value = profile.faction || '';
+
         const rarityRadio = document.querySelector(`#edit-rarity-radios input[value="${profile.rarity || '5-star'}"]`);
         if (rarityRadio) rarityRadio.checked = true;
 
@@ -119,7 +122,20 @@ document.addEventListener('DOMContentLoaded', () => {
         populateSelect('element', config.elements);
         populateSelect('signature_weapon', config.signatureOptions);
         populateSelect('talents', config.talentOptions);
+        populateNationsSelect();
     };
+
+    async function populateNationsSelect() {
+        try {
+            const response = await fetch('php/api.php?action=get_nations');
+            const nations = await response.json();
+            const nationOptions = nations.map(n => ({ name: n.name, value: n.name }));
+            populateSelect('nation', nationOptions, 'Scegli una nazione...');
+            populateSelect('edit-nation', nationOptions, 'Scegli una nazione...');
+        } catch (error) {
+            console.error('Could not load nations for select', error);
+        }
+    }
 
     window.initCharacterLibrarySelect = () => {
         const characterLibrarySelect = document.getElementById('character-library-select');

@@ -118,6 +118,10 @@ function get_ticket_log_file() {
     return get_tickets_dir() . 'log.txt';
 }
 
+function get_nations_file() {
+    return __DIR__ . '/../data/nations.json';
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -580,7 +584,9 @@ function save_character() {
             'constellation' => isset($_POST['constellation']) ? intval($_POST['constellation']) : 0,
             'signature_weapon' => $_POST['signature_weapon'] ?? '',
             'talents' => $_POST['talents'] ?? '',
-            'rarity' => $_POST['rarity'] ?? '5-star'
+            'rarity' => $_POST['rarity'] ?? '5-star',
+            'nation' => $_POST['nation'] ?? '',
+            'faction' => $_POST['faction'] ?? ''
         ],
         'builds' => []
     ];
@@ -646,7 +652,7 @@ function update_character() {
     }
 
     $data['profile']['name'] = $new_name;
-    $fields = ['element','role','tracked_stats','acquisition_date','signature_weapon','talents','rarity'];
+    $fields = ['element','role','tracked_stats','acquisition_date','signature_weapon','talents','rarity', 'nation', 'faction'];
     foreach($fields as $f) {
         if(isset($_POST[$f])) $data['profile'][$f] = $_POST[$f];
     }
@@ -1638,6 +1644,67 @@ function close_ticket() {
     }
 }
 
+// --- NATION FUNCTIONS ---
+function get_nations() {
+    $nations_file = get_nations_file();
+    if (!file_exists($nations_file)) {
+        file_put_contents($nations_file, '[]');
+    }
+    header('Content-Type: application/json');
+    echo file_get_contents($nations_file);
+}
+
+function add_nation() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $name = $_POST['name'] ?? '';
+    if (empty($name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il nome della nazione è obbligatorio.']);
+        return;
+    }
+
+    $nations_file = get_nations_file();
+    $nations = json_decode(file_get_contents($nations_file), true);
+
+    foreach ($nations as $nation) {
+        if (strcasecmp($nation['name'], $name) == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Una nazione con questo nome esiste già.']);
+            return;
+        }
+    }
+
+    $nations[] = ['name' => $name];
+    file_put_contents($nations_file, json_encode($nations, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
+function delete_nation() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $name = $_POST['name'] ?? '';
+    if (empty($name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il nome della nazione è obbligatorio.']);
+        return;
+    }
+
+    $nations_file = get_nations_file();
+    $nations = json_decode(file_get_contents($nations_file), true);
+
+    $nations = array_filter($nations, function($nation) use ($name) {
+        return strcasecmp($nation['name'], $name) != 0;
+    });
+
+    file_put_contents($nations_file, json_encode(array_values($nations), JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
 
 // --- ROUTER ---
 $action = '';
@@ -1652,9 +1719,9 @@ if (isset($_REQUEST['action'])) {
 
 
 
-$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings'];
+$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',
