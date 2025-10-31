@@ -446,6 +446,16 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
+                                        <label for="library-char-nazione" class="form-label">Nazione</label>
+                                        <select class="form-select" id="library-char-nazione" name="nazione"></select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="library-char-fazione" class="form-label">Fazione/Tribe</label>
+                                        <input type="text" class="form-control" id="library-char-fazione" name="fazione">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
                                         <label for="library-char-icon" class="form-label">Icona</label>
                                         <input type="file" class="form-control" id="library-char-icon" name="icon" accept="image/*">
                                     </div>
@@ -1208,39 +1218,59 @@
         <!-- Sezione per il Grimorio -->
         <div id="grimoire-view" class="view">
             <div class="d-flex align-items-center mb-3">
-                <h2 class="mb-0">Libreria dei Personaggi</h2>
-                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Esplora la libreria di tutti i personaggi disponibili. Clicca su un personaggio per vederne i dettagli, come la descrizione e le abilità."><i class="bi bi-question-circle"></i></button>
-            </div>
-            <p class="text-muted small mb-4">Esplora tutti i personaggi disponibili nel gioco. Clicca su un personaggio per vedere i suoi dettagli.</p>
-            
-            <div id="grimoire-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
-                <div class="col-lg-4 col-md-6">
-                    <label for="grimoire-name-filter" class="form-label">Filtra per Nome</label>
-                    <div class="search-input-container">
-                        <i class="bi bi-search"></i>
-                        <input type="search" id="grimoire-name-filter" class="form-control" placeholder="Cerca personaggio...">
-                    </div>
-                </div>
-                <div class="col-lg-5 col-md-6">
-                    <label class="form-label">Filtra per Elemento</label>
-                    <div id="grimoire-element-filters" class="d-flex flex-wrap gap-2">
-                        <!-- Checkbox degli elementi per il grimorio -->
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-12">
-                    <label for="grimoire-sort-select" class="form-label">Ordina per</label>
-                    <select id="grimoire-sort-select" class="form-select">
-                        <option value="nameAsc">Nome (A-Z)</option>
-                        <option value="nameDesc">Nome (Z-A)</option>
-                        <option value="elementAsc">Elemento</option>
-                        <option value="rarityDesc">Rarità (5-4)</option>
-                        <option value="rarityAsc">Rarità (4-5)</option>
-                    </select>
-                </div>
+                <h2 class="mb-0">Libreria</h2>
+                <button class="btn btn-outline-secondary btn-sm help-btn ms-2" data-help-text="Esplora la libreria di tutti i personaggi e le nazioni disponibili. Clicca su un elemento per vederne i dettagli."><i class="bi bi-question-circle"></i></button>
             </div>
 
-            <div id="grimoire-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-6 g-4">
-                <!-- Le card dei personaggi del grimorio verranno inserite qui -->
+            <div class="grimoire-content-wrapper card">
+                <ul class="nav nav-tabs mb-3" id="grimoire-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="grimoire-characters-tab" data-bs-toggle="tab" data-bs-target="#grimoire-characters" type="button" role="tab" aria-controls="grimoire-characters" aria-selected="true">Personaggi</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="grimoire-nations-tab" data-bs-toggle="tab" data-bs-target="#grimoire-nations" type="button" role="tab" aria-controls="grimoire-nations" aria-selected="false">Nazioni</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="grimoire-tab-content">
+                    <div class="tab-pane fade show active" id="grimoire-characters" role="tabpanel" aria-labelledby="grimoire-characters-tab">
+                        <p class="text-muted small mb-4">Esplora tutti i personaggi disponibili nel gioco. Clicca su un personaggio per vedere i suoi dettagli.</p>
+                        <div id="grimoire-controls" class="row g-3 align-items-center mb-4 p-3 border rounded">
+                            <div class="col-lg-4 col-md-6">
+                                <label for="grimoire-name-filter" class="form-label">Filtra per Nome</label>
+                                <div class="search-input-container">
+                                    <i class="bi bi-search"></i>
+                                    <input type="search" id="grimoire-name-filter" class="form-control" placeholder="Cerca personaggio...">
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-md-6">
+                                <label class="form-label">Filtra per Elemento</label>
+                                <div id="grimoire-element-filters" class="d-flex flex-wrap gap-2">
+                                    <!-- Checkbox degli elementi per il grimorio -->
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-12">
+                                <label for="grimoire-sort-select" class="form-label">Ordina per</label>
+                                <select id="grimoire-sort-select" class="form-select">
+                                    <option value="nameAsc">Nome (A-Z)</option>
+                                    <option value="nameDesc">Nome (Z-A)</option>
+                                    <option value="elementAsc">Elemento</option>
+                                    <option value="rarityDesc">Rarità (5-4)</option>
+                                    <option value="rarityAsc">Rarità (4-5)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="grimoire-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-5 row-cols-lg-6 g-4">
+                            <!-- Le card dei personaggi del grimorio verranno inserite qui -->
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="grimoire-nations" role="tabpanel" aria-labelledby="grimoire-nations-tab">
+                        <p class="text-muted small mb-4">Esplora le nazioni e le zone di Teyvat. Clicca su una nazione per saperne di più.</p>
+                        <div id="nations-grid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                            <!-- Le card delle nazioni verranno inserite qui -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1495,16 +1525,25 @@
                             <select class="form-select" id="edit-library-char-element" name="element" required></select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="edit-library-char-weapon" class="form-label">Arma</label>
-                            <select class="form-select" id="edit-library-char-weapon" name="weapon">
-                                <option value="Sword">Sword</option>
-                                <option value="Polearm">Polearm</option>
-                                <option value="Catalyst">Catalyst</option>
-                                <option value="Bow">Bow</option>
-                                <option value="Claymore">Claymore</option>
-                            </select>
-                        </div>
-                    </div>
+                                                                    <label for="edit-library-char-weapon" class="form-label">Arma</label>
+                                                                    <select class="form-select" id="edit-library-char-weapon" name="weapon">
+                                                                        <option value="Sword">Sword</option>
+                                                                        <option value="Polearm">Polearm</option>
+                                                                        <option value="Catalyst">Catalyst</option>
+                                                                        <option value="Bow">Bow</option>
+                                                                        <option value="Claymore">Claymore</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="edit-library-char-nazione" class="form-label">Nazione</label>
+                                                                    <select class="form-select" id="edit-library-char-nazione" name="nazione"></select>
+                                                                </div>
+                                                                <div class="col-md-6 mb-3">
+                                                                    <label for="edit-library-char-fazione" class="form-label">Fazione/Tribe</label>
+                                                                    <input type="text" class="form-control" id="edit-library-char-fazione" name="fazione">
+                                                                </div>                    </div>
                     <div class="mb-3">
                         <label class="form-label d-block">Rarità</label>
                         <div class="form-check form-check-inline">

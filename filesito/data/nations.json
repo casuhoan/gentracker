@@ -1,6 +1,7 @@
 [
     {
-        "name": "Mondstadt"
+        "name": "Mondstadt",
+        "description": "A city of freedom that lies in the northeast of Teyvat."
     },
     {
         "name": "Liyue"
@@ -15,7 +16,9 @@
         "name": "Fontaine"
     },
     {
-        "name": "Natlan"
+        "name": "Natlan",
+        "description": "A fiery nation of warriors and dragons.",
+        "image": "backgrounds/Natlan.webp"
     },
     {
         "name": "Snezhnaya"

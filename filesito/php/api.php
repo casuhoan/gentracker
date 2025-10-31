@@ -1260,6 +1260,8 @@ function add_character_to_library() {
         'elemento' => $_POST['element'] ?? '',
         'arma' => $_POST['weapon'] ?? '',
         'rarita' => $_POST['rarity'] ?? '5-star',
+        'nazione' => $_POST['nazione'] ?? '',
+        'fazione' => $_POST['fazione'] ?? '',
         'wip' => isset($_POST['wip']),
     ];
     $library[] = $new_char;
@@ -1333,6 +1335,8 @@ function update_library_character() {
     $updated_char_data['elemento'] = $_POST['element'] ?? '';
     $updated_char_data['arma'] = $_POST['weapon'] ?? '';
     $updated_char_data['rarita'] = $_POST['rarity'] ?? '5-star';
+    $updated_char_data['nazione'] = $_POST['nazione'] ?? '';
+    $updated_char_data['fazione'] = $_POST['fazione'] ?? '';
     $updated_char_data['wip'] = isset($_POST['wip']);
 
     $safe_char_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $new_name);

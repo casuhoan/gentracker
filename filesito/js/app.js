@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.characterLibrary = [];
     window.elementsData = [];
     window.weaponsData = [];
+    window.nationsData = [];
     window.currentCharacterData = null;
     window.dataLoaded = false;
     window.currentUser = null;
@@ -92,6 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#grimoire-character/')) {
             const charName = decodeURIComponent(hash.substring(20));
             if(typeof loadCharacterDetailPage === 'function') loadCharacterDetailPage(charName);
+        } else if (hash.startsWith('#grimoire-nation/')) {
+            const nationName = decodeURIComponent(hash.substring(17));
+            if(typeof loadNationDetailPage === 'function') loadNationDetailPage(nationName);
         } else if (hash.startsWith('#submit-ticket/')) {
             const charName = decodeURIComponent(hash.substring(15));
             showView('ticket-submission-view');
@@ -251,11 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const init = async () => {
         try {
-            const [charLibResponse, elementsResponse, weaponsResponse, settingsResponse] = await Promise.all([
+            const [charLibResponse, elementsResponse, weaponsResponse, settingsResponse, nationsResponse] = await Promise.all([
                 fetch('data/characters_list.json?v=' + new Date().getTime()),
                 fetch('php/api.php?action=get_elements'),
                 fetch('php/api.php?action=get_weapons'),
-                fetch('php/api.php?action=get_settings')
+                fetch('php/api.php?action=get_settings'),
+                fetch('data/nations.json?v=' + new Date().getTime())
             ]);
 
             if (!charLibResponse.ok) throw new Error('Failed to load characters_list.json');
@@ -278,6 +283,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 grimoireBackground = settings.grimoire_background || null;
             } else {
                 console.error('Could not load settings data.');
+            }
+
+            if (nationsResponse.ok) {
+                nationsData = await nationsResponse.json();
+            } else {
+                console.error('Could not load nations data.');
             }
 
             if(typeof initCharacterLibrarySelect === 'function') initCharacterLibrarySelect();

@@ -21,10 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return window.keywordSettings;
     };
 
-    const formatDescription = async (text, characterName) => {
+    const formatDescription = async (text, itemName, itemType = 'personaggio') => {
         if (!text) {
-            const charName = characterName || '';
-            return `Questo personaggio non ha ancora una descrizione, se vuoi scriverla o farla scrivere invia pure un ticket ai nostri Amministratori con il testo desiderato tramite questo <a href="#submit-ticket/${encodeURIComponent(charName)}">link</a>.`;
+            if (itemType === 'personaggio') {
+                 return `Questo personaggio non ha ancora una descrizione, se vuoi scriverla o farla scrivere invia pure un ticket ai nostri Amministratori con il testo desiderato tramite questo <a href="#submit-ticket/${encodeURIComponent(itemName)}">link</a>.`;
+            }
+            return `Questa ${itemType} non ha ancora una descrizione.`
         }
 
         const settings = await getKeywordSettings();
@@ -113,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elementFiltersContainer.innerHTML = ''; // Clear previous filters
 
         elementsData.forEach(element => {
-            const elId = `grimoire-filter-${createSafeId(element.name)}`;
+            const elId = `grimoimoire-filter-${createSafeId(element.name)}`;
             const iconPath = element.icon ? `data/icons/elements/${element.icon}` : '';
 
             const label = document.createElement('label');
@@ -217,7 +219,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.loadGrimoirePage = () => {
+        const nationsTab = document.getElementById('grimoire-nations-tab');
+        
+        // Carica i personaggi di default
         applyGrimoireFiltersAndSorting();
+    
+        // Aggiungi l'event listener per il tab delle nazioni
+        nationsTab.addEventListener('click', loadNationsPage, { once: true });
+    
         applyGrimoireBackground();
     };
 
@@ -386,5 +395,91 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.removeProperty('--grimoire-background');
             body.classList.remove('grimoire-background');
         }
+    };
+    
+    // --- NATION FUNCTIONS ---
+
+    const renderNations = (nations) => {
+        const grid = document.getElementById('nations-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+        if (nations.length === 0) {
+            grid.innerHTML = '<div class="col-12 text-center"><p>Nessuna nazione trovata.</p></div>';
+            return;
+        }
+
+        nations.forEach(nation => {
+            const card = document.createElement('div');
+            card.className = 'col';
+            const imageUrl = nation.image ? `data/${nation.image}` : `https://via.placeholder.com/300x200?text=${nation.name}`;
+
+            card.innerHTML = `
+                <a href="#grimoire-nation/${encodeURIComponent(nation.name)}" class="text-decoration-none">
+                    <div class="card h-100">
+                        <img src="${imageUrl}" class="card-img-top" alt="${nation.name}">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">${nation.name}</h5>
+                        </div>
+                    </div>
+                </a>
+            `;
+            grid.appendChild(card);
+        });
+    };
+
+    window.loadNationsPage = async () => {
+        // La variabile 'nationsData' dovrebbe essere già stata caricata e disponibile globalmente
+        if (window.nationsData) {
+            renderNations(window.nationsData);
+        } else {
+            console.error("Dati delle nazioni non trovati.");
+        }
+    };
+
+    window.loadNationDetailPage = async (nationName) => {
+        const nation = window.nationsData.find(n => n.name === nationName);
+        const detailView = document.getElementById('character-detail-view'); // Riutilizziamo la vista dettaglio
+
+        if (!nation || !detailView) {
+            location.hash = '#grimoire';
+            return;
+        }
+
+        const imageUrl = nation.image ? `data/${nation.image}` : '';
+        const displayDescription = await formatDescription(nation.description, nation.name, 'nazione');
+
+        detailView.innerHTML = `
+            <div class="container-fluid">
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
+                    </div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h2 class="display-5">${nation.name}</h2>
+                        <hr>
+                        <div class="nation-detail-content">
+                            ${imageUrl ? `<img src="${imageUrl}" class="img-fluid rounded float-start me-3 mb-3" alt="Immagine di ${nation.name}" style="max-width: 300px;">` : ''}
+                            <p>${displayDescription}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        showView('character-detail-view');
+        applyGrimoireBackground();
+        
+        document.getElementById('back-to-grimoire').addEventListener('click', () => {
+            // Assicurati che il tab 'Nazioni' sia attivo quando torni indietro
+            location.hash = '#grimoire';
+            const nationsTab = document.getElementById('grimoire-nations-tab');
+            if (nationsTab) {
+                const tab = new bootstrap.Tab(nationsTab);
+                tab.show();
+            }
+        });
     };
 });

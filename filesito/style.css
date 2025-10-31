@@ -1203,9 +1203,53 @@ body.dark-mode .grimoire-view-icon .grimoire-card {
 }
 
 .tooltip-keyword {
-    font-style: italic;
-    cursor: help;
     border-bottom: 1px dotted;
+}
+
+.grimoire-content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: none;
+}
+
+body.dark-mode .grimoire-content-wrapper {
+    background-color: rgba(33, 37, 41, 0.8);
+}
+
+#grimoire-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+}
+
+body.dark-mode #grimoire-tabs .nav-link {
+    color: #dee2e6;
+}
+
+#grimoire-tabs .nav-link.active {
+    color: #0d6efd;
+    background-color: transparent;
+    border-color: #0d6efd;
+}
+
+body.dark-mode #grimoire-tabs .nav-link.active {
+    color: #6ea8fe;
+    border-bottom-color: #6ea8fe;
+}
+
+#grimoire-tabs.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+}
+
+body.dark-mode #grimoire-tabs.nav-tabs {
+    border-bottom: 1px solid #495057;
+}
+
+.nation-detail-content::after {
+    content: "";
+    display: table;
+    clear: both;
 }
  / *   C h a r a c t e r   B a n n e r   S t y l e s   * / 
  . c h a r a c t e r - b a n n e r - c o n t a i n e r   { 

@@ -60,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.loadLibraryManagement = async () => {
         try {
             const elementOptions = elementsData.map(el => ({ name: el.name, value: el.name }));
+            const nationOptions = nationsData.map(n => ({ name: n.name, value: n.name }));
+            populateSelect('library-char-nazione', nationOptions, 'Scegli nazione...');
+            populateSelect('edit-library-char-nazione', nationOptions);
+            populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
+            populateSelect('edit-library-char-element', elementOptions);
             populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
             populateSelect('edit-library-char-element', elementOptions);
 
@@ -1021,6 +1026,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('edit-library-char-title').value = charData.titolo || '';
             document.getElementById('edit-library-char-element').value = charData.elemento || '';
             document.getElementById('edit-library-char-weapon').value = charData.arma || '';
+            document.getElementById('edit-library-char-nazione').value = charData.nazione || '';
+            document.getElementById('edit-library-char-fazione').value = charData.fazione || '';
             
             const rarityRadio = document.querySelector(`#edit-library-character-modal input[name="rarity"][value="${charData.rarita || '5-star'}"]`);
             if(rarityRadio) rarityRadio.checked = true;
