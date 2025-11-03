@@ -1,10 +1,12 @@
 [
     {
         "name": "Mondstadt",
-        "description": "A city of freedom that lies in the northeast of Teyvat."
+        "description": "A city of freedom that lies in the northeast of Teyvat.",
+        "image": "nations\/mondstadt.png"
     },
     {
-        "name": "Liyue"
+        "name": "Liyue",
+        "description": "XXX"
     },
     {
         "name": "Inazuma"
@@ -18,7 +20,7 @@
     {
         "name": "Natlan",
         "description": "A fiery nation of warriors and dragons.",
-        "image": "backgrounds/Natlan.webp"
+        "image": "backgrounds\/Natlan.webp"
     },
     {
         "name": "Snezhnaya"

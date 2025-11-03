@@ -1251,6 +1251,67 @@ body.dark-mode #grimoire-tabs.nav-tabs {
     display: table;
     clear: both;
 }
+
+/* Nation Card Styles */
+.nation-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.nation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.nation-card .card-img-top {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.nation-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.nation-card .card-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+    padding: 1.5rem 1rem 1rem 1rem;
+}
+
+.nation-card .card-title {
+    color: white;
+    font-weight: bold;
+    font-size: 1.25rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+/* Dark Mode for Nations Accordion */
+body.dark-mode #nations-accordion-container .accordion-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode #nations-accordion-container .accordion-header .accordion-button {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+}
+
+body.dark-mode #nations-accordion-container .accordion-header .accordion-button::after {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode #nations-accordion-container .accordion-body {
+    background-color: var(--dark-bg);
+    color: var(--dark-color);
+}
  / *   C h a r a c t e r   B a n n e r   S t y l e s   * / 
  . c h a r a c t e r - b a n n e r - c o n t a i n e r   { 
          p a d d i n g :   0 ; 

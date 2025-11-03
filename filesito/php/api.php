@@ -1826,6 +1826,68 @@ function delete_nation() {
     echo json_encode(['status' => 'success']);
 }
 
+function update_nation_details() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $name = $_POST['name'] ?? '';
+    if (empty($name)) {
+        echo json_encode(['status' => 'error', 'message' => 'Il nome della nazione è obbligatorio.']);
+        return;
+    }
+
+    $nations_file = get_nations_file();
+    $nations = json_decode(file_get_contents($nations_file), true);
+
+    $nation_index = -1;
+    foreach ($nations as $index => $nation) {
+        if (strcasecmp($nation['name'], $name) == 0) {
+            $nation_index = $index;
+            break;
+        }
+    }
+
+    if ($nation_index === -1) {
+        echo json_encode(['status' => 'error', 'message' => 'Nazione non trovata.']);
+        return;
+    }
+
+    $nations[$nation_index]['description'] = $_POST['description'] ?? '';
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $nations_img_dir = __DIR__ . '/../data/nations/';
+        if (!is_dir($nations_img_dir)) {
+            mkdir($nations_img_dir, 0777, true);
+        }
+
+        // Delete old image if it exists
+        if (!empty($nations[$nation_index]['image'])) {
+            $old_image_path = __DIR__ . '/../data/' . $nations[$nation_index]['image'];
+            if (file_exists($old_image_path)) {
+                unlink($old_image_path);
+            }
+        }
+
+        $file_ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $safe_name = preg_replace('/[^a-zA-Z0-9_-]/', '_', strtolower($name));
+        $file_name = $safe_name . '.' . $file_ext;
+        $target_file = $nations_img_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+            $nations[$nation_index]['image'] = 'nations/' . $file_name;
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Errore durante il caricamento dell\'immagine.']);
+            return;
+        }
+    }
+
+    file_put_contents($nations_file, json_encode($nations, JSON_PRETTY_PRINT));
+    echo json_encode(['status' => 'success']);
+}
+
 function organize_splasharts() {
     if (!is_admin()) {
         http_response_code(403);
@@ -1928,7 +1990,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'add_weapon', 'update_weapon_icon', 'organize_splasharts'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

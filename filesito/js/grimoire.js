@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.innerHTML = `
                 <a href="#grimoire-nation/${encodeURIComponent(nation.name)}" class="text-decoration-none">
-                    <div class="card h-100">
+                    <div class="card h-100 nation-card">
                         <img src="${imageUrl}" class="card-img-top" alt="${nation.name}">
                         <div class="card-body">
                             <h5 class="card-title text-center">${nation.name}</h5>

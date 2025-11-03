@@ -1296,18 +1296,42 @@ async function loadNationsManagement() {
     try {
         const response = await fetch('php/api.php?action=get_nations');
         const nations = await response.json();
-        const container = document.getElementById('nations-list-container');
+        const container = document.getElementById('nations-accordion-container');
         if (!container) return;
         container.innerHTML = '';
         if (nations && nations.length > 0) {
-            nations.forEach(nation => {
-                const nationNode = document.createElement('div');
-                nationNode.className = 'list-group-item d-flex justify-content-between align-items-center';
-                nationNode.innerHTML = `
-                    <span>${nation.name}</span>
-                    <button class="btn btn-sm btn-danger delete-nation-btn" data-nation-name="${nation.name}">&times;</button>
+            nations.forEach((nation, index) => {
+                const nationId = `nation-${index}`;
+                const imageUrl = nation.image ? `data/${nation.image}` : '';
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item';
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header" id="heading-${nationId}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${nationId}" aria-expanded="false" aria-controls="collapse-${nationId}">
+                            ${nation.name}
+                        </button>
+                    </h2>
+                    <div id="collapse-${nationId}" class="accordion-collapse collapse" aria-labelledby="heading-${nationId}" data-bs-parent="#nations-accordion-container">
+                        <div class="accordion-body">
+                            <form class="nation-details-form" data-nation-name="${nation.name}">
+                                <div class="mb-3">
+                                    <label for="nation-desc-${nationId}" class="form-label">Descrizione</label>
+                                    <textarea id="nation-desc-${nationId}" name="description" class="form-control" rows="3">${nation.description || ''}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="nation-image-${nationId}" class="form-label">Immagine di Copertina</label>
+                                    <input type="file" id="nation-image-${nationId}" name="image" class="form-control" accept="image/*">
+                                    ${imageUrl ? `<img src="${imageUrl}" class="img-thumbnail mt-2" style="max-height: 100px;">` : ''}
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary btn-sm">Salva Modifiche</button>
+                                    <button type="button" class="btn btn-danger btn-sm delete-nation-btn" data-nation-name="${nation.name}">Elimina Nazione</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 `;
-                container.appendChild(nationNode);
+                container.appendChild(accordionItem);
             });
         }
     } catch (error) {
@@ -1346,9 +1370,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const nationsListContainer = document.getElementById('nations-list-container');
-    if (nationsListContainer) {
-        nationsListContainer.addEventListener('click', async (e) => {
+    const nationsContainer = document.getElementById('nations-accordion-container');
+    if (nationsContainer) {
+        nationsContainer.addEventListener('click', async (e) => {
             if (e.target.classList.contains('delete-nation-btn')) {
                 const nationName = e.target.dataset.nationName;
                 
@@ -1381,6 +1405,32 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
+            }
+        });
+
+        nationsContainer.addEventListener('submit', async (e) => {
+            if (e.target.classList.contains('nation-details-form')) {
+                e.preventDefault();
+                const form = e.target;
+                const nationName = form.dataset.nationName;
+                const formData = new FormData(form);
+                formData.append('action', 'update_nation_details');
+                formData.append('name', nationName);
+
+                try {
+                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        showToast('Dettagli nazione aggiornati!');
+                        // Optionally refresh the view
+                        loadNationsManagement();
+                    } else {
+                        showErrorAlert(result.message);
+                    }
+                } catch (error) {
+                    showErrorAlert('Errore di comunicazione con il server.');
+                }
             }
         });
     }
