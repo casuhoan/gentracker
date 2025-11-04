@@ -825,37 +825,124 @@ body.dark-mode .table td {
       object-fit: cover;
   }
 
-/* Custom Card for Gallery */
-.custom-card {
+/* New Gallery Card Styles */
+.gallery-card-new {
     position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    height: 300px; /* Altezza leggermente ridotta */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery-card-new:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.gallery-card-new-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain; /* Immagine completamente visibile */
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.gallery-card-new:hover .gallery-card-new-background {
+    transform: scale(1.05);
+}
+
+.gallery-card-new-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%);
+}
+
+.gallery-card-new-content {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-    background-clip: border-box;
-    border: 1px solid rgba(0, 0, 0, 0.175);
-    border-radius: 0.375rem;
+    justify-content: space-between;
     height: 100%;
+    padding: 1rem;
+    color: white;
+}
+
+.gallery-card-new-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.gallery-card-new-rarity .bi-star-fill {
+    color: #ffc107;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8); /* Ombra più pronunciata */
+}
+
+.gallery-card-new-element img {
+    width: 36px; /* Icona elemento leggermente più grande */
+    height: 36px;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.8)); /* Ombra più pronunciata */
+}
+
+.gallery-card-new-body {
     text-align: center;
 }
 
-body:not(.dark-mode) .custom-card {
-    background-color: #e9ecef;
-    color: #212529;
+.gallery-card-new-name {
+    font-size: 1.7rem; /* Nome leggermente più grande */
+    font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.9); /* Ombra più pronunciata */
 }
 
-body.dark-mode .custom-card {
-    background-color: #343a40;
-    color: #dee2e6;
+.gallery-card-new-roles .role-tag {
+    font-size: 0.8rem; /* Tag leggermente più grandi */
+    padding: 0.3rem 0.6rem;
 }
 
-/* Opacity Styles */
-body.card-opacity-on:not(.dark-mode) .custom-card {
-    background-color: rgba(233, 236, 239, 0.3);
+.gallery-card-new-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem; /* Footer leggermente più grande */
+    opacity: 0.9;
 }
 
-body.card-opacity-on.dark-mode .custom-card {
-    background-color: rgba(52, 58, 64, 0.3);
+.gallery-card-new-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.gallery-card-new:hover .gallery-card-new-hover-overlay {
+    opacity: 1;
+}
+
+/* Opacity modes */
+body.card-opacity-on .gallery-card-new {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+body.card-opacity-on.dark-mode .gallery-card-new {
+    background-color: rgba(52, 58, 64, 0.8);
 }
 /* Gallery Settings Panel */
 #gallery-settings-panel {
@@ -1312,91 +1399,69 @@ body.dark-mode #nations-accordion-container .accordion-body {
     background-color: var(--dark-bg);
     color: var(--dark-color);
 }
- / *   C h a r a c t e r   B a n n e r   S t y l e s   * / 
- . c h a r a c t e r - b a n n e r - c o n t a i n e r   { 
-         p a d d i n g :   0 ; 
-         b o r d e r - r a d i u s :   0   0   1 0 p x   1 0 p x ; 
-         b a c k g r o u n d :   l i n e a r - g r a d i e n t ( 1 3 5 d e g ,   # 2 1 2 5 2 9 ,   # 4 9 5 0 5 7 ) ; 
-         c o l o r :   w h i t e ; 
-         o v e r f l o w :   h i d d e n ;   / *   C r u c i a l   f o r   c r o p p i n g   e f f e c t   * / 
-         p o s i t i o n :   r e l a t i v e ; 
-         m i n - h e i g h t :   1 8 0 p x ;   / *   A d j u s t   a s   n e e d e d   * / 
-         m a r g i n - t o p :   - 1 p x ;   / *   T o   m e r g e   w i t h   t h e   c a r d   h e a d e r   * / 
- } 
- 
- . b a n n e r - s p l a s h - a r t   { 
-         p o s i t i o n :   a b s o l u t e ; 
-         r i g h t :   0 ; 
-         b o t t o m :   0 ; 
-         w i d t h :   a u t o ; 
-         h e i g h t :   1 2 0 % ;   / *   M a k e   i t   l a r g e r   t o   b e   a b l e   t o   c r o p   * / 
-         o p a c i t y :   0 . 5 ; 
-         c l i p - p a t h :   i n s e t ( 0   2 0 %   2 0 %   0 ) ; 
-         m a s k - i m a g e :   l i n e a r - g r a d i e n t ( t o   t o p ,   r g b a ( 0 , 0 , 0 , 1 )   5 0 % ,   r g b a ( 0 , 0 , 0 , 0 )   1 0 0 % ) ; 
- } 
- 
- . b a n n e r - e l e m e n t   { 
-         p o s i t i o n :   a b s o l u t e ; 
-         t o p :   1 5 p x ; 
-         l e f t :   1 5 p x ; 
-         w i d t h :   4 8 p x ; 
-         h e i g h t :   4 8 p x ; 
-         z - i n d e x :   2 ; 
-         f i l t e r :   d r o p - s h a d o w ( 0   0   3 p x   r g b a ( 0 , 0 , 0 , 0 . 7 ) ) ; 
- } 
- 
- . b a n n e r - t e x t - c o n t e n t   { 
-         p o s i t i o n :   a b s o l u t e ; 
-         b o t t o m :   1 5 p x ; 
-         l e f t :   1 5 p x ; 
-         z - i n d e x :   2 ; 
-         t e x t - s h a d o w :   1 p x   1 p x   3 p x   r g b a ( 0 , 0 , 0 , 0 . 5 ) ; 
- } 
- 
- . b a n n e r - t e x t - c o n t e n t   h 4   { 
-         f o n t - w e i g h t :   b o l d ; 
-         c o l o r :   w h i t e ; 
-         m a r g i n - b o t t o m :   0 ; 
- } 
- 
- . b a n n e r - t e x t - c o n t e n t   p   { 
-         f o n t - s t y l e :   i t a l i c ; 
-         m a r g i n - b o t t o m :   5 p x ; 
-         c o l o r :   # e 0 e 0 e 0 ; 
- } 
- 
- . b a n n e r - r a r i t y   . b i - s t a r - f i l l   { 
-         c o l o r :   # f f c 1 0 7 ; 
-         t e x t - s h a d o w :   1 p x   1 p x   3 p x   r g b a ( 0 , 0 , 0 , 0 . 5 ) ; 
- } 
- 
- / *   I d e a l   S t a t s   C a r d   t o   m a t c h   b a n n e r   * / 
- # d a s h b o a r d - v i e w   . c a r d . b o r d e r - p r i m a r y   { 
-         b a c k g r o u n d :   l i n e a r - g r a d i e n t ( 1 3 5 d e g ,   # 2 c 3 e 5 0 ,   # 4 a 6 e 8 a ) ; 
-         b o r d e r :   n o n e ; 
- } 
- 
- # d a s h b o a r d - v i e w   . c a r d . b o r d e r - p r i m a r y   . c a r d - h e a d e r   { 
-         b a c k g r o u n d - c o l o r :   # 1 d 2 b 3 a ; 
- } 
- 
- # i d e a l - s t a t s - d i s p l a y   { 
-         p a d d i n g - t o p :   1 r e m ; 
- } 
- 
- # i d e a l - s t a t s - d i s p l a y   . l i s t - g r o u p - i t e m   { 
-         b a c k g r o u n d - c o l o r :   t r a n s p a r e n t ; 
-         b o r d e r - c o l o r :   r g b a ( 2 5 5 , 2 5 5 , 2 5 5 , 0 . 2 ) ; 
-         c o l o r :   w h i t e ; 
- } 
- 
- # i d e a l - s t a t s - d i s p l a y   . b a d g e   { 
-         b a c k g r o u n d - c o l o r :   # 4 a 6 e 8 a ; 
- } 
- 
- / *   A d j u s t m e n t s   f o r   m e r g e d   b u i l d   s e l e c t o r s   * / 
- # d a s h b o a r d - v i e w   . c a r d - h e a d e r   s e l e c t   { 
-         m a x - w i d t h :   2 0 0 p x ; 
- } 
-  
- 
+
+/* Dark Mode for Keyword Tooltips Accordion */
+body.dark-mode #keyword-tooltips-accordion .accordion-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button::after {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-body {
+    background-color: var(--dark-bg);
+    color: var(--dark-color);
+}
+
+/* Dark Mode for Keyword Tooltips Accordion */
+body.dark-mode #keyword-tooltips-accordion .accordion-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button::after {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-body {
+    background-color: var(--dark-bg);
+    color: var(--dark-color);
+}
+
+/* Dark Mode for Keyword Tooltips Accordion */
+body.dark-mode #keyword-tooltips-accordion .accordion-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-card-border);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button {
+    background-color: var(--dark-card-bg);
+    color: var(--dark-color);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-header .accordion-button::after {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+body.dark-mode #keyword-tooltips-accordion .accordion-body {
+    background-color: var(--dark-bg);
+    color: var(--dark-color);
+}
+#banner-splash-art {
+    width: auto;
+    height: 180%;
+    right: -15%;
+    bottom: -10%;
+}

@@ -230,29 +230,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             let rolesHtml = '';
             if (char.role && char.role.length) {
-                rolesHtml = '<div class="card-roles">';
+                rolesHtml = '<div class="gallery-card-new-roles">';
                 char.role.forEach(role => { rolesHtml += `<span class="role-tag" style="background-color: ${roleColors[role] || '#6c757d'}">${role}</span>`; });
                 rolesHtml += '</div>';
             }
-            let hoverStatsHtml = `<div class="card-hover-stats"><h5>Ultima Build (Score: ${charData.buildScore.toFixed(1)}%)</h5>`;
-            if (char.latest_build_stats && Object.keys(char.latest_build_stats).length > 0) {
-                hoverStatsHtml += '<ul class="list-unstyled text-start">';
-                for (const [stat, value] of Object.entries(char.latest_build_stats)) { hoverStatsHtml += `<li><strong>${stat}:</strong> ${value}</li>`; }
-                hoverStatsHtml += '</ul>';
-            } else { hoverStatsHtml += '<p class="text-center small">Nessuna build registrata.</p>'; }
-            hoverStatsHtml += '</div>';
             const constellationColorClass = getStatusColorClass('constellation', char.latest_constellation, char.rarity);
+            const element = elementsData.find(e => e.name === char.element);
+            const elementIcon = element ? element.icon : '';
+            let rarityStars = '';
+            const starCount = char.rarity === '5-star' ? 5 : 4;
+            for (let i = 0; i < starCount; i++) {
+                rarityStars += '<i class="bi bi-star-fill"></i>';
+            }
+
             galleryGrid.innerHTML += `
                 <div class="col">
-                    <div class="custom-card gallery-card">
-                        ${hoverStatsHtml}
-                        <div class="card-constellation ${constellationColorClass}">C${char.latest_constellation || 0}</div>
-                        <img src="${char.splashart || 'uploads/default_avatar.png'}" class="card-img-top" alt="${char.name}" style="height: 250px; object-fit: contain;">
-                        <div class="card-body"><h5 class="card-title">${char.name}</h5>${rolesHtml}</div>
-                        <div class="card-acquisition-date">${formattedDate}</div>
-                        <a href="#character/${encodeURIComponent(char.name)}" class="stretched-link"></a>
+                    <div class="gallery-card-new gallery-card-link" data-char-name="${encodeURIComponent(char.name)}">
+                        <div class="gallery-card-new-background" style="background-image: url('${char.splashart || 'uploads/default_avatar.png'}')"></div>
+                        <div class="gallery-card-new-overlay"></div>
+                        <div class="gallery-card-new-content">
+                            <div class="gallery-card-new-header">
+                                <div class="gallery-card-new-rarity">
+                                    ${rarityStars}
+                                </div>
+                                <div class="gallery-card-new-element">
+                                    <img src="data/icons/elements/${elementIcon}" alt="${char.element}">
+                                </div>
+                            </div>
+                            <div class="gallery-card-new-body">
+                                <h5 class="gallery-card-new-name">${char.name}</h5>
+                                ${rolesHtml}
+                            </div>
+                            <div class="gallery-card-new-footer">
+                                <div class="gallery-card-new-constellation ${constellationColorClass}">C${char.latest_constellation || 0}</div>
+                                <div class="gallery-card-new-date">${formattedDate}</div>
+                            </div>
+                        </div>
+                        <div class="gallery-card-new-hover-overlay">
+                            <i class="bi bi-search"></i>
+                        </div>
                     </div>
                 </div>`;
+        });
+
+        galleryGrid.addEventListener('click', (event) => {
+            const card = event.target.closest('.gallery-card-link');
+            if (card) {
+                const charName = card.dataset.charName;
+                if (charName) {
+                    window.location.hash = `#character/${charName}`;
+                }
+            }
         });
     };
 

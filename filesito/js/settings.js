@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderKeywordTables = () => {
+    const renderKeywordManagement = () => {
         if (keywordColorsTable) {
             keywordColorsTable.innerHTML = '';
             keywordColors.forEach((item, index) => {
@@ -399,20 +399,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        if (keywordTooltipsTable) {
-            keywordTooltipsTable.innerHTML = '';
+        const tooltipsAccordion = document.getElementById('keyword-tooltips-accordion');
+        if (tooltipsAccordion) {
+            tooltipsAccordion.innerHTML = '';
             keywordTooltips.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><input type="text" class="form-control form-control-sm keyword-tooltip-input" data-index="${index}" value="${item.keyword}"></td>
-                    <td><textarea class="form-control form-control-sm keyword-tooltip-desc" data-index="${index}">${item.description}</textarea></td>
-                    <td class="text-nowrap">
-                        <button class="btn btn-sm btn-outline-secondary move-keyword-up-btn" data-type="tooltip" data-index="${index}" ${index === 0 ? 'disabled' : ''}>&uarr;</button>
-                        <button class="btn btn-sm btn-outline-secondary move-keyword-down-btn" data-type="tooltip" data-index="${index}" ${index === keywordTooltips.length - 1 ? 'disabled' : ''}>&darr;</button>
-                        <button class="btn btn-sm btn-danger delete-keyword-tooltip-btn ms-2" data-index="${index}">&times;</button>
-                    </td>
+                const itemId = `tooltip-${index}`;
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item';
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header" id="heading-${itemId}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${itemId}" aria-expanded="false" aria-controls="collapse-${itemId}">
+                            ${item.keyword}
+                        </button>
+                    </h2>
+                    <div id="collapse-${itemId}" class="accordion-collapse collapse" aria-labelledby="heading-${itemId}" data-bs-parent="#keyword-tooltips-accordion">
+                        <div class="accordion-body">
+                            <form class="keyword-tooltip-details-form" data-index="${index}">
+                                <div class="mb-3">
+                                    <label for="keyword-tooltip-keyword-${itemId}" class="form-label">Parola Chiave</label>
+                                    <input type="text" id="keyword-tooltip-keyword-${itemId}" class="form-control" value="${item.keyword}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="keyword-tooltip-desc-${itemId}" class="form-label">Descrizione</label>
+                                    <textarea id="keyword-tooltip-desc-${itemId}" class="form-control" rows="5">${item.description}</textarea>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="submit" class="btn btn-primary btn-sm">Salva</button>
+                                    <button type="button" class="btn btn-danger btn-sm delete-keyword-tooltip-btn" data-index="${index}">Elimina</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 `;
-                keywordTooltipsTable.appendChild(row);
+                tooltipsAccordion.appendChild(accordionItem);
             });
         }
     };
@@ -425,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 keywordColors = data.colors;
                 keywordTooltips = data.tooltips;
                 populateColorSelect();
-                renderKeywordTables();
+                renderKeywordManagement();
             } else {
                 showErrorAlert('Impossibile caricare le impostazioni delle parole chiave.');
             }
@@ -1187,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const keyword = keywordInput.value.trim();
             if (keyword) {
                 keywordColors.push({ keyword: keyword, color: colorSelect.value });
-                renderKeywordTables();
+                renderKeywordManagement();
                 keywordInput.value = '';
             }
         } else if (e.target.id === 'keyword-tooltip-form') {
@@ -1197,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const description = descInput.value.trim();
             if (keyword && description) {
                 keywordTooltips.push({ keyword: keyword, description: description });
-                renderKeywordTables();
+                renderKeywordManagement();
                 keywordInput.value = '';
                 descInput.value = '';
             }
@@ -1208,23 +1227,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('delete-keyword-color-btn')) {
             const index = parseInt(e.target.dataset.index);
             keywordColors.splice(index, 1);
-            renderKeywordTables();
+            renderKeywordManagement();
         }
         if (e.target.classList.contains('delete-keyword-tooltip-btn')) {
             const index = parseInt(e.target.dataset.index);
             keywordTooltips.splice(index, 1);
-            renderKeywordTables();
+            renderKeywordManagement();
         }
         if (e.target.classList.contains('move-keyword-up-btn')) {
             const index = parseInt(e.target.dataset.index);
             const type = e.target.dataset.type;
             if (type === 'color' && index > 0) {
                 [keywordColors[index - 1], keywordColors[index]] = [keywordColors[index], keywordColors[index - 1]];
-                renderKeywordTables();
+                renderKeywordManagement();
             }
             if (type === 'tooltip' && index > 0) {
                 [keywordTooltips[index - 1], keywordTooltips[index]] = [keywordTooltips[index], keywordTooltips[index - 1]];
-                renderKeywordTables();
+                renderKeywordManagement();
             }
         }
         if (e.target.classList.contains('move-keyword-down-btn')) {
@@ -1232,25 +1251,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = e.target.dataset.type;
             if (type === 'color' && index < keywordColors.length - 1) {
                 [keywordColors[index], keywordColors[index + 1]] = [keywordColors[index + 1], keywordColors[index]];
-                renderKeywordTables();
+                renderKeywordManagement();
             }
             if (type === 'tooltip' && index < keywordTooltips.length - 1) {
                 [keywordTooltips[index], keywordTooltips[index + 1]] = [keywordTooltips[index + 1], keywordTooltips[index]];
-                renderKeywordTables();
+                renderKeywordManagement();
             }
         }
     });
 
-    document.getElementById('v-pills-keywords')?.addEventListener('input', (e) => {
-        const index = parseInt(e.target.dataset.index);
-        if (isNaN(index)) return;
-
-        if (e.target.classList.contains('keyword-color-input')) {
-            if(keywordColors[index]) keywordColors[index].keyword = e.target.value;
-        } else if (e.target.classList.contains('keyword-tooltip-input')) {
-            if(keywordTooltips[index]) keywordTooltips[index].keyword = e.target.value;
-        } else if (e.target.classList.contains('keyword-tooltip-desc')) {
-            if(keywordTooltips[index]) keywordTooltips[index].description = e.target.value;
+    document.getElementById('v-pills-keywords')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (e.target.classList.contains('keyword-tooltip-details-form')) {
+            const index = parseInt(e.target.dataset.index);
+            const keywordInput = e.target.querySelector('input[type="text"]');
+            const descTextarea = e.target.querySelector('textarea');
+            keywordTooltips[index].keyword = keywordInput.value;
+            keywordTooltips[index].description = descTextarea.value;
+            renderKeywordManagement();
+            showToast('Tooltip salvato!');
         }
     });
 
@@ -1316,7 +1335,7 @@ async function loadNationsManagement() {
                             <form class="nation-details-form" data-nation-name="${nation.name}">
                                 <div class="mb-3">
                                     <label for="nation-desc-${nationId}" class="form-label">Descrizione</label>
-                                    <textarea id="nation-desc-${nationId}" name="description" class="form-control" rows="3">${nation.description || ''}</textarea>
+                                    <textarea id="nation-desc-${nationId}" name="description" class="form-control" rows="5">${nation.description || ''}</textarea>
                                 </div>
                                 <div class="mb-3">
                                     <label for="nation-image-${nationId}" class="form-label">Immagine di Copertina</label>
