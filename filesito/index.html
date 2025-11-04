@@ -6,7 +6,7 @@
     <title>Genshin Stats Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="style.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.2">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="icon" type="image/png" href="data/favicons/favicon.png">
     <style>
@@ -243,6 +243,10 @@
         }
         body.dark-mode #dashboard-view .card.border-primary {
             background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
+
+        .admin-only {
+            display: none !important;
         }
     </style>
 </head>
@@ -1309,6 +1313,7 @@
                     <h5 class="footer-heading">Info</h5>
                     <p class="footer-text">&copy; 2025 Genshin Stats Tracker. Tutti i diritti riservati.</p>
                     <p class="footer-text small text-white-50 mt-2">Alcune informazioni e dati possono essere presi dal <a href="https://genshin-impact.fandom.com/" target="_blank" rel="noopener noreferrer" class="text-white-50">fandom di Genshin Impact</a>.</p>
+                    <p id="directory-size-container" class="footer-text small text-white-50 mt-2 admin-only">Spazio occupato: <span id="directory-size"></span></p>
                 </div>
             </div>
         </div>

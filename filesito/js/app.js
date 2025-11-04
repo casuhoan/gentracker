@@ -135,6 +135,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- AUTHENTICATION FUNCTIONS ---
+    const fetchDirectorySize = async () => {
+        if (isAdmin) {
+            try {
+                const response = await fetch('php/api.php?action=get_filesito_size');
+                const result = await response.json();
+                if (result.status === 'success') {
+                    const sizeElement = document.getElementById('directory-size');
+                    const containerElement = document.getElementById('directory-size-container');
+                    if (sizeElement && containerElement) {
+                        sizeElement.textContent = result.size;
+                        containerElement.classList.remove('admin-only');
+                        containerElement.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Errore durante il recupero della dimensione della cartella:', error);
+            }
+        }
+    };
+
     const checkSession = async () => {
         try {
             const response = await fetch('php/api.php?action=check_session');
@@ -150,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 isAdmin = (result.role === 'admin');
                 isModerator = (result.role === 'moderator');
+                await fetchDirectorySize();
             } else {
                 currentUser = null;
                 isAdmin = false;

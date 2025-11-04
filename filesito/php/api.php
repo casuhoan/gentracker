@@ -1888,6 +1888,59 @@ function update_nation_details() {
     echo json_encode(['status' => 'success']);
 }
 
+function getDirectorySize($path) {
+    $total_size = 0;
+    $files = scandir($path);
+    $clean_path = rtrim($path, '/') . '/';
+
+    foreach($files as $t) {
+        if ($t<>"." && $t<>"..") {
+            $current_file = $clean_path . $t;
+            if (is_dir($current_file)) {
+                $size = getDirectorySize($current_file);
+                $total_size += $size;
+            }
+            else {
+                $total_size += filesize($current_file);
+            }
+        }
+    }
+
+    return $total_size;
+}
+
+function formatSize($bytes) {
+    if ($bytes >= 1073741824) {
+        $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        $bytes = number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        $bytes = number_format($bytes / 1024, 2) . ' KB';
+    } elseif ($bytes > 1) {
+        $bytes = $bytes . ' bytes';
+    } elseif ($bytes == 1) {
+        $bytes = $bytes . ' byte';
+    } else {
+        $bytes = '0 bytes';
+    }
+
+    return $bytes;
+}
+
+function get_filesito_size() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $path = __DIR__ . '/..'; // This should point to 'filesito'
+    $size = getDirectorySize($path);
+    $formatted_size = formatSize($size);
+
+    echo json_encode(['status' => 'success', 'size' => $formatted_size]);
+}
+
 function organize_splasharts() {
     if (!is_admin()) {
         http_response_code(403);
@@ -1990,7 +2043,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

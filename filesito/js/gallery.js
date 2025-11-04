@@ -237,15 +237,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const constellationColorClass = getStatusColorClass('constellation', char.latest_constellation, char.rarity);
             const element = elementsData.find(e => e.name === char.element);
             const elementIcon = element ? element.icon : '';
+            const elementColor = element ? element.color : '#ccc'; // Get element color, default to gray
             let rarityStars = '';
             const starCount = char.rarity === '5-star' ? 5 : 4;
             for (let i = 0; i < starCount; i++) {
                 rarityStars += '<i class="bi bi-star-fill"></i>';
             }
 
+            const buildScore = charData.buildScore ? Math.round(charData.buildScore) : 'N/A';
+            let trackedStatsHtml = '';
+            if (char.latest_build_stats && char.tracked_stats) {
+                char.tracked_stats.forEach(stat => {
+                    const value = char.latest_build_stats[stat] || 'N/D';
+                    trackedStatsHtml += `<li><span>${stat}:</span> <span>${value}</span></li>`;
+                });
+            }
+
             galleryGrid.innerHTML += `
                 <div class="col">
-                    <div class="gallery-card-new gallery-card-link" data-char-name="${encodeURIComponent(char.name)}">
+                    <div class="gallery-card-new gallery-card-link" data-char-name="${encodeURIComponent(char.name)}" style="--element-color: ${elementColor}">
                         <div class="gallery-card-new-background" style="background-image: url('${char.splashart || 'uploads/default_avatar.png'}')"></div>
                         <div class="gallery-card-new-overlay"></div>
                         <div class="gallery-card-new-content">
@@ -267,7 +277,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                         <div class="gallery-card-new-hover-overlay">
-                            <i class="bi bi-search"></i>
+                             <div class="card-hover-info">
+                                <h5>Ultima Build</h5>
+                                <p class="build-score">Build Score: <span class="build-score-value">${buildScore}</span></p>
+                                <ul class="build-stats-list">
+                                    ${trackedStatsHtml}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>`;
