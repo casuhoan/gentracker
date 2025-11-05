@@ -1315,6 +1315,7 @@ async function loadNationsManagement() {
     try {
         const response = await fetch('php/api.php?action=get_nations');
         const nations = await response.json();
+        window.nationsData = nations; // Update the global variable
         const container = document.getElementById('nations-accordion-container');
         if (!container) return;
         container.innerHTML = '';
@@ -1327,11 +1328,15 @@ async function loadNationsManagement() {
                 accordionItem.innerHTML = `
                     <h2 class="accordion-header" id="heading-${nationId}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${nationId}" aria-expanded="false" aria-controls="collapse-${nationId}">
-                            ${nation.name}
+                            ${nation.name} ${nation.hidden ? '<span class="badge bg-secondary ms-2">Nascosta</span>' : ''}
                         </button>
                     </h2>
                     <div id="collapse-${nationId}" class="accordion-collapse collapse" aria-labelledby="heading-${nationId}" data-bs-parent="#nations-accordion-container">
                         <div class="accordion-body">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input nation-visibility-switch" type="checkbox" role="switch" id="nation-hidden-${nationId}" data-nation-name="${nation.name}" ${nation.hidden ? 'checked' : ''}>
+                                <label class="form-check-label" for="nation-hidden-${nationId}">Nascondi Nazione</label>
+                            </div>
                             <form class="nation-details-form" data-nation-name="${nation.name}">
                                 <div class="mb-3">
                                     <label for="nation-desc-${nationId}" class="form-label">Descrizione</label>
@@ -1391,6 +1396,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nationsContainer = document.getElementById('nations-accordion-container');
     if (nationsContainer) {
+        nationsContainer.addEventListener('change', async (e) => {
+            if (e.target.classList.contains('nation-visibility-switch')) {
+                const nationName = e.target.dataset.nationName;
+                const isHidden = e.target.checked;
+
+                try {
+                    const response = await fetch('php/api.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'update_nation_visibility',
+                            name: nationName,
+                            hidden: isHidden
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        showToast('Visibilità della nazione aggiornata.');
+                        await loadNationsManagement(); // Reload to show the badge and update window.nationsData
+
+                        // Re-populate dropdowns
+                        const nationOptions = window.nationsData.map(n => ({ name: n.name, value: n.name }));
+                        if(typeof populateSelect === 'function'){
+                            populateSelect('library-char-nazione', nationOptions, 'Scegli nazione...');
+                            populateSelect('edit-library-char-nazione', nationOptions);
+                            populateSelect('nation', nationOptions, 'Scegli nazione...'); // For character creation form
+                            populateSelect('edit-nation', nationOptions, 'Scegli nazione...'); // For character edit form
+                        }
+                    } else {
+                        showErrorAlert(result.message);
+                    }
+                } catch (error) {
+                    showErrorAlert('Errore di comunicazione con il server.');
+                }
+            }
+        });
+
         nationsContainer.addEventListener('click', async (e) => {
             if (e.target.classList.contains('delete-nation-btn')) {
                 const nationName = e.target.dataset.nationName;

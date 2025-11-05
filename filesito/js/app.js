@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('php/api.php?action=get_elements'),
                 fetch('php/api.php?action=get_weapons'),
                 fetch('php/api.php?action=get_settings'),
-                fetch('data/nations.json?v=' + new Date().getTime())
+                fetch('php/api.php?action=get_nations')
             ]);
 
             if (!charLibResponse.ok) throw new Error('Failed to load characters_list.json');

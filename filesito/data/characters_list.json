@@ -5,12 +5,13 @@
         "titolo": "Titolo personaggio",
         "elemento": "Geo",
         "arma": "Sword",
-        "rarita": "5-star",
+        "rarita": "4-star",
         "nazione": "Mondstadt",
         "fazione": "Knights of Favonius",
         "icon": "library\/Albedo_Icon.webp",
         "banner": "library\/Albedo_Card.webp",
-        "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO.\r\nAlem haram Pyro ca.\r\nsubito una Crisi sss\r\nAahahahah Albedo aahahaha\r\nBond of Life"
+        "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO.\r\nAlem haram Pyro ca.\r\nsubito una Crisi sss\r\nAahahahah Albedo aahahaha\r\nBond of Life",
+        "wip": false
     },
     {
         "nome": "Alhaitham",

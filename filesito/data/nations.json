@@ -1,8 +1,10 @@
 [
     {
         "name": "Mondstadt",
-        "description": "A city of freedom that lies in the northeast of Teyvat. Ci sta",
-        "image": "nations\/mondstadt.png"
+        "description": "A city of freedom that lies in the northeast of Teyvat. Ci sta\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra tortor sit amet euismod ultricies. Integer pulvinar mauris nisi, et pellentesque ligula tempus at. Vestibulum euismod, enim sit amet viverra rutrum, mi libero venenatis lectus, eu rutrum ante odio ut massa. Cras rhoncus tempor arcu, id commodo metus commodo sit amet. Praesent eleifend placerat tempus. Nullam suscipit viverra neque sit amet elementum. Integer eget lorem sit amet nunc venenatis sodales vitae non massa.\r\n\r\nVestibulum condimentum massa a magna fringilla, nec tempor lacus pellentesque. Curabitur feugiat lorem sit amet mi lacinia, vel ultricies nibh sagittis. Praesent vestibulum urna a elit mollis pulvinar. Nunc rhoncus sapien ut est aliquam pretium. Praesent lacinia placerat lorem eleifend ultrices. Morbi quis malesuada elit, sit amet rutrum dolor. Donec elementum mauris diam, quis aliquam erat bibendum id. Proin eget imperdiet est. Donec consequat neque ut pulvinar ultricies. Quisque aliquet libero eget risus tempus, eget cursus arcu lobortis. Fusce rutrum, ipsum vel lacinia convallis, velit quam condimentum justo, at egestas urna sapien a odio. Sed pretium turpis nec luctus semper. Etiam porttitor finibus odio. Nam eu egestas arcu. Suspendisse potenti. Etiam malesuada accumsan laoreet.\r\n\r\nCurabitur efficitur fringilla leo, a pharetra metus fermentum nec. Aenean pretium ligula nunc, euismod porta ante mattis viverra. In hac habitasse platea dictumst. Donec in nisl scelerisque turpis aliquet molestie. Vestibulum lobortis cursus scelerisque. Praesent dictum ut turpis et aliquam. Proin a dapibus tellus, accumsan facilisis lacus. Suspendisse dignissim porta commodo. Pellentesque ac neque dictum ipsum tincidunt venenatis. Aenean finibus magna ac massa efficitur, ac malesuada ante hendrerit. Etiam sollicitudin orci lectus, id volutpat lectus congue bibendum. Curabitur nec finibus libero, sit amet hendrerit augue. Proin tempus, velit ac mollis lobortis, nisl nibh semper mauris, pretium imperdiet libero urna in tortor. Donec feugiat magna quis leo imperdiet semper sed non erat.\r\n\r\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra tortor sit amet euismod ultricies. Integer pulvinar mauris nisi, et pellentesque ligula tempus at. Vestibulum euismod, enim sit amet viverra rutrum, mi libero venenatis lectus, eu rutrum ante odio ut massa. Cras rhoncus tempor arcu, id commodo metus commodo sit amet. Praesent eleifend placerat tempus. Nullam suscipit viverra neque sit amet elementum. Integer eget lorem sit amet nunc venenatis sodales vitae non massa.\r\n\r\nVestibulum condimentum massa a magna fringilla, nec tempor lacus pellentesque. Curabitur feugiat lorem sit amet mi lacinia, vel ultricies nibh sagittis. Praesent vestibulum urna a elit mollis pulvinar. Nunc rhoncus sapien ut est aliquam pretium. Praesent lacinia placerat lorem eleifend ultrices. Morbi quis malesuada elit, sit amet rutrum dolor. Donec elementum mauris diam, quis aliquam erat bibendum id. Proin eget imperdiet est. Donec consequat neque ut pulvinar ultricies. Quisque aliquet libero eget risus tempus, eget cursus arcu lobortis. Fusce rutrum, ipsum vel lacinia convallis, velit quam condimentum justo, at egestas urna sapien a odio. Sed pretium turpis nec luctus semper. Etiam porttitor finibus odio. Nam eu egestas arcu. Suspendisse potenti. Etiam malesuada accumsan laoreet.\r\n\r\nCurabitur efficitur fringilla leo, a pharetra metus fermentum nec. Aenean pretium ligula nunc, euismod porta ante mattis viverra. In hac habitasse platea dictumst. Donec in nisl scelerisque turpis aliquet molestie. Vestibulum lobortis cursus scelerisque. Praesent dictum ut turpis et aliquam. Proin a dapibus tellus, accumsan facilisis lacus. Suspendisse dignissim porta commodo. Pellentesque ac neque dictum ipsum tincidunt venenatis. Aenean finibus magna ac massa efficitur, ac malesuada ante hendrerit. Etiam sollicitudin orci lectus, id volutpat lectus congue bibendum. Curabitur nec finibus libero, sit amet hendrerit augue. Proin tempus, velit ac mollis lobortis, nisl nibh semper mauris, pretium imperdiet libero urna in tortor. Donec feugiat magna quis leo imperdiet semper sed non erat.",
+        "image": "nations\/mondstadt.png",
+        "hidden": false,
+        "image2": "nations\/mondstadt_2.webp"
     },
     {
         "name": "Liyue",
@@ -23,12 +25,15 @@
         "image": "backgrounds\/Natlan.webp"
     },
     {
-        "name": "Snezhnaya"
+        "name": "Snezhnaya",
+        "hidden": true
     },
     {
-        "name": "Khaenri'ah"
+        "name": "Khaenri'ah",
+        "hidden": true
     },
     {
-        "name": "NodKrai"
+        "name": "NodKrai",
+        "hidden": true
     }
 ]

@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyGrimoireBackground();
     };
 
-    window.loadCharacterDetailPage = async (characterName) => { 
+    window.loadCharacterDetailPage = async (characterName) => {
         const char = characterLibrary.find(c => c.nome === characterName);
         const detailView = document.getElementById('character-detail-view');
 
@@ -239,151 +239,221 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const bannerUrl = char.banner ? `data/${char.banner}` : 'https://via.placeholder.com/400x600';
-        const iconUrl = char.icon ? `data/${char.icon}` : 'https://via.placeholder.com/128';
-        const element = elementsData.find(e => e.name === char.elemento);
-        const elementIconUrl = element ? `data/icons/elements/${element.icon}` : '';
+        const render = async () => {
+            const bannerUrl = char.banner ? `data/${char.banner}` : 'https://via.placeholder.com/400x600';
+            const iconUrl = char.icon ? `data/${char.icon}` : 'https://via.placeholder.com/128';
+            const element = elementsData.find(e => e.name === char.elemento);
+            const elementIconUrl = element ? `data/icons/elements/${element.icon}` : '';
+            const weapon = weaponsData.find(w => w.name === char.arma);
+            const weaponIconUrl = weapon && weapon.icon ? `data/icons/weapons/${weapon.icon}` : '';
 
-        const weapon = weaponsData.find(w => w.name === char.arma);
-        const weaponIconUrl = weapon && weapon.icon ? `data/icons/weapons/${weapon.icon}` : '';
-
-        let rarityHtml = '';
-        if (char.rarita) {
-            const starCount = char.rarita === '5-star' ? 5 : 4;
-            for(let i=0; i<starCount; i++) {
-                rarityHtml += '<i class="bi bi-star-fill text-warning"></i>';
+            let rarityHtml = '';
+            if (char.rarita) {
+                const starCount = char.rarita === '5-star' ? 5 : 4;
+                for (let i = 0; i < starCount; i++) {
+                    rarityHtml += '<i class="bi bi-star-fill text-warning"></i>';
+                }
             }
-        }
 
-        const displayDescription = await formatDescription(char.description, characterName);
+            const displayDescription = await formatDescription(char.description, characterName);
 
-        detailView.innerHTML = `
-            <div class="container-fluid">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
+            // Options for select
+            const elementOptions = elementsData.map(e => `<option value="${e.name}" ${e.name === char.elemento ? 'selected' : ''}>${e.name}</option>`).join('');
+            const weaponOptions = weaponsData.map(w => `<option value="${w.name}" ${w.name === char.arma ? 'selected' : ''}>${w.name}</option>`).join('');
+            const nationOptions = nationsData.map(n => `<option value="${n.name}" ${n.name === char.nazione ? 'selected' : ''}>${n.name}</option>`).join('');
+            const rarityOptions = ['5-star', '4-star'].map(r => `<option value="${r}" ${r === char.rarita ? 'selected' : ''}>${r}</option>`).join('');
+
+            detailView.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
+                        </div>
+                        <div class="col-6 text-end">
+                            ${isAdmin ? `
+                                <button id="edit-char-btn" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill"></i> Modifica Personaggio</button>
+                                <button id="save-char-btn" class="btn btn-success btn-sm d-none"><i class="bi bi-save"></i> Salva Modifiche</button>
+                                <button id="cancel-char-btn" class="btn btn-secondary btn-sm d-none"><i class="bi bi-x-lg"></i> Annulla</button>
+                            ` : ''}
+                        </div>
                     </div>
-                </div>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img src="${bannerUrl}" class="img-fluid rounded" alt="Banner di ${char.nome}">
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="d-flex align-items-center mb-4">
-                                    <img src="${iconUrl}" class="rounded-circle me-4" alt="Icona di ${char.nome}" style="width: 100px; height: 100px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-                                    <div>
-                                        <h2 class="display-5">${char.nome}</h2>
-                                        <h4 class="text-muted fw-light">${char.titolo || ''}</h4>
-                                    </div>
-                                </div>
-                                
-                                <div class="row border-top pt-3">
-                                    <div class="col-6 col-md-4 mb-3">
-                                        <h5>Elemento</h5>
-                                        <p class="d-flex align-items-center"><img src="${elementIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.elemento || 'N/D'}</p>
-                                    </div>
-                                    <div class="col-6 col-md-4 mb-3">
-                                        <h5>Rarità</h5>
-                                        <p>${rarityHtml || 'N/D'}</p>
-                                    </div>
-                                    <div class="col-12 col-md-4 mb-3">
-                                        <h5>Arma</h5>
-                                        <p class="d-flex align-items-center"><img src="${weaponIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.arma || 'N/D'}</p>
-                                    </div>
-                                </div>
-
-                                <div class="row border-top pt-3">
-                                    <div class="col-6 col-md-4 mb-3">
-                                        <h5>Nazione</h5>
-                                        <p>${char.nazione || 'N/D'}</p>
-                                    </div>
-                                    <div class="col-6 col-md-4 mb-3">
-                                        <h5>Fazione/Tribe</h5>
-                                        <p>${char.fazione || 'N/D'}</p>
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 position-relative">
-                                    <h5 class="border-bottom pb-2 mb-3">Descrizione</h5>
-                                    <div id="description-display-container">
-                                        <p>${displayDescription}</p>
-                                    </div>
-                                    <div id="description-edit-container" style="display: none;">
-                                        <textarea id="description-textarea" class="form-control" rows="8">${char.description || ''}</textarea>
-                                        <div class="text-end mt-2">
-                                            <button id="cancel-description-edit" class="btn btn-secondary btn-sm">Annulla</button>
-                                            <button id="save-description" class="btn btn-primary btn-sm">Salva</button>
+                    <form id="edit-char-form">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="display-view">
+                                            <img src="${bannerUrl}" class="img-fluid rounded" alt="Banner di ${char.nome}">
+                                        </div>
+                                        <div class="edit-view d-none">
+                                            <label class="form-label">Banner attuale</label>
+                                            <img src="${bannerUrl}" class="img-fluid rounded mt-2" style="max-height: 200px;">
                                         </div>
                                     </div>
-                                    ${(isAdmin || isModerator) ? '<button id="edit-description-btn" class="btn btn-outline-primary btn-sm" style="position: absolute; top: 0; right: 0;"><i class="bi bi-pencil-fill"></i></button>' : ''}
+
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="display-view me-4">
+                                                <img src="${iconUrl}" class="rounded-circle" alt="Icona di ${char.nome}" style="width: 100px; height: 100px; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                                            </div>
+                                            <div class="edit-view d-none me-4">
+                                                <label class="form-label">Icona attuale</label>
+                                                <img src="${iconUrl}" class="rounded-circle mt-2" style="width: 80px; height: 80px;">
+                                            </div>
+                                            <div>
+                                                <div class="display-view">
+                                                    <h2 class="display-5">${char.nome}</h2>
+                                                    <h4 class="text-muted fw-light">${char.titolo || ''}</h4>
+                                                </div>
+                                                <div class="edit-view d-none">
+                                                    <div class="mb-2">
+                                                        <label class="form-label">Nome</label>
+                                                        <input type="text" class="form-control" name="name" value="${char.nome}">
+                                                    </div>
+                                                    <div>
+                                                        <label class="form-label">Titolo</label>
+                                                        <input type="text" class="form-control" name="title" value="${char.titolo || ''}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row border-top pt-3">
+                                            <div class="col-6 col-md-4 mb-3">
+                                                <h5>Elemento</h5>
+                                                <div class="display-view">
+                                                    <p class="d-flex align-items-center"><img src="${elementIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.elemento || 'N/D'}</p>
+                                                </div>
+                                                <div class="edit-view d-none">
+                                                    <select class="form-select" name="element">${elementOptions}</select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-4 mb-3">
+                                                <h5>Rarità</h5>
+                                                <div class="display-view"><p>${rarityHtml || 'N/D'}</p></div>
+                                                <div class="edit-view d-none">
+                                                    <select class="form-select" name="rarity">${rarityOptions}</select>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4 mb-3">
+                                                <h5>Arma</h5>
+                                                <div class="display-view">
+                                                    <p class="d-flex align-items-center"><img src="${weaponIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.arma || 'N/D'}</p>
+                                                </div>
+                                                <div class="edit-view d-none">
+                                                    <select class="form-select" name="weapon">${weaponOptions}</select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row border-top pt-3">
+                                            <div class="col-6 col-md-4 mb-3">
+                                                <h5>Nazione</h5>
+                                                <div class="display-view"><p>${char.nazione || 'N/D'}</p></div>
+                                                <div class="edit-view d-none">
+                                                    <select class="form-select" name="nazione">${nationOptions}</select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-4 mb-3">
+                                                <h5>Fazione/Tribe</h5>
+                                                <div class="display-view"><p>${char.fazione || 'N/D'}</p></div>
+                                                <div class="edit-view d-none">
+                                                    <input type="text" class="form-control" name="fazione" value="${char.fazione || ''}">
+                                                </div>
+                                            </div>
+                                            <div class="col-6 col-md-4 mb-3 align-self-center">
+                                                <div class="edit-view d-none">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="char-wip-switch" name="wip" ${char.wip ? 'checked' : ''}>
+                                                        <label class="form-check-label" for="char-wip-switch">WIP</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="mt-4 position-relative">
+                                            <h5 class="border-bottom pb-2 mb-3">Descrizione</h5>
+                                            <div class="display-view">
+                                                <p>${displayDescription}</p>
+                                            </div>
+                                            <div class="edit-view d-none">
+                                                <textarea name="description" class="form-control" rows="8">${char.description || ''}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
-        `;
+            `;
 
+            attachEventListeners();
+        };
+
+        const attachEventListeners = () => {
+            document.getElementById('back-to-grimoire').addEventListener('click', () => {
+                location.hash = '#grimoire';
+            });
+
+            if (isAdmin) {
+                const editBtn = document.getElementById('edit-char-btn');
+                const saveBtn = document.getElementById('save-char-btn');
+                const cancelBtn = document.getElementById('cancel-char-btn');
+
+                editBtn.addEventListener('click', () => toggleEditMode(true));
+                cancelBtn.addEventListener('click', () => toggleEditMode(false));
+                saveBtn.addEventListener('click', saveChanges);
+            }
+        };
+
+        const toggleEditMode = (isEditing) => {
+            detailView.querySelectorAll('.display-view').forEach(el => el.classList.toggle('d-none', isEditing));
+            detailView.querySelectorAll('.edit-view').forEach(el => el.classList.toggle('d-none', !isEditing));
+            
+            document.getElementById('edit-char-btn').classList.toggle('d-none', isEditing);
+            document.getElementById('save-char-btn').classList.toggle('d-none', !isEditing);
+            document.getElementById('cancel-char-btn').classList.toggle('d-none', !isEditing);
+        };
+
+        const saveChanges = async () => {
+            const form = document.getElementById('edit-char-form');
+            const formData = new FormData(form);
+            formData.append('action', 'update_library_character');
+            formData.append('original_name', characterName);
+
+            // Aggiungi il campo WIP se la checkbox è selezionata
+            const wipCheckbox = form.querySelector('[name="wip"]');
+            if (wipCheckbox && wipCheckbox.checked) {
+                formData.append('wip', 'on');
+            }
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Personaggio aggiornato con successo!');
+                    // Ricarica i dati della libreria e la pagina
+                    const [charLibResponse] = await Promise.all([
+                        fetch('data/characters_list.json?v=' + new Date().getTime()),
+                    ]);
+                    characterLibrary = await charLibResponse.json();
+                    const newName = formData.get('name');
+                    location.hash = `#grimoire-character/${encodeURIComponent(newName)}`;
+                } else {
+                    showErrorAlert(result.message || 'Errore durante l\'aggiornamento.');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        };
+
+        render();
         showView('character-detail-view');
         applyGrimoireBackground();
-
-        const tooltipTriggerList = [].slice.call(detailView.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
-        document.getElementById('back-to-grimoire').addEventListener('click', () => {
-            location.hash = '#grimoire';
-        });
-
-        if (isAdmin || isModerator) {
-            const editBtn = document.getElementById('edit-description-btn');
-            const saveBtn = document.getElementById('save-description');
-            const cancelBtn = document.getElementById('cancel-description-edit');
-            const displayContainer = document.getElementById('description-display-container');
-            const editContainer = document.getElementById('description-edit-container');
-
-            editBtn.addEventListener('click', () => {
-                displayContainer.style.display = 'none';
-                editContainer.style.display = 'block';
-                editBtn.style.display = 'none';
-            });
-
-            cancelBtn.addEventListener('click', () => {
-                displayContainer.style.display = 'block';
-                editContainer.style.display = 'none';
-                editBtn.style.display = 'block';
-            });
-
-            saveBtn.addEventListener('click', async () => {
-                const newDescription = document.getElementById('description-textarea').value;
-                
-                const formData = new FormData();
-                formData.append('action', 'update_character_description');
-                formData.append('character_name', characterName);
-                formData.append('description', newDescription);
-
-                try {
-                    const response = await fetch('php/api.php', { method: 'POST', body: formData });
-                    const result = await response.json();
-
-                    if (result.status === 'success') {
-                        showToast('Descrizione salvata!');
-                        char.description = newDescription;
-                        const formatted = await formatDescription(newDescription, characterName);
-                        displayContainer.querySelector('p').innerHTML = formatted;
-                        cancelBtn.click();
-                    } else {
-                        showErrorAlert(result.message || 'Errore nel salvataggio della descrizione.');
-                    }
-                } catch (error) {
-                    showErrorAlert('Errore di comunicazione con il server.');
-                }
-            });
-        }
     };
 
     window.applyGrimoireBackground = () => {
@@ -403,13 +473,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('nations-grid');
         if (!grid) return;
 
+        // Filtra le nazioni direttamente qui
+        const visibleNations = nations.filter(nation => !nation.hidden);
+
         grid.innerHTML = '';
-        if (nations.length === 0) {
+        if (visibleNations.length === 0) {
             grid.innerHTML = '<div class="col-12 text-center"><p>Nessuna nazione trovata.</p></div>';
             return;
         }
 
-        nations.forEach(nation => {
+        visibleNations.forEach(nation => {
             const card = document.createElement('div');
             card.className = 'col';
             const imageUrl = nation.image ? `data/${nation.image}` : `https://via.placeholder.com/300x200?text=${nation.name}`;
@@ -429,57 +502,149 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.loadNationsPage = async () => {
-        // La variabile 'nationsData' dovrebbe essere già stata caricata e disponibile globalmente
-        if (window.nationsData) {
-            renderNations(window.nationsData);
-        } else {
-            console.error("Dati delle nazioni non trovati.");
+        try {
+            const response = await fetch('php/api.php?action=get_nations');
+            const nations = await response.json();
+            renderNations(nations);
+        } catch (error) {
+            console.error("Dati delle nazioni non trovati.", error);
+            showErrorAlert('Impossibile caricare i dati delle nazioni.');
         }
     };
 
     window.loadNationDetailPage = async (nationName) => {
         const nation = window.nationsData.find(n => n.name === nationName);
-        const detailView = document.getElementById('character-detail-view'); // Riutilizziamo la vista dettaglio
+        const detailView = document.getElementById('character-detail-view');
 
         if (!nation || !detailView) {
             location.hash = '#grimoire';
             return;
         }
 
-        const imageUrl = nation.image ? `data/${nation.image}` : '';
-        const displayDescription = await formatDescription(nation.description, nation.name, 'nazione');
+        const render = async () => {
+            const imageUrl = nation.image ? `data/${nation.image}` : '';
+            const imageUrl2 = nation.image2 ? `data/${nation.image2}` : '';
+            const displayDescription = await formatDescription(nation.description, nation.name, 'nazione');
 
-        detailView.innerHTML = `
-            <div class="container-fluid">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
-                    </div>
-                </div>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h2 class="display-5">${nation.name}</h2>
-                        <hr>
-                        <div class="nation-detail-content">
-                            ${imageUrl ? `<img src="${imageUrl}" class="img-fluid rounded float-start me-3 mb-3" alt="Immagine di ${nation.name}" style="max-width: 300px;">` : ''}
-                            <p>${displayDescription}</p>
+            detailView.innerHTML = `
+                <div class="container-fluid">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
+                        </div>
+                        <div class="col-6 text-end">
+                            ${isAdmin ? `
+                                <button id="edit-nation-btn" class="btn btn-primary btn-sm"><i class="bi bi-pencil-fill"></i> Modifica Nazione</button>
+                                <button id="save-nation-btn" class="btn btn-success btn-sm d-none"><i class="bi bi-save"></i> Salva</button>
+                                <button id="cancel-nation-btn" class="btn btn-secondary btn-sm d-none"><i class="bi bi-x-lg"></i> Annulla</button>
+                            ` : ''}
                         </div>
                     </div>
+                    <form id="edit-nation-form">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h2 class="display-5">${nation.name}</h2>
+                                <hr>
+                                <div class="nation-detail-content">
+                                    <div class="display-view">
+                                        <div class="clearfix mb-4">
+                                            ${imageUrl ? `<img src="${imageUrl}" class="img-fluid rounded float-start me-4 mb-3" style="max-width: 450px;">` : ''}
+                                            <p id="description-part-1"></p>
+                                        </div>
+                                        
+                                        <div class="clearfix mt-4">
+                                            ${imageUrl2 ? `<img src="${imageUrl2}" class="img-fluid rounded float-end ms-4 mb-3" style="max-width: 400px;">` : ''}
+                                            <p id="description-part-2"></p>
+                                        </div>
+                                    </div>
+                                    <div class="edit-view d-none">
+                                        <div class="mb-3">
+                                            <label class="form-label">Descrizione</label>
+                                            <textarea name="description" class="form-control" rows="10">${nation.description || ''}</textarea>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Immagine Principale</label>
+                                                <input type="file" name="image" class="form-control">
+                                                ${imageUrl ? `<img src="${imageUrl}" class="img-fluid rounded mt-2" style="max-height: 150px;">` : ''}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Immagine Secondaria</label>
+                                                <input type="file" name="image2" class="form-control">
+                                                ${imageUrl2 ? `<img src="${imageUrl2}" class="img-fluid rounded mt-2" style="max-height: 150px;">` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        `;
+            `;
 
+            // Split and inject description
+            const descriptionContainer1 = document.getElementById('description-part-1');
+            const descriptionContainer2 = document.getElementById('description-part-2');
+            if (descriptionContainer1 && descriptionContainer2) {
+                const words = displayDescription.split(' ');
+                const half = Math.ceil(words.length / 2);
+                const firstHalf = words.slice(0, half).join(' ');
+                const secondHalf = words.slice(half).join(' ');
+                descriptionContainer1.innerHTML = firstHalf;
+                descriptionContainer2.innerHTML = secondHalf;
+            }
+
+            attachEventListeners();
+        };
+
+        const attachEventListeners = () => {
+            document.getElementById('back-to-grimoire').addEventListener('click', () => {
+                location.hash = '#grimoire';
+                const nationsTab = document.getElementById('grimoire-nations-tab');
+                if (nationsTab) new bootstrap.Tab(nationsTab).show();
+            });
+
+            if (isAdmin) {
+                document.getElementById('edit-nation-btn').addEventListener('click', () => toggleEditMode(true));
+                document.getElementById('cancel-nation-btn').addEventListener('click', () => toggleEditMode(false));
+                document.getElementById('save-nation-btn').addEventListener('click', saveChanges);
+            }
+        };
+
+        const toggleEditMode = (isEditing) => {
+            detailView.querySelector('.display-view').classList.toggle('d-none', isEditing);
+            detailView.querySelector('.edit-view').classList.toggle('d-none', !isEditing);
+            document.getElementById('edit-nation-btn').classList.toggle('d-none', isEditing);
+            document.getElementById('save-nation-btn').classList.toggle('d-none', !isEditing);
+            document.getElementById('cancel-nation-btn').classList.toggle('d-none', !isEditing);
+        };
+
+        const saveChanges = async () => {
+            const form = document.getElementById('edit-nation-form');
+            const formData = new FormData(form);
+            formData.append('action', 'update_nation_details');
+            formData.append('name', nationName);
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showToast('Dettagli nazione aggiornati!');
+                    // Ricarica dati e vista
+                    const nationsResponse = await fetch('php/api.php?action=get_nations');
+                    window.nationsData = await nationsResponse.json();
+                    location.reload(); // Simple reload to show changes
+                } else {
+                    showErrorAlert(result.message || 'Errore durante l\'aggiornamento.');
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        };
+
+        render();
         showView('character-detail-view');
         applyGrimoireBackground();
-        
-        document.getElementById('back-to-grimoire').addEventListener('click', () => {
-            // Assicurati che il tab 'Nazioni' sia attivo quando torni indietro
-            location.hash = '#grimoire';
-            const nationsTab = document.getElementById('grimoire-nations-tab');
-            if (nationsTab) {
-                const tab = new bootstrap.Tab(nationsTab);
-                tab.show();
-            }
-        });
     };
 });
