@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('dashboard.js loaded.');
+
 
     const statOrder = ["HP", "Atk", "Def", "Elemental Mastery", "Crit Rate (%)", "Crit Damage (%)", "Energy Recharge (%)"];
 

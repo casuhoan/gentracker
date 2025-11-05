@@ -1436,82 +1436,7 @@ function upload_grimoire_background() {
     }
 }
 
-function get_character_schema() {
-    header('Content-Type: application/json'); // Spostato all'inizio
-    $schema_file = get_character_schema_file();
-    if (!file_exists($schema_file)) {
-        // Crea uno schema di default se il file non esiste
-        $default_schema = [
-            [
-                "name" => "nome",
-                "label" => "Nome",
-                "type" => "text",
-                "required" => true,
-                "editable" => false
-            ],
-            [
-                "name" => "titolo",
-                "label" => "Titolo",
-                "type" => "text",
-                "required" => false,
-                "editable" => true
-            ],
-            [
-                "name" => "elemento",
-                "label" => "Elemento",
-                "type" => "select",
-                "optionsSource" => "elements",
-                "required" => true,
-                "editable" => true
-            ],
-            [
-                "name" => "arma",
-                "label" => "Arma",
-                "type" => "text",
-                "required" => false,
-                "editable" => true
-            ],
-            [
-                "name" => "rarita",
-                "label" => "Rarità",
-                "type" => "radio",
-                "options" => [
-                    "4-star",
-                    "5-star"
-                ],
-                "required" => true,
-                "editable" => true
-            ],
-            [
-                "name" => "immagine",
-                "label" => "Immagine",
-                "type" => "file",
-                "required" => true,
-                "editable" => false
-            ]
-        ];
-        file_put_contents($schema_file, json_encode($default_schema, JSON_PRETTY_PRINT));
-        echo json_encode($default_schema);
-        return;
-    }
-    echo file_get_contents($schema_file);
-}
 
-function save_character_schema() {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $schema = $data['schema'] ?? null;
-
-    if ($schema === null) {
-        echo json_encode(['status' => 'error', 'message' => 'Nessun dato dello schema ricevuto.']);
-        return;
-    }
-
-    if (file_put_contents(get_character_schema_file(), json_encode($schema, JSON_PRETTY_PRINT))) {
-        echo json_encode(['status' => 'success', 'message' => 'Schema dei personaggi salvato con successo.']);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare lo schema dei personaggi.']);
-    }
-}
 
 function update_character_description() {
     if (!is_admin() && !is_moderator()) {
@@ -1965,6 +1890,48 @@ function update_nation_visibility() {
     }
 }
 
+function update_nations_order() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $ordered_names = json_decode(file_get_contents('php://input'), true)['order'] ?? null;
+
+    if ($ordered_names === null) {
+        echo json_encode(['status' => 'error', 'message' => 'Nessun ordine fornito.']);
+        return;
+    }
+
+    $nations_file = get_nations_file();
+    $nations = json_decode(file_get_contents($nations_file), true);
+    
+    $nations_by_name = [];
+    foreach ($nations as $nation) {
+        $nations_by_name[$nation['name']] = $nation;
+    }
+
+    $reordered_nations = [];
+    foreach ($ordered_names as $name) {
+        if (isset($nations_by_name[$name])) {
+            $reordered_nations[] = $nations_by_name[$name];
+            unset($nations_by_name[$name]); // Rimuovi per tenere traccia di quelle non ordinate
+        }
+    }
+
+    // Aggiungi alla fine eventuali nazioni non presenti nella lista ordinata (per sicurezza)
+    foreach ($nations_by_name as $unaccounted_nation) {
+        $reordered_nations[] = $unaccounted_nation;
+    }
+
+    if (file_put_contents($nations_file, json_encode($reordered_nations, JSON_PRETTY_PRINT))) {
+        echo json_encode(['status' => 'success', 'message' => 'Ordine delle nazioni salvato.']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il nuovo ordine.']);
+    }
+}
+
 function getDirectorySize($path) {
     $total_size = 0;
     $files = scandir($path);
@@ -2120,7 +2087,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'get_character_schema', 'save_character_schema', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility', 'update_nations_order'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

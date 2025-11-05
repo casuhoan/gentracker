@@ -337,37 +337,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const splashartInput = document.getElementById('splashart');
-    if (splashartInput) {
-        splashartInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    document.getElementById('character-preview-image').src = event.target.result;
-                    document.getElementById('character-preview-container').classList.remove('empty');
-                    document.getElementById('default_image_path').value = '';
+    const setupImagePreview = (inputId, previewId, containerId, defaultPathInputId) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        document.getElementById(previewId).src = event.target.result;
+                        document.getElementById(containerId).classList.remove('empty');
+                        if (defaultPathInputId) {
+                            document.getElementById(defaultPathInputId).value = '';
+                        }
+                    }
+                    reader.readAsDataURL(file);
                 }
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+            });
+        }
+    };
 
-    const editSplashartInput = document.getElementById('edit-splashart');
-    if (editSplashartInput) {
-        editSplashartInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    document.getElementById('character-edit-preview-image').src = event.target.result;
-                    document.getElementById('character-edit-preview-container').classList.remove('empty');
-                    document.getElementById('edit-default-image-path').value = '';
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+    setupImagePreview('splashart', 'character-preview-image', 'character-preview-container', 'default_image_path');
+    setupImagePreview('edit-splashart', 'character-edit-preview-image', 'character-edit-preview-container', 'edit-default-image-path');
 
     const editUseDefaultBtn = document.getElementById('edit-use-default-image-btn');
     if (editUseDefaultBtn) {
@@ -427,19 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const gobletCheckbox = document.getElementById('track-goblet-elementale');
-    const gobletContainer = document.getElementById('ideal-goblet-elementale-container');
-    if (gobletCheckbox && gobletContainer) {
-        gobletCheckbox.addEventListener('change', (e) => {
-            gobletContainer.style.display = e.target.checked ? 'block' : 'none';
-        });
-    }
+    const setupCheckboxToggle = (checkboxId, containerId) => {
+        const checkbox = document.getElementById(checkboxId);
+        const container = document.getElementById(containerId);
+        if (checkbox && container) {
+            checkbox.addEventListener('change', (e) => {
+                container.style.display = e.target.checked ? 'block' : 'none';
+            });
+        }
+    };
 
-    const editGobletCheckbox = document.getElementById('edit-track-goblet-elementale');
-    const editGobletContainer = document.getElementById('edit-ideal-goblet-elementale-container');
-    if (editGobletCheckbox && editGobletContainer) {
-        editGobletCheckbox.addEventListener('change', (e) => {
-            editGobletContainer.style.display = e.target.checked ? 'block' : 'none';
-        });
-    }
+    setupCheckboxToggle('track-goblet-elementale', 'ideal-goblet-elementale-container');
+    setupCheckboxToggle('edit-track-goblet-elementale', 'edit-ideal-goblet-elementale-container');
 });

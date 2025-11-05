@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
             populateSelect('edit-library-char-nazione', nationOptions);
             populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
             populateSelect('edit-library-char-element', elementOptions);
-            populateSelect('library-char-element', elementOptions, 'Scegli elemento...');
             populateSelect('edit-library-char-element', elementOptions);
 
             const tableBody = document.getElementById('library-character-table-body');
@@ -1307,15 +1306,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-});
-
-// --- NATIONS MANAGEMENT --- 
-
 async function loadNationsManagement() {
     try {
-        const response = await fetch('php/api.php?action=get_nations');
+        const response = await fetch('php/api.php?action=get_nations&context=management');
         const nations = await response.json();
-        window.nationsData = nations; // Update the global variable
+        window.nationsData = nations;
         const container = document.getElementById('nations-accordion-container');
         if (!container) return;
         container.innerHTML = '';
@@ -1325,10 +1320,17 @@ async function loadNationsManagement() {
                 const imageUrl = nation.image ? `data/${nation.image}` : '';
                 const accordionItem = document.createElement('div');
                 accordionItem.className = 'accordion-item';
+                accordionItem.setAttribute('draggable', 'true');
+                accordionItem.dataset.nationName = nation.name;
+
                 accordionItem.innerHTML = `
                     <h2 class="accordion-header" id="heading-${nationId}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${nationId}" aria-expanded="false" aria-controls="collapse-${nationId}">
-                            ${nation.name} ${nation.hidden ? '<span class="badge bg-secondary ms-2">Nascosta</span>' : ''}
+                        <button class="accordion-button collapsed d-flex justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${nationId}" aria-expanded="false" aria-controls="collapse-${nationId}">
+                            <span>
+                                <i class="bi bi-grip-vertical me-2 drag-handle"></i>
+                                ${nation.name}
+                            </span>
+                            ${nation.hidden ? '<span class="badge bg-secondary ms-2">Nascosta</span>' : ''}
                         </button>
                     </h2>
                     <div id="collapse-${nationId}" class="accordion-collapse collapse" aria-labelledby="heading-${nationId}" data-bs-parent="#nations-accordion-container">
@@ -1342,10 +1344,17 @@ async function loadNationsManagement() {
                                     <label for="nation-desc-${nationId}" class="form-label">Descrizione</label>
                                     <textarea id="nation-desc-${nationId}" name="description" class="form-control" rows="5">${nation.description || ''}</textarea>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="nation-image-${nationId}" class="form-label">Immagine di Copertina</label>
-                                    <input type="file" id="nation-image-${nationId}" name="image" class="form-control" accept="image/*">
-                                    ${imageUrl ? `<img src="${imageUrl}" class="img-thumbnail mt-2" style="max-height: 100px;">` : ''}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nation-image-${nationId}" class="form-label">Immagine Principale</label>
+                                        <input type="file" id="nation-image-${nationId}" name="image" class="form-control" accept="image/*">
+                                        ${nation.image ? `<img src="data/${nation.image}" class="img-thumbnail mt-2" style="max-height: 100px;">` : ''}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nation-image2-${nationId}" class="form-label">Immagine Secondaria</label>
+                                        <input type="file" id="nation-image2-${nationId}" name="image2" class="form-control" accept="image/*">
+                                        ${nation.image2 ? `<img src="data/${nation.image2}" class="img-thumbnail mt-2" style="max-height: 100px;">` : ''}
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <button type="submit" class="btn btn-primary btn-sm">Salva Modifiche</button>
@@ -1364,8 +1373,74 @@ async function loadNationsManagement() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+let draggedItem = null;
+
+function handleDragStart(e) {
+    draggedItem = e.target;
+    setTimeout(() => {
+        e.target.style.display = 'none';
+    }, 0);
+}
+
+function handleDragEnd(e) {
+    setTimeout(() => {
+        draggedItem.style.display = '';
+        draggedItem = null;
+    }, 0);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    const container = document.getElementById('nations-accordion-container');
+    const afterElement = getDragAfterElement(container, e.clientY);
+    if (afterElement == null) {
+        container.appendChild(draggedItem);
+    } else {
+        container.insertBefore(draggedItem, afterElement);
+    }
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.accordion-item:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+
     const addNationForm = document.getElementById('add-nation-form');
+    const saveOrderBtn = document.getElementById('save-nations-order-btn');
+
+    if (saveOrderBtn) {
+        saveOrderBtn.addEventListener('click', async () => {
+            const orderedNames = [...document.querySelectorAll('#nations-accordion-container .accordion-item')].map(item => item.dataset.nationName);
+            
+            try {
+                const response = await fetch('php/api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'update_nations_order', order: orderedNames })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    saveOrderBtn.classList.add('d-none');
+                } else {
+                    showErrorAlert(result.message);
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        });
+    }
+
     if (addNationForm) {
         addNationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1396,6 +1471,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nationsContainer = document.getElementById('nations-accordion-container');
     if (nationsContainer) {
+        nationsContainer.addEventListener('dragstart', handleDragStart);
+        nationsContainer.addEventListener('dragend', handleDragEnd);
+        nationsContainer.addEventListener('dragover', handleDragOver);
+        nationsContainer.addEventListener('drop', () => {
+            document.getElementById('save-nations-order-btn').classList.remove('d-none');
+        });
+
         nationsContainer.addEventListener('change', async (e) => {
             if (e.target.classList.contains('nation-visibility-switch')) {
                 const nationName = e.target.dataset.nationName;

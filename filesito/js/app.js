@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navUserManagementLink = document.getElementById('nav-user-management');
 
     // --- ROUTER E GESTIONE VISTE ---
-    window.showView = (viewId) => {
+    window.showView = (viewId, onComplete) => {
         window.scrollTo(0, 0); // Reset scroll position on view change
         const body = document.body;
         views.forEach(view => view.classList.remove('active'));
@@ -51,6 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(typeof applyGrimoireBackground === 'function') applyGrimoireBackground();
         } else {
             if(typeof updateAppearanceUI === 'function') updateAppearanceUI(); 
+        }
+
+        if (typeof onComplete === 'function') {
+            // Use a small timeout to ensure the DOM is updated before the callback runs
+            setTimeout(onComplete, 50);
         }
     };
 
@@ -327,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(typeof initGallerySettings === 'function') initGallerySettings();
         if(typeof updateLoginUI === 'function') updateLoginUI();
         console.log('App initialization complete.');
-        console.log('window.calculateBuildScore is type:', typeof window.calculateBuildScore);
+
     };
 
     document.querySelector('main').addEventListener('click', (e) => {

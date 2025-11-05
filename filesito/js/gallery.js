@@ -167,8 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return { score: details.finalScore, details: details };
     }
-    console.log('calculateBuildScore defined in gallery.js. Type:', typeof window.calculateBuildScore);
-    console.log('calculateBuildScore defined in gallery.js. Type:', typeof window.calculateBuildScore);
+
 
     window.applyFiltersAndSorting = () => {
         let filteredCharacters = [...sourceCharacterData];
