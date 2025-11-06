@@ -10,7 +10,7 @@
         "fazione": "Knights of Favonius",
         "icon": "library\/Albedo_Icon.webp",
         "banner": "library\/Albedo_Card.webp",
-        "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO.\r\nAlem haram Pyro ca.\r\nsubito una Crisi sss\r\nAahahahah Albedo aahahaha\r\nBond of Life",
+        "description": "Esempio descrizione, spero funzioni bene.\r\nSONO TORNATO A CAPO.\r\nAlem haram Pyro ca.\r\nsubito una Crisi sss\r\nAahahahah Albedo aahahaha\r\nBond of Life\r\n<span style=\"font-size: calc(1em + 4px);\">Test<\/span>",
         "wip": false
     },
     {
@@ -19,7 +19,7 @@
         "icon": "library\/Alhaitham_Icon.webp",
         "banner": "library\/Alhaitham_Card.webp",
         "titolo": "XXX",
-        "elemento": "Electro",
+        "elemento": "Pyro",
         "arma": "Sword",
         "rarita": "5-star",
         "nazione": "Sumeru",

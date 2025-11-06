@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         applyGrimoireBackground();
     };
 
-    window.loadCharacterDetailPage = async (characterName) => { 
+    window.loadCharacterDetailPage = async (characterName) => {
         const char = characterLibrary.find(c => c.nome === characterName);
         const detailView = document.getElementById('character-detail-view');
 
@@ -260,8 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
         detailView.innerHTML = `
             <div class="container-fluid">
                 <div class="row mb-3">
-                    <div class="col-12">
+                    <div class="col-12 d-flex justify-content-between">
                         <button id="back-to-grimoire" class="btn btn-dark btn-sm"><i class="bi bi-arrow-left"></i> Torna alla Libreria</button>
+                        ${isAdmin ? `<button id="edit-library-char-btn" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i> Modifica Personaggio</button>` : ''}
                     </div>
                 </div>
                 <div class="card shadow-sm">
@@ -306,19 +307,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 </div>
 
-                                <div class="mt-4 position-relative">
+                                <div class="mt-2 position-relative">
                                     <h5 class="border-bottom pb-2 mb-3">Descrizione</h5>
                                     <div id="description-display-container">
                                         <p>${displayDescription}</p>
                                     </div>
                                     <div id="description-edit-container" style="display: none;">
+                                        <div class="btn-toolbar mb-1" role="toolbar">
+                                            <div class="btn-group me-2" role="group">
+                                                <button type="button" id="add-title-btn" class="btn btn-outline-secondary btn-sm">Aggiungi titolo</button>
+                                            </div>
+                                        </div>
                                         <textarea id="description-textarea" class="form-control" rows="8">${char.description || ''}</textarea>
                                         <div class="text-end mt-2">
                                             <button id="cancel-description-edit" class="btn btn-secondary btn-sm">Annulla</button>
                                             <button id="save-description" class="btn btn-primary btn-sm">Salva</button>
                                         </div>
                                     </div>
-                                    ${(isAdmin || isModerator) ? '<button id="edit-description-btn" class="btn btn-outline-primary btn-sm" style="position: absolute; top: 0; right: 0;"><i class="bi bi-pencil-fill"></i></button>' : ''}
+                                    ${(isAdmin || isModerator) ? `<button id="edit-description-btn" class="btn btn-outline-primary btn-sm" style="position: absolute; top: 0; right: 0;"><i class="bi bi-pencil-fill"></i></button>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -339,23 +345,82 @@ document.addEventListener('DOMContentLoaded', () => {
             location.hash = '#grimoire';
         });
 
+        if (isAdmin) {
+            document.getElementById('edit-library-char-btn').addEventListener('click', () => {
+                const modalElement = document.getElementById('edit-library-character-modal');
+                const modal = new bootstrap.Modal(modalElement);
+
+                // Pre-populate selects
+                const elementOptions = elementsData.map(el => ({ name: el.name, value: el.name }));
+                const nationOptions = nationsData.map(n => ({ name: n.name, value: n.name }));
+                window.populateSelect('edit-library-char-element', elementOptions);
+                window.populateSelect('edit-library-char-nazione', nationOptions);
+
+                // Populate common fields
+                document.getElementById('edit-library-original-name').value = char.nome;
+                document.getElementById('edit-library-char-name').value = char.nome;
+                document.getElementById('edit-library-char-title').value = char.titolo;
+                document.getElementById('edit-library-char-element').value = char.elemento;
+                document.getElementById('edit-library-char-weapon').value = char.arma;
+                document.getElementById('edit-library-char-nazione').value = char.nazione;
+                document.getElementById('edit-library-char-fazione').value = char.fazione;
+
+                // Populate radio buttons for rarity
+                const rarity5 = document.getElementById('edit-lib-rarity-5');
+                const rarity4 = document.getElementById('edit-lib-rarity-4');
+                if (char.rarita === '5-star') {
+                    rarity5.checked = true;
+                } else {
+                    rarity4.checked = true;
+                }
+
+                // Populate WIP checkbox
+                document.getElementById('edit-library-char-wip').checked = char.wip;
+
+                // Populate images
+                document.getElementById('edit-library-current-icon').src = char.icon ? `data/${char.icon}` : '';
+                document.getElementById('edit-library-current-banner').src = char.banner ? `data/${char.banner}` : '';
+                document.getElementById('edit-library-current-image').src = char.splashart ? `data/${char.splashart}` : '';
+
+                modal.show();
+            });
+        }
+
         if (isAdmin || isModerator) {
             const editBtn = document.getElementById('edit-description-btn');
             const saveBtn = document.getElementById('save-description');
             const cancelBtn = document.getElementById('cancel-description-edit');
             const displayContainer = document.getElementById('description-display-container');
             const editContainer = document.getElementById('description-edit-container');
+            const addTitleBtn = document.getElementById('add-title-btn');
 
-            editBtn.addEventListener('click', () => {
-                displayContainer.style.display = 'none';
-                editContainer.style.display = 'block';
-                editBtn.style.display = 'none';
-            });
+            if (addTitleBtn) {
+                addTitleBtn.addEventListener('click', () => {
+                    const textarea = document.getElementById('description-textarea');
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const text = textarea.value;
+                    const tag = '<span style="font-size: calc(1em + 3px);"></span>';
+                    textarea.value = text.substring(0, start) + tag + text.substring(end);
+                    const cursorPos = start + 42; // Position cursor inside the span
+                    textarea.selectionStart = cursorPos;
+                    textarea.selectionEnd = cursorPos;
+                    textarea.focus();
+                });
+            }
+
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    displayContainer.style.display = 'none';
+                    editContainer.style.display = 'block';
+                    editBtn.style.display = 'none';
+                });
+            }
 
             cancelBtn.addEventListener('click', () => {
                 displayContainer.style.display = 'block';
                 editContainer.style.display = 'none';
-                editBtn.style.display = 'block';
+                if (editBtn) editBtn.style.display = 'block';
             });
 
             saveBtn.addEventListener('click', async () => {

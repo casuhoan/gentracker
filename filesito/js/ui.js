@@ -13,7 +13,7 @@ const showErrorAlert = (message) => {
     Swal.fire({ icon: 'error', title: 'Oops...', text: message });
 };
 
-const populateSelect = (selectId, options, firstOptionText) => {
+window.populateSelect = (selectId, options, firstOptionText) => {
     const select = document.getElementById(selectId);
     if (!select) return;
     select.innerHTML = '';

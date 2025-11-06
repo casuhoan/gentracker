@@ -26,6 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         document.getElementById('banner-rarity').innerHTML = rarityHtml;
+
+        const bannerContainer = document.getElementById('character-banner-container');
+        if (baseChar) {
+            bannerContainer.style.cursor = 'pointer';
+            bannerContainer.onclick = () => {
+                location.hash = `#grimoire-character/${encodeURIComponent(baseChar.nome)}`;
+            };
+        } else {
+            bannerContainer.style.cursor = 'default';
+            bannerContainer.onclick = null;
+        }
     };
 
     window.loadDashboard = (charData) => {
