@@ -225,36 +225,106 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadInventoryManagementTab = async () => {
         const container = document.getElementById('v-pills-inventory-management');
         if (!container) return;
+        container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
-        const settingsRes = await fetch('php/api.php?action=get_settings');
-        const settings = await settingsRes.json();
-        const currentBg = settings.inventory_background || '';
+        try {
+            // Fetch all data in parallel
+            const [settingsRes, backgroundsRes, enkaCharMapRes, savedMapRes] = await Promise.all([
+                fetch('php/api.php?action=get_settings'),
+                fetch('php/api.php?action=get_backgrounds'),
+                fetch('inventory/character_id_map.json'),
+                fetch('php/api.php?action=get_inventory_character_map')
+            ]);
 
-        const backgroundsRes = await fetch('php/api.php?action=get_backgrounds');
-        const backgroundsData = await backgroundsRes.json();
-        
-        let optionsHtml = '<option value="">Sfondo Casuale</option>';
-        if (backgroundsData.status === 'success') {
-            backgroundsData.backgrounds.forEach(bg => {
-                optionsHtml += `<option value="${bg}" ${currentBg === bg ? 'selected' : ''}>${bg}</option>`;
-            });
-        }
+            const settings = await settingsRes.json();
+            const backgroundsData = await backgroundsRes.json();
+            const enkaCharMap = await enkaCharMapRes.json();
+            const savedMap = await savedMapRes.json();
+            
+            const currentBg = settings.inventory_background || '';
 
-        container.innerHTML = `
-            <h4>Impostazioni Sfondo Inventario</h4>
-            <p class="text-muted small">Scegli uno sfondo predefinito per le pagine dell'inventario (elenco e dettaglio). Se non viene scelto, verrà usato uno sfondo casuale.</p>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <label class="input-group-text" for="inventory-bg-select">Sfondo</label>
-                        <select class="form-select" id="inventory-bg-select">
-                            ${optionsHtml}
-                        </select>
-                        <button class="btn btn-primary" id="save-inventory-bg-btn">Salva</button>
+            // --- Render Background Settings ---
+            let bgOptionsHtml = '<option value="">Sfondo Casuale</option>';
+            if (backgroundsData.status === 'success') {
+                backgroundsData.backgrounds.forEach(bg => {
+                    bgOptionsHtml += `<option value="${bg}" ${currentBg === bg ? 'selected' : ''}>${bg}</option>`;
+                });
+            }
+            const backgroundSettingsHtml = `
+                <h4>Impostazioni Sfondo Inventario</h4>
+                <p class="text-muted small">Scegli uno sfondo predefinito per le pagine dell'inventario (elenco e dettaglio). Se non viene scelto, verrà usato uno sfondo casuale.</p>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <label class="input-group-text" for="inventory-bg-select">Sfondo</label>
+                            <select class="form-select" id="inventory-bg-select">
+                                ${bgOptionsHtml}
+                            </select>
+                            <button class="btn btn-primary" id="save-inventory-bg-btn">Salva Sfondo</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+                <hr class="my-4">
+            `;
+
+            // --- Render Character Mapping ---
+            const libraryOptionsHtml = characterLibrary
+                .map(c => `<option value="${c.nome}">${c.nome}</option>`)
+                .join('');
+
+            let tableRowsHtml = '';
+            for (const id in enkaCharMap) {
+                const enkaName = enkaCharMap[id];
+                const savedCharName = savedMap[id] || '';
+                
+                const selectOptions = characterLibrary.map(c => {
+                    const isSelected = (c.nome === savedCharName) || (!savedCharName && c.nome === enkaName);
+                    return `<option value="${c.nome}" ${isSelected ? 'selected' : ''}>${c.nome}</option>`;
+                }).join('');
+
+                tableRowsHtml += `
+                    <tr>
+                        <td><strong>${enkaName}</strong></td>
+                        <td><code class="small">${id}</code></td>
+                        <td>
+                            <select class="form-select form-select-sm inventory-char-map-select" data-avatar-id="${id}">
+                                <option value="">-- Non Associare --</option>
+                                ${selectOptions}
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            const characterMappingHtml = `
+                <h4>Associazione Personaggi Inventario</h4>
+                <p class="text-muted small">Associa ogni personaggio dell'inventario (da Enka.Network) a un personaggio della tua libreria locale. Questo permette di usare le immagini e i dati corretti (banner, splash, ecc.) nella visualizzazione dell'inventario.</p>
+                <div class="table-responsive" style="max-height: 60vh; overflow-y: auto;">
+                    <table class="table table-striped table-sm">
+                        <thead class="table-dark" style="position: sticky; top: 0;">
+                            <tr>
+                                <th>Personaggio (Enka)</th>
+                                <th>Avatar ID</th>
+                                <th>Personaggio Associato (Libreria)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-end mt-3">
+                    <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati</button>
+                    <button class="btn btn-success" id="save-inventory-char-map-btn">Salva Associazioni</button>
+                </div>
+            `;
+
+            container.innerHTML = backgroundSettingsHtml + characterMappingHtml;
+
+        } catch (error) {
+            container.innerHTML = '<div class="alert alert-danger">Impossibile caricare le impostazioni di gestione dell\'inventario.</div>';
+            console.error('Error loading inventory management tab:', error);
+        }
     };
 
 
@@ -506,17 +576,73 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-tabContent')?.addEventListener('click', async (e) => {
         if (e.target.id === 'save-inventory-bg-btn') {
             const selectedBg = document.getElementById('inventory-bg-select').value;
-            const formData = new FormData();
-            formData.append('action', 'save_inventory_settings');
-            formData.append('inventory_background', selectedBg);
-
+            
             try {
-                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const response = await fetch('php/api.php', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'save_inventory_settings',
+                        inventory_background: selectedBg
+                    })
+                });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showToast('Impostazioni inventario salvate!');
+                    showToast('Impostazioni sfondo inventario salvate!');
+                    // Update global settings object if it exists
+                    if(window.siteSettings) {
+                        window.siteSettings.inventory_background = selectedBg;
+                    }
                 } else {
                     showErrorAlert(result.message || 'Errore nel salvataggio.');
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        }
+
+        if (e.target.id === 'sync-inventory-data-btn') {
+            try {
+                const response = await fetch('php/api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'sync_inventory_data' })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Dati sincronizzati con successo!');
+                } else {
+                    showErrorAlert(result.message || 'Errore durante la sincronizzazione.');
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        }
+
+        if (e.target.id === 'save-inventory-char-map-btn') {
+            const map = {};
+            document.querySelectorAll('.inventory-char-map-select').forEach(select => {
+                const avatarId = select.dataset.avatarId;
+                const selectedValue = select.value;
+                if (avatarId && selectedValue) {
+                    map[avatarId] = selectedValue;
+                }
+            });
+
+            try {
+                const response = await fetch('php/api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'save_inventory_character_map', map: map })
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Associazioni personaggi salvate!');
+                    // Invalidate and reload the map
+                    window.inventoryCharacterMap = null; 
+                    await loadInventoryData(); // from app.js
+                } else {
+                    showErrorAlert(result.message || 'Errore nel salvataggio della mappa.');
                 }
             } catch (error) {
                 showErrorAlert('Errore di comunicazione con il server.');

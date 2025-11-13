@@ -134,6 +134,51 @@ function get_weapon_icons_dir() {
     return $dir;
 }
 
+function get_inventory_character_map_file() {
+    // This now points to the non-synced, master file
+    return __DIR__ . '/../inventory/inventory_character_map.json';
+}
+
+function get_data_dir() {
+    $dir = __DIR__ . '/../data/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    return $dir;
+}
+
+function sync_inventory_data() {
+    $source_dir = __DIR__ . '/../inventory/';
+    $dest_dir = get_data_dir(); // Ensures 'data' directory exists
+
+    $files_to_sync = [
+        'inventory_character_map.json',
+        'en_stat_map.json',
+        'character_id_map.json'
+    ];
+
+    $errors = [];
+    foreach ($files_to_sync as $filename) {
+        $source_file = $source_dir . $filename;
+        $dest_file = $dest_dir . $filename;
+
+        if (file_exists($source_file)) {
+            if (!copy($source_file, $dest_file)) {
+                $errors[] = "Impossibile copiare {$filename}.";
+            }
+        } else {
+            $errors[] = "File di origine non trovato: {$filename}.";
+        }
+    }
+
+    if (empty($errors)) {
+        echo json_encode(['status' => 'success', 'message' => 'Dati dell\'inventario sincronizzati con successo.']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Si sono verificati errori durante la sincronizzazione.', 'details' => $errors]);
+    }
+}
+
 function get_element_icons_dir() {
     $dir = __DIR__ . '/../data/icons/elements/';
     if (!is_dir($dir)) {
@@ -2021,6 +2066,33 @@ function get_filesito_size() {
     echo json_encode(['status' => 'success', 'size' => $formatted_size]);
 }
 
+function get_inventory_character_map() {
+    if (!is_admin()) { http_response_code(403); echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']); return; }
+    $map_file = get_inventory_character_map_file();
+    if (!file_exists($map_file)) {
+        file_put_contents($map_file, '{}');
+    }
+    header('Content-Type: application/json');
+    echo file_get_contents($map_file);
+}
+
+function save_inventory_character_map() {
+    if (!is_admin()) { http_response_code(403); echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']); return; }
+    $map_file = get_inventory_character_map_file();
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (isset($data['map'])) {
+        if (file_put_contents($map_file, json_encode($data['map'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+            echo json_encode(['status' => 'success', 'message' => 'Mappa personaggi inventario salvata.']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare il file della mappa.']);
+        }
+    } else {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Dati mappa mancanti.']);
+    }
+}
+
 function organize_splasharts() {
     if (!is_admin()) {
         http_response_code(403);
@@ -2189,7 +2261,7 @@ if (isset($_REQUEST['action'])) {
 
 $public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons', 'getInventory'];
 $user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket', 'save_genshin_uid'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility', 'update_nations_order', 'save_inventory_settings'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility', 'update_nations_order', 'save_inventory_settings', 'get_inventory_character_map', 'save_inventory_character_map', 'sync_inventory_data'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

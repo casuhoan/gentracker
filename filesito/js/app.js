@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.isModerator = false;
     window.grimoireBackground = null;
     window.keywordSettings = null;
+    window.inventoryCharacterMap = null;
+    window.backgrounds = [];
+    window.enkaStatMap = {};
 
     // --- ELEMENTI DOM ---
     const views = document.querySelectorAll('.view');
@@ -285,14 +288,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const loadInventoryData = async () => {
+        if (window.inventoryCharacterMap) return; // Already loaded
+        try {
+            const response = await fetch('php/api.php?action=get_inventory_character_map');
+            if (response.ok) {
+                window.inventoryCharacterMap = await response.json();
+            } else {
+                console.error('Could not load inventory character map.');
+                window.inventoryCharacterMap = {};
+            }
+        } catch (error) {
+            console.error('Error fetching inventory character map:', error);
+            window.inventoryCharacterMap = {};
+        }
+    };
+
     const init = async () => {
         try {
-            const [charLibResponse, elementsResponse, weaponsResponse, settingsResponse, nationsResponse] = await Promise.all([
+            const [charLibResponse, elementsResponse, weaponsResponse, settingsResponse, nationsResponse, backgroundsResponse, enkaStatMapResponse] = await Promise.all([
                 fetch('data/characters_list.json?v=' + new Date().getTime()),
                 fetch('php/api.php?action=get_elements'),
                 fetch('php/api.php?action=get_weapons'),
                 fetch('php/api.php?action=get_settings'),
-                fetch('php/api.php?action=get_nations')
+                fetch('php/api.php?action=get_nations'),
+                fetch('php/api.php?action=get_backgrounds'),
+                fetch('data/en_stat_map.json')
             ]);
 
             if (!charLibResponse.ok) throw new Error('Failed to load characters_list.json');
@@ -313,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (settingsResponse.ok) {
                 const settings = await settingsResponse.json();
                 grimoireBackground = settings.grimoire_background || null;
+                window.siteSettings = settings; // Store all settings globally
             } else {
                 console.error('Could not load settings data.');
             }
@@ -322,6 +344,23 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.error('Could not load nations data.');
             }
+
+            if (backgroundsResponse.ok) {
+                const bgData = await backgroundsResponse.json();
+                if (bgData.status === 'success') {
+                    window.backgrounds = bgData.backgrounds;
+                }
+            } else {
+                console.error('Could not load backgrounds data.');
+            }
+
+            if (enkaStatMapResponse.ok) {
+                window.enkaStatMap = await enkaStatMapResponse.json();
+            } else {
+                console.error('Could not load enka stat map.');
+            }
+
+            await loadInventoryData();
 
             if(typeof initCharacterLibrarySelect === 'function') initCharacterLibrarySelect();
         } catch (error) {
