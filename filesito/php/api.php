@@ -436,11 +436,47 @@ function check_session() {
             'avatar' => $found_user['avatar'] ?? '',
             'background' => $found_user['background'] ?? 'disattivato',
             'opacity' => $found_user['opacity'] ?? 'no',
-            'grimoire_view' => $found_user['grimoire_view'] ?? 'splash'
+            'grimoire_view' => $found_user['grimoire_view'] ?? 'splash',
+            'genshin_uid' => $found_user['genshin_uid'] ?? '' // Add genshin_uid here
         ]);
     } else {
         // Se l'ID utente in sessione non esiste più, distruggi la sessione
         logout();
+    }
+}
+
+function save_genshin_uid() {
+    if (!is_logged_in()) {
+        http_response_code(401);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso non effettuato.']);
+        return;
+    }
+
+    $users_file = get_users_file();
+    $users = json_decode(file_get_contents($users_file), true);
+
+    $genshin_uid = $_POST['genshin_uid'] ?? '';
+
+    $user_found = false;
+    foreach ($users as &$user) {
+        if ($user['id'] === $_SESSION['user_id']) {
+            $user['genshin_uid'] = $genshin_uid;
+            $user_found = true;
+            break;
+        }
+    }
+
+    if (!$user_found) {
+        http_response_code(404);
+        echo json_encode(['status' => 'error', 'message' => 'Utente non trovato.']);
+        return;
+    }
+
+    if (file_put_contents($users_file, json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        echo json_encode(['status' => 'success', 'message' => 'UID Genshin Impact salvato con successo.']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare l\'UID Genshin Impact.']);
     }
 }
 
@@ -2072,6 +2108,72 @@ function organize_splasharts() {
     }
 }
 
+function save_inventory_settings() {
+    if (!is_admin()) {
+        http_response_code(403);
+        echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']);
+        return;
+    }
+
+    $settings_file = get_settings_file();
+    $settings = [];
+    if (file_exists($settings_file)) {
+        $settings = json_decode(file_get_contents($settings_file), true);
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+    }
+
+    $inventory_background = $_POST['inventory_background'] ?? '';
+    $settings['inventory_background'] = $inventory_background;
+
+    if (file_put_contents($settings_file, json_encode($settings, JSON_PRETTY_PRINT))) {
+        echo json_encode(['status' => 'success', 'message' => 'Impostazioni inventario salvate.']);
+    } else {
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile salvare le impostazioni.']);
+    }
+}
+
+function getInventory() {
+    $uid = $_GET['uid'] ?? '';
+    if (empty($uid) || !is_numeric($uid)) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'UID non valido.']);
+        return;
+    }
+
+    $url = "https://enka.network/api/uid/{$uid}/";
+    
+    $ch = curl_init();
+    
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Gentracker/1.0'); // Set a User-Agent
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15); // 15 second timeout
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Follow redirects
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Workaround for local SSL certificate issues
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        // cURL error
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        http_response_code(502); // Bad Gateway
+        echo json_encode(['status' => 'error', 'message' => 'Impossibile contattare i server di Enka.Network (cURL Error: ' . $curl_error . ')']);
+        return;
+    }
+    
+    curl_close($ch);
+
+    // Forward Enka's response, including any error codes it might have sent (e.g. 404, 429)
+    http_response_code($http_code);
+    header('Content-Type: application/json');
+    echo $response;
+}
+
 // --- ROUTER ---
 $action = '';
 if (isset($_REQUEST['action'])) {
@@ -2085,9 +2187,9 @@ if (isset($_REQUEST['action'])) {
 
 
 
-$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons'];
-$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket'];
-$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility', 'update_nations_order'];
+$public_actions = ['login', 'logout', 'check_session', 'get_elements', 'get_settings', 'get_nations', 'get_weapons', 'getInventory'];
+$user_actions   = ['get_all_characters', 'save_character', 'update_character', 'save_build', 'update_build', 'delete_build', 'update_user', 'delete_character', 'get_backgrounds', 'submit_ticket', 'save_genshin_uid'];
+$admin_actions  = ['get_all_users', 'delete_users', 'register', 'add_character_to_library', 'update_library_character', 'upload_background', 'delete_background', 'get_user_schema', 'save_user_schema', 'enforce_user_schema', 'add_element', 'update_element_icon', 'upload_favicon', 'upload_grimoire_background', 'update_character_description', 'sync_library_images', 'get_keyword_settings', 'save_keyword_settings', 'get_tickets', 'close_ticket', 'add_nation', 'delete_nation', 'update_nation_details', 'add_weapon', 'update_weapon_icon', 'organize_splasharts', 'get_filesito_size', 'update_nation_visibility', 'update_nations_order', 'save_inventory_settings'];
 $moderator_allowed_actions = [
     'upload_background',
     'upload_grimoire_background',

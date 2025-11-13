@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('v-pills-weapons-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-tickets-tab')?.classList.remove('d-none');
             document.getElementById('v-pills-nations-tab')?.classList.remove('d-none');
+            document.getElementById('v-pills-inventory-management-tab')?.classList.remove('d-none');
         }
 
         // Show tabs for both Admin and Moderator
@@ -220,6 +221,42 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(weaponNode);
         });
     }
+
+    const loadInventoryManagementTab = async () => {
+        const container = document.getElementById('v-pills-inventory-management');
+        if (!container) return;
+
+        const settingsRes = await fetch('php/api.php?action=get_settings');
+        const settings = await settingsRes.json();
+        const currentBg = settings.inventory_background || '';
+
+        const backgroundsRes = await fetch('php/api.php?action=get_backgrounds');
+        const backgroundsData = await backgroundsRes.json();
+        
+        let optionsHtml = '<option value="">Sfondo Casuale</option>';
+        if (backgroundsData.status === 'success') {
+            backgroundsData.backgrounds.forEach(bg => {
+                optionsHtml += `<option value="${bg}" ${currentBg === bg ? 'selected' : ''}>${bg}</option>`;
+            });
+        }
+
+        container.innerHTML = `
+            <h4>Impostazioni Sfondo Inventario</h4>
+            <p class="text-muted small">Scegli uno sfondo predefinito per le pagine dell'inventario (elenco e dettaglio). Se non viene scelto, verrà usato uno sfondo casuale.</p>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <label class="input-group-text" for="inventory-bg-select">Sfondo</label>
+                        <select class="form-select" id="inventory-bg-select">
+                            ${optionsHtml}
+                        </select>
+                        <button class="btn btn-primary" id="save-inventory-bg-btn">Salva</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
 
     // --- TICKET MANAGEMENT ---
 
@@ -463,6 +500,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('v-pills-keywords-tab')?.addEventListener('shown.bs.tab', loadKeywordManagement);
     document.getElementById('v-pills-tickets-tab')?.addEventListener('shown.bs.tab', loadTicketManagement);
     document.getElementById('v-pills-nations-tab')?.addEventListener('shown.bs.tab', loadNationsManagement);
+    document.getElementById('v-pills-inventory-management-tab')?.addEventListener('shown.bs.tab', loadInventoryManagementTab);
+
+
+    document.getElementById('v-pills-tabContent')?.addEventListener('click', async (e) => {
+        if (e.target.id === 'save-inventory-bg-btn') {
+            const selectedBg = document.getElementById('inventory-bg-select').value;
+            const formData = new FormData();
+            formData.append('action', 'save_inventory_settings');
+            formData.append('inventory_background', selectedBg);
+
+            try {
+                const response = await fetch('php/api.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showToast('Impostazioni inventario salvate!');
+                } else {
+                    showErrorAlert(result.message || 'Errore nel salvataggio.');
+                }
+            } catch (error) {
+                showErrorAlert('Errore di comunicazione con il server.');
+            }
+        }
+    });
+
 
     document.getElementById('v-pills-tabContent')?.addEventListener('submit', async (e) => {
         e.preventDefault();

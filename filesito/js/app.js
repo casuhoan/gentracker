@@ -101,6 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#grimoire-nation/')) {
             const nationName = decodeURIComponent(hash.substring(17));
             if(typeof loadNationDetailPage === 'function') loadNationDetailPage(nationName);
+        } else if (hash.startsWith('#inventory-character/')) {
+            const avatarId = decodeURIComponent(hash.substring(21));
+            if(typeof loadInventoryCharacterPage === 'function') loadInventoryCharacterPage(avatarId);
         } else if (hash.startsWith('#submit-ticket/')) {
             const charName = decodeURIComponent(hash.substring(15));
             showView('ticket-submission-view');
@@ -125,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 '#manage-builds': 'build-management-view',
                 '#user-management': 'user-management-view',
                 '#settings': 'settings-view',
+                '#inventory': 'inventory-view',
             };
             const viewId = routeMap[hash] || 'gallery-view';
             showView(viewId);
@@ -136,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (viewId === 'build-management-view' && typeof loadBuildManagement === 'function') loadBuildManagement();
             if (viewId === 'user-management-view' && typeof loadUserManagement === 'function') loadUserManagement();
             if (viewId === 'settings-view' && typeof loadSettingsPage === 'function') loadSettingsPage();
+            if (viewId === 'inventory-view' && typeof loadInventoryPage === 'function') loadInventoryPage();
         }
     };
 
@@ -171,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     avatar: result.avatar, 
                     background: result.background,
                     card_opacity: (result.opacity === 'yes' ? 'on' : 'off'),
-                    grimoire_view: result.grimoire_view || 'splash'
+                    grimoire_view: result.grimoire_view || 'splash',
+                    genshin_uid: result.genshin_uid || ''
                 };
                 isAdmin = (result.role === 'admin');
                 isModerator = (result.role === 'moderator');

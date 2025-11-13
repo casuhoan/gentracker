@@ -272,6 +272,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#manage-builds" id="nav-manage-builds">Gestisci Build</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#inventory" id="nav-inventory">Inventario</a>
+                    </li>
                 </ul>
                 <div class="d-flex align-items-center ms-auto">
                     <!-- Theme Toggle Switch -->
@@ -329,6 +332,7 @@
                         <a class="nav-link d-none" id="v-pills-keywords-tab" data-bs-toggle="pill" href="#v-pills-keywords" role="tab" aria-controls="v-pills-keywords" aria-selected="false"><i class="bi bi-tags-fill me-2"></i>Gestione Parole Chiave</a>
                         <a class="nav-link d-none" id="v-pills-tickets-tab" data-bs-toggle="pill" href="#v-pills-tickets" role="tab" aria-controls="v-pills-tickets" aria-selected="false"><i class="bi bi-ticket-detailed-fill me-2"></i>Gestione Ticket</a>
                         <a class="nav-link d-none" id="v-pills-nations-tab" data-bs-toggle="pill" href="#v-pills-nations" role="tab" aria-controls="v-pills-nations" aria-selected="false"><i class="bi bi-globe-americas me-2"></i>Gestione Nazioni</a>
+                        <a class="nav-link d-none" id="v-pills-inventory-management-tab" data-bs-toggle="pill" href="#v-pills-inventory-management" role="tab"><i class="bi bi-box-seam me-2"></i>Gestione Inventario</a>
                     </div>
                 </div>
                 <!-- Contenuto delle schede -->
@@ -613,59 +617,59 @@
                         </div>
 
                         <!-- Pannello Gestione Parole Chiave -->
-<div class="tab-pane fade" id="v-pills-keywords" role="tabpanel" aria-labelledby="v-pills-keywords-tab">
-    <h4>Gestione Parole Chiave per le Descrizioni</h4>
-    <p class="text-muted small">Aggiungi parole chiave per colorare automaticamente il testo o per mostrare un fumetto con una spiegazione al passaggio del mouse.</p>
-    
-    <hr>
-    <h5>Colorazione Parole Chiave</h5>
-    <form id="keyword-color-form" class="mb-3 row g-3 align-items-end">
-        <div class="col-md-4">
-            <label for="keyword-color-input" class="form-label">Parola Chiave</label>
-            <input type="text" id="keyword-color-input" class="form-control">
-        </div>
-        <div class="col-md-4">
-            <label for="keyword-color-select" class="form-label">Colore</label>
-            <select id="keyword-color-select" class="form-select"></select>
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Aggiungi Colore</button>
-        </div>
-    </form>
-    <div class="table-responsive mb-4">
-        <table class="table table-sm">
-            <thead>
-                <tr>
-                    <th>Parola</th>
-                    <th>Colore</th>
-                    <th>Azione</th>
-                </tr>
-            </thead>
-            <tbody id="keyword-colors-table-body">
-                <!-- Righe inserite da JS -->
-            </tbody>
-        </table>
-    </div>
+                        <div class="tab-pane fade" id="v-pills-keywords" role="tabpanel" aria-labelledby="v-pills-keywords-tab">
+                            <h4>Gestione Parole Chiave per le Descrizioni</h4>
+                            <p class="text-muted small">Aggiungi parole chiave per colorare automaticamente il testo o per mostrare un fumetto con una spiegazione al passaggio del mouse.</p>
+                            
+                            <hr>
+                            <h5>Colorazione Parole Chiave</h5>
+                            <form id="keyword-color-form" class="mb-3 row g-3 align-items-end">
+                                <div class="col-md-4">
+                                    <label for="keyword-color-input" class="form-label">Parola Chiave</label>
+                                    <input type="text" id="keyword-color-input" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="keyword-color-select" class="form-label">Colore</label>
+                                    <select id="keyword-color-select" class="form-select"></select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">Aggiungi Colore</button>
+                                </div>
+                            </form>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Parola</th>
+                                            <th>Colore</th>
+                                            <th>Azione</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="keyword-colors-table-body">
+                                        <!-- Righe inserite da JS -->
+                                    </tbody>
+                                </table>
+                            </div>
 
-    <hr>
-    <h5>Tooltip Parole Chiave</h5>
-    <form id="keyword-tooltip-form" class="mb-3">
-        <div class="mb-2">
-            <label for="keyword-tooltip-input" class="form-label">Parola o Frase Chiave</label>
-            <input type="text" id="keyword-tooltip-input" class="form-control">
-        </div>
-        <div class="mb-2">
-            <label for="keyword-tooltip-desc" class="form-label">Descrizione (per il fumetto)</label>
-            <textarea id="keyword-tooltip-desc" class="form-control" rows="2"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Aggiungi Tooltip</button>
-    </form>
-    <div class="accordion" id="keyword-tooltips-accordion"></div>
-    <hr class="my-4">
-    <div class="text-end">
-        <button class="btn btn-success" id="save-keyword-settings-btn"><i class="bi bi-save me-2"></i>Salva Tutte le Impostazioni</button>
-    </div>
-</div>
+                            <hr>
+                            <h5>Tooltip Parole Chiave</h5>
+                            <form id="keyword-tooltip-form" class="mb-3">
+                                <div class="mb-2">
+                                    <label for="keyword-tooltip-input" class="form-label">Parola o Frase Chiave</label>
+                                    <input type="text" id="keyword-tooltip-input" class="form-control">
+                                </div>
+                                <div class="mb-2">
+                                    <label for="keyword-tooltip-desc" class="form-label">Descrizione (per il fumetto)</label>
+                                    <textarea id="keyword-tooltip-desc" class="form-control" rows="2"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Aggiungi Tooltip</button>
+                            </form>
+                            <div class="accordion" id="keyword-tooltips-accordion"></div>
+                            <hr class="my-4">
+                            <div class="text-end">
+                                <button class="btn btn-success" id="save-keyword-settings-btn"><i class="bi bi-save me-2"></i>Salva Tutte le Impostazioni</button>
+                            </div>
+                        </div>
                         <!-- Pannello Gestione Ticket -->
                         <div class="tab-pane fade" id="v-pills-tickets" role="tabpanel" aria-labelledby="v-pills-tickets-tab">
                             <h4>Gestione Ticket Descrizioni</h4>
@@ -731,6 +735,11 @@
                             <h5>Nazioni Esistenti</h5>
                             <button id="save-nations-order-btn" class="btn btn-success btn-sm mb-3 d-none">Salva Ordine</button>
                             <div class="accordion" id="nations-accordion-container"></div>
+                        </div>
+                        
+                        <!-- Pannello Gestione Inventario -->
+                        <div class="tab-pane fade" id="v-pills-inventory-management" role="tabpanel" aria-labelledby="v-pills-inventory-management-tab">
+                            <!-- Contenuto generato da settings.js -->
                         </div>
                     </div>
                 </div>
@@ -1291,6 +1300,16 @@
                 </div>
             </form>
         </div>
+
+        <!-- Sezione Inventario -->
+        <div id="inventory-view" class="view">
+            <!-- Contenuto generato da inventory.js -->
+        </div>
+
+        <!-- Sezione Dettaglio Personaggio Inventario -->
+        <div id="inventory-character-detail-view" class="view">
+            <!-- Contenuto generato da inventory.js -->
+        </div>
     </main>
 
     <footer class="site-footer">
@@ -1329,6 +1348,7 @@
     <script src="js/build.js"></script>
     <script src="js/settings.js?v=1.2"></script>
     <script src="js/app.js?v=1.2"></script>
+    <script src="js/inventory.js"></script>
     <script src="js/user-management.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 

@@ -28,6 +28,71 @@ body.body-has-background {
 
 
 
+/* Force dark text and no shadow for inventory detail header */
+.inventory-detail-header-text {
+    text-shadow: none !important;
+    color: #212529 !important;
+}
+
+/* Styles for Stat Rows on Character Detail Page */
+.stat-row {
+    background-color: #f1f3f5; /* A light grey */
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #dee2e6;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.stat-row span {
+    color: #495057; /* Slightly muted color for the stat name */
+}
+
+.stat-row strong {
+    color: #212529; /* Dark color for the stat value */
+}
+
+/* Dark Mode styles for stat rows */
+body.dark-mode .stat-row {
+    background-color: #343a40; /* A dark grey */
+    border-color: #495057;
+}
+
+body.dark-mode .stat-row span {
+    color: #adb5bd; /* Lighter muted color */
+}
+
+body.dark-mode .stat-row strong {
+    color: #f8f9fa; /* White color for the stat value */
+}
+
+/* Styles for Equipment Cards (Weapon/Artifacts) on Character Detail Page */
+.equip-item-card {
+    background-color: #f1f3f5; /* Light grey */
+    border: 1px solid #dee2e6;
+    color: #212529; /* Dark text */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.equip-item-card .text-muted {
+    color: #6c757d !important;
+}
+
+body.dark-mode .equip-item-card {
+    background-color: #343a40; /* Dark grey */
+    border-color: #495057;
+    color: #f8f9fa; /* Light text */
+}
+body.dark-mode .equip-item-card .text-muted {
+    color: #adb5bd !important;
+}
+
+/* Remove backlight from inventory view titles */
+body.body-has-background #inventory-view h1,
+body.body-has-background #inventory-view h2 {
+    text-shadow: none !important;
+    color: inherit !important; /* Ensure text color adapts to theme */
+}
+
 /* Specific overrides to remove text shadow and ensure appropriate color */
 body.body-has-background #gallery-settings-toggle-btn i,
 body.body-has-background .custom-card h5,

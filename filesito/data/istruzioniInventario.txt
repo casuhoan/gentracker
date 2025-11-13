@@ -1,0 +1,45 @@
+Perfetto, ora vorrei creare questa nuova pagina inventario e dividerò il progetto in più punti:
+
+1-Prima richiesta.
+    All'interno della pagina, al primo accesso chiederà di impostare un UID per far visualizzare i dati richiesti, questo verrà salvato in una proprietà dell'utente.
+    
+    la pagina principale (home) che mostrerà in alto una specie di banner con il Nome utente in gioco, il livello AR e sotto la descrizione.
+    Se possibile vorrei che avesse anche l'icona corrispondente del personaggio. Ma non so se è possibile perché vedo che è collegata ad un ID (probabilmente di un database loro)
+    Più in basso ci saranno tutti i personaggi con le relative splash art (di base ordinati per livello, ma ci sarà comunque una sezione filtro identica a quella già presente nella galleria)
+    Vorrei che le splash art visualizzate siano le stesse della pagina di libreria, quindi procederei così: Fammi una funzione che mi formatta bene tutti i nomi dei file in questo modo:
+    - Le Splash devono essere: "Splash_NomePersonaggio.webp". Dove nome personaggio è il nome del personaggio attuale formattato in modo da essere: "PrimoNome_SecondoNome_NNomi" (Nella cartella del singolo utente ci sono i nomi formattati in quel modo)
+    - Le icone sono già formattate: "Nome_EventualeSecondoNome_Icon.webp"
+    - I banner sono già formattati: "Nome_EventualeSecondoNome_Card.webp"
+    Queste vorrei fossero collegate a tutti i personaggi che ci sono su Genshin.
+    Ci possono essere degli errori su come il gioco definisce i personaggi, quindi riesci a scrivermi una lista di tutti i nomi dei personaggi presenti in queste API? Così provo ad analizzarli e vedere se ci sono differenze.
+    Per esempio, io Itto lo chiamo Arataki Itto, e nei nostri file abbiamo Atataki_Itto, ma se loro avessero IttoArataki, dovrei modificarlo io manualmente.
+    Per ora ti interrompo io, poi aggiornerò questo file con le prossime richieste.
+Fine Prima Richiesta.
+
+2-Seconda richiesta:
+    Come fare la pagina del personaggio.
+    Nella pagina interna del personaggio vorrei vedere questo: 
+    - Nome personaggio
+    - Livello personaggio
+    - Un banner con la splash simile a quello che c'è nella pagina di Confronto build che ti rimanda al personaggio corrispondente della libreria
+    - La statistiche del personaggio
+    - L'arma e la descrizione dell'artefatto
+    Ti ho creato una cartella in @filesito/data/spunti/ dove ti ho messo due screenshot della schermata principale. Per ora fallo fedele con i
+    dati e per lo sfondo prendi uno a caso in backgrounds. Poi inseriscimi una nuova scheda nelle impostazioni utente per gestire l'inventario
+    (per ora metti solo il cambio dello sfondo). Questa scheda sarà accessibile solo dagli admin.
+Fine Seconda Richiesta.
+
+3-Terza richiesta:
+    Lo sfondo di questa nuova pagina inventario (e sottopagine) sarà questo: @filesito/data/spunti/f4ad957b4a48eda55bafa05aac2f63a5.jpeg.
+    La schermata di inserimento UID e la pagina principale non devono avere i titoli con la retroilluminazione (è una funzione che ho messo io, quando c'è impostato uno sfondo personalizzato, tutti i titoli sono fatti così).
+    Poi le card devono essere simili a quelle nella Galleria dei personaggi.
+Fine Terza Richiesta.
+
+4-Quarta richiesta:
+    Pensiamo alla grafica della pagina dei personaggi.
+    A sinistra, al posto della splash mettici il banner.
+    Le righe a destra te le suddivido così:
+    - 1: Nome, livello e livello di amicizia visualizzale come ora, ma rimuovi solo la retroilluminazione e lascia sempre il font scuro a prescindere dal tema.
+    - 2: Le statistiche devono coincidere con la lista che c'è durante la creazione di un personaggio: HP (Max HP nell'inventario), ATK, DEF, Energy Recharge, Elemental Mastery, Crit Rate e Crit Damage. Inoltre noto che sembrano sbagliate alcune stats, prova a ricontrollarle.
+    - 3: Gli artefatti e le armi sono giusti, ma non mostrare i nomi. Per le armi scrivi solo le Stats e per gli artefatti fai 5 div staccati con tutte le stats di cui quella principale e quelle inferiori.
+Fine Quarta Richiesta.
