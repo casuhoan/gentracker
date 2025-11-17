@@ -43,3 +43,19 @@ Fine Terza Richiesta.
     - 2: Le statistiche devono coincidere con la lista che c'è durante la creazione di un personaggio: HP (Max HP nell'inventario), ATK, DEF, Energy Recharge, Elemental Mastery, Crit Rate e Crit Damage. Inoltre noto che sembrano sbagliate alcune stats, prova a ricontrollarle.
     - 3: Gli artefatti e le armi sono giusti, ma non mostrare i nomi. Per le armi scrivi solo le Stats e per gli artefatti fai 5 div staccati con tutte le stats di cui quella principale e quelle inferiori.
 Fine Quarta Richiesta.
+
+5-Quinta Richiesta:
+    Perfetto, ora creami una pagina di Gestione inventario accessibile solo dalle impostazioni degli admin (ci sono già diverse pagine, creane una coerente). 
+    In questa pagina potrò fare queste cose: Cambiare lo sfondo dell'inventario e gestire la lista dei personaggi inseriti. 
+    In questa lista posso associare un ID ad un personaggio della Libreria, dove prenderà le Splash e i Banner da mostrare.
+Fine Quinta Richiesta.
+
+6-Sesta richiesta:
+    Ora nella pagina del personaggio dell'inventario vorrei un pulsante per migrare i dati della build attuale di un personaggio in un personaggio della Galleria.
+    Come funzionerà nello specifico:
+    1. Verrà visualizzata una pagina nuova che ti mostrerà i vari personaggi della Galleria che hanno associato quel personaggio (Per Esempio, se ho Navia nel mio inventario e premo, posso migrare la mia build attuale in una dei miei personaggi che hanno Navia, dato che puoi creare più personaggi per ogni personaggio)
+    2. Una volta selezionato il personaggio comparirà una schermata nuova che sarà identica a quella di creazione di una build, ma con quasi tutti i dati già compilati.
+    3. I dati già compilati (rispetto alla pagina normale) sono questi: Personaggio, Data di acquisizione e le statistiche selezionate per il personaggio.
+    4. Poi chiederà i dati che non possono essere compilati da solo: Signature (selezionabile), Costellazione (selezionabile) e Talenti (selezionabile)
+    5. Alla fine chiederà conferma e poi entrando nella pagina di confronto build del personaggio troverò come ultima build quella migrata.
+Fine Sesta Richiesta.

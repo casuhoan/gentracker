@@ -2196,7 +2196,8 @@ function save_inventory_settings() {
         }
     }
 
-    $inventory_background = $_POST['inventory_background'] ?? '';
+    $data = json_decode(file_get_contents('php://input'), true);
+    $inventory_background = $data['inventory_background'] ?? '';
     $settings['inventory_background'] = $inventory_background;
 
     if (file_put_contents($settings_file, json_encode($settings, JSON_PRETTY_PRINT))) {

@@ -238,7 +238,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const settings = await settingsRes.json();
             const backgroundsData = await backgroundsRes.json();
-            const enkaCharMap = await enkaCharMapRes.json();
+            
+            // Convert the Enka character map array to an object for easier lookup
+            const enkaCharMapArray = await enkaCharMapRes.json();
+            const enkaCharMap = enkaCharMapArray.reduce((acc, char) => {
+                acc[char.id] = char.name;
+                return acc;
+            }, {});
+
             const savedMap = await savedMapRes.json();
             
             const currentBg = settings.inventory_background || '';
@@ -268,10 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             // --- Render Character Mapping ---
-            const libraryOptionsHtml = characterLibrary
-                .map(c => `<option value="${c.nome}">${c.nome}</option>`)
-                .join('');
-
             let tableRowsHtml = '';
             for (const id in enkaCharMap) {
                 const enkaName = enkaCharMap[id];
@@ -286,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <tr>
                         <td><strong>${enkaName}</strong></td>
                         <td><code class="small">${id}</code></td>
+                        <td><span class="badge bg-info text-dark">${savedCharName || 'Nessuno'}</span></td>
                         <td>
                             <select class="form-select form-select-sm inventory-char-map-select" data-avatar-id="${id}">
                                 <option value="">-- Non Associare --</option>
@@ -305,7 +309,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tr>
                                 <th>Personaggio (Enka)</th>
                                 <th>Avatar ID</th>
-                                <th>Personaggio Associato (Libreria)</th>
+                                <th>Attualmente Associato a</th>
+                                <th>Nuova Associazione (Libreria)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,6 +321,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="text-end mt-3">
                     <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati</button>
                     <button class="btn btn-success" id="save-inventory-char-map-btn">Salva Associazioni</button>
+                </div>
+                <div class="mt-4 p-3 border rounded form-section-box">
+                    <h5 class="mb-3">Aggiungi Nuova Associazione Manuale</h5>
+                    <p class="small text-muted">Usa questa sezione per mappare manualmente un Avatar ID che non compare nell'elenco sopra a un personaggio della tua libreria.</p>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-4">
+                            <label for="manual-avatar-id" class="visually-hidden">Avatar ID</label>
+                            <input type="text" class="form-control" id="manual-avatar-id" placeholder="Avatar ID (es. 10000122)">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="manual-char-select" class="visually-hidden">Personaggio</label>
+                            <select id="manual-char-select" class="form-select">
+                                <option value="">Scegli personaggio dalla libreria...</option>
+                                ${characterLibrary.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" id="add-manual-association-btn">Aggiungi</button>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -617,6 +642,51 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 showErrorAlert('Errore di comunicazione con il server.');
             }
+        }
+
+        if (e.target.id === 'add-manual-association-btn') {
+            const avatarId = document.getElementById('manual-avatar-id').value.trim();
+            const charName = document.getElementById('manual-char-select').value;
+
+            if (!avatarId || !charName) {
+                showErrorAlert('Per favore, compila sia l\'Avatar ID che il nome del personaggio.');
+                return;
+            }
+
+            // Check if the row already exists
+            const existingRow = document.querySelector(`select[data-avatar-id="${avatarId}"]`);
+            if (existingRow) {
+                showErrorAlert('Questo Avatar ID è già presente nella tabella. Modifica l\'associazione esistente.');
+                return;
+            }
+
+            // Create a new row and add it to the table
+            const tableBody = document.querySelector('#v-pills-inventory-management tbody');
+            const newRow = document.createElement('tr');
+            
+            const selectOptions = characterLibrary.map(c => {
+                const isSelected = c.nome === charName;
+                return `<option value="${c.nome}" ${isSelected ? 'selected' : ''}>${c.nome}</option>`;
+            }).join('');
+
+            newRow.innerHTML = `
+                <td><strong>${avatarId} (Manuale)</strong></td>
+                <td><code class="small">${avatarId}</code></td>
+                <td><span class="badge bg-warning text-dark">Nuovo</span></td>
+                <td>
+                    <select class="form-select form-select-sm inventory-char-map-select" data-avatar-id="${avatarId}">
+                        <option value="">-- Non Associare --</option>
+                        ${selectOptions}
+                    </select>
+                </td>
+            `;
+            tableBody.prepend(newRow); // Add to the top
+
+            // Clear input fields
+            document.getElementById('manual-avatar-id').value = '';
+            document.getElementById('manual-char-select').value = '';
+            
+            showToast('Associazione aggiunta alla tabella. Clicca "Salva Associazioni" per renderla permanente.');
         }
 
         if (e.target.id === 'save-inventory-char-map-btn') {

@@ -915,7 +915,7 @@ body.dark-mode .table td {
     height: 100%;
     background-size: cover; /* Usa cover per riempire lo spazio */
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: center 30%;
     transition: transform 0.3s ease;
 }
 

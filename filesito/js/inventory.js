@@ -209,10 +209,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return statKey;
     }
 
-    const formatStatValue = (key, value) => {
+    const formatStatValue = (key, value, source = 'character') => {
         const statInfo = enkaStatMap ? enkaStatMap[key] : null;
         if (statInfo && statInfo.percent) {
-             return `${(value * 100).toFixed(1)}%`;
+            // Only character stats are decimals (e.g., 0.466 for 46.6%)
+            if (source === 'character') {
+                return `${(value * 100).toFixed(1)}%`;
+            }
+            // Weapon and artifact stats are already percentages (e.g., 27.6 for 27.6%)
+            return `${value.toFixed(1)}%`;
         }
         return Math.round(value);
     };
@@ -229,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statsHtml += `
                     <div class="col-12 col-md-6 d-flex justify-content-between align-items-center stat-row">
                         <span>${getStatName(stringKey)}</span>
-                        <strong>${formatStatValue(stringKey, value)}</strong>
+                        <strong>${formatStatValue(stringKey, value, 'character')}</strong>
                     </div>`;
             }
         }
@@ -247,8 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const mainStat = weapon.flat.weaponStats[0];
             const subStat = weapon.flat.weaponStats[1];
             html += `<div class="card equip-item-card p-2">`;
-            if (mainStat) html += `<div>${getStatName(mainStat.appendPropId)}: <strong>${Math.round(mainStat.statValue)}</strong></div>`;
-            if (subStat) html += `<div class="small text-muted">${getStatName(subStat.appendPropId)}: ${formatStatValue(subStat.appendPropId, subStat.statValue)}</div>`;
+            if (mainStat) html += `<div>${getStatName(mainStat.appendPropId)}: <strong>${formatStatValue(mainStat.appendPropId, mainStat.statValue, 'weapon')}</strong></div>`;
+            if (subStat) html += `<div class="small text-muted">${getStatName(subStat.appendPropId)}: ${formatStatValue(subStat.appendPropId, subStat.statValue, 'weapon')}</div>`;
             html += `</div>`;
         } else { 
             html += '<p>Nessuna arma equipaggiata.</p>'; 
@@ -274,11 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     let substatsHtml = '<ul class="list-unstyled list-inside small text-muted">';
                     if (art.flat.reliquarySubstats) {
                         art.flat.reliquarySubstats.forEach(substat => {
-                            substatsHtml += `<li>${getStatName(substat.appendPropId)}: ${formatStatValue(substat.appendPropId, substat.statValue)}</li>`;
+                            substatsHtml += `<li>${getStatName(substat.appendPropId)}: ${formatStatValue(substat.appendPropId, substat.statValue, 'artifact')}</li>`;
                         });
                     }
                     substatsHtml += '</ul>';
-                    html += `<div class="card equip-item-card p-2 h-100"><strong>${getStatName(mainStatKey)}: ${formatStatValue(mainStatKey, mainStatValue)}</strong>${substatsHtml}</div>`;
+                    html += `<div class="card equip-item-card p-2 h-100"><strong>${getStatName(mainStatKey)}: ${formatStatValue(mainStatKey, mainStatValue, 'artifact')}</strong>${substatsHtml}</div>`;
                 } else {
                     html += `<div class="card equip-item-card p-2 h-100 d-flex align-items-center justify-content-center"><span class="text-muted small">Slot ${slotKey} vuoto</span></div>`;
                 }
