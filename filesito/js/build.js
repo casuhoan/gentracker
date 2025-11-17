@@ -1,6 +1,24 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    const FIGHT_PROP_ID_MAP = {
+        "1": "FIGHT_PROP_BASE_HP", "2": "FIGHT_PROP_HP", "3": "FIGHT_PROP_HP_PERCENT",
+        "4": "FIGHT_PROP_BASE_ATTACK", "5": "FIGHT_PROP_ATTACK", "6": "FIGHT_PROP_ATTACK_PERCENT",
+        "7": "FIGHT_PROP_BASE_DEFENSE", "8": "FIGHT_PROP_DEFENSE", "9": "FIGHT_PROP_DEFENSE_PERCENT",
+        "10": "FIGHT_PROP_BASE_SPEED", "11": "FIGHT_PROP_SPEED_PERCENT",
+        "20": "FIGHT_PROP_CRITICAL", "21": "FIGHT_PROP_ANTI_CRITICAL", "22": "FIGHT_PROP_CRITICAL_HURT",
+        "23": "FIGHT_PROP_CHARGE_EFFICIENCY", "26": "FIGHT_PROP_HEAL_ADD", "27": "FIGHT_PROP_HEALED_ADD",
+        "28": "FIGHT_PROP_ELEMENT_MASTERY", "29": "FIGHT_PROP_PHYSICAL_SUB_HURT", "30": "FIGHT_PROP_PHYSICAL_ADD_HURT",
+        "40": "FIGHT_PROP_FIRE_ADD_HURT", "41": "FIGHT_PROP_ELEC_ADD_HURT", "42": "FIGHT_PROP_WATER_ADD_HURT",
+        "43": "FIGHT_PROP_GRASS_ADD_HURT", "44": "FIGHT_PROP_WIND_ADD_HURT", "45": "FIGHT_PROP_ROCK_ADD_HURT",
+        "46": "FIGHT_PROP_ICE_ADD_HURT", "50": "FIGHT_PROP_FIRE_SUB_HURT", "51": "FIGHT_PROP_ELEC_SUB_HURT",
+        "52": "FIGHT_PROP_WATER_SUB_HURT", "53": "FIGHT_PROP_GRASS_SUB_HURT", "54": "FIGHT_PROP_WIND_SUB_HURT",
+        "55": "FIGHT_PROP_ROCK_SUB_HURT", "56": "FIGHT_PROP_ICE_SUB_HURT",
+        "2000": "FIGHT_PROP_MAX_HP", "2001": "FIGHT_PROP_ATTACK", "2002": "FIGHT_PROP_DEFENSE"
+    };
+    let enkaStatMap = {};
+    fetch('inventory/en_stat_map.json').then(r => r.json()).then(data => enkaStatMap = data);
+
     // --- BUILD FUNCTIONS ---
 
     window.loadCharactersForBuildLogger = () => {
@@ -112,6 +130,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const prefillBuildFormFromMigration = (galleryCharData) => {
+        const inventoryCharData = window.migrationData.inventoryCharData;
+        const fightPropMap = inventoryCharData.fightPropMap;
+
+        // Set date to today
+        document.getElementById('build-date').value = new Date().toISOString().split('T')[0];
+
+        // Pre-fill Constellation
+        const constellationInput = document.getElementById('build_constellation');
+        if (constellationInput && inventoryCharData.talentIdList) {
+            constellationInput.value = inventoryCharData.talentIdList.length;
+        }
+
+        // Map the display stat name (from tracked_stats) to the numeric key in fightPropMap
+        const nameToNumericKey = {
+            "HP": "2000",
+            "Atk": "2001",
+            "Def": "2002",
+            "Energy Recharge (%)": "23",
+            "Elemental Mastery": "28",
+            "Crit Rate (%)": "20",
+            "Crit Damage (%)": "22",
+            "Healing Bonus (%)": "26",
+            "Pyro DMG Bonus (%)": "40",
+            "Electro DMG Bonus (%)": "41",
+            "Hydro DMG Bonus (%)": "42",
+            "Dendro DMG Bonus (%)": "43",
+            "Anemo DMG Bonus (%)": "44",
+            "Geo DMG Bonus (%)": "45",
+            "Cryo DMG Bonus (%)": "46",
+            "Physical DMG Bonus (%)": "30"
+        };
+
+        // Pre-fill stats
+        galleryCharData.profile.tracked_stats.forEach(trackedStatName => {
+            const numericKey = nameToNumericKey[trackedStatName];
+            if (numericKey && fightPropMap[numericKey] !== undefined) {
+                const value = fightPropMap[numericKey];
+                const input = document.getElementById(`build-${createSafeId(trackedStatName)}`);
+                if (input) {
+                    const stringKey = FIGHT_PROP_ID_MAP[numericKey];
+                    const statInfo = enkaStatMap ? enkaStatMap[stringKey] : null;
+                    if (statInfo && statInfo.percent) {
+                        input.value = (value * 100).toFixed(1);
+                    } else {
+                        input.value = Math.round(value);
+                    }
+                }
+            }
+        });
+
+        showToast('Modulo pre-compilato con i dati dall\'inventario.');
+    };
+
     const buildForm = document.getElementById('build-form');
     if (buildForm) {
         buildForm.onsubmit = async (e) => {
@@ -192,6 +264,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const statId = createSafeId(stat);
                 buildStatsInputs.innerHTML += `<div class="col-md-4 mb-3"><label for="build-${statId}" class="form-label">${stat}</label><input type="number" step="0.1" class="form-control" id="build-${statId}" name="stats[${stat}]"></div>`;
             });
+
+            // Pre-fill talents and signature weapon from the latest build
+            const talentsSelect = document.getElementById('build_talents');
+            const signatureSelect = document.getElementById('build_signature_weapon');
+
+            if (charData.builds && charData.builds.length > 0) {
+                const latestBuild = charData.builds[0]; // Assumes builds are sorted descending by date
+                if (talentsSelect) {
+                    talentsSelect.value = latestBuild.talents || config.talentOptions[0];
+                }
+                if (signatureSelect) {
+                    signatureSelect.value = latestBuild.signature_weapon || config.signatureOptions[0];
+                }
+            } else {
+                // Set to default if no builds exist
+                if (talentsSelect) {
+                    talentsSelect.selectedIndex = 0;
+                }
+                if (signatureSelect) {
+                    signatureSelect.selectedIndex = 0;
+                }
+            }
+
+            // --- NEW MIGRATION LOGIC ---
+            // Use a timeout to ensure the DOM is updated with the new inputs
+            setTimeout(() => {
+                if (window.migrationData && window.migrationData.targetCharName === charName) {
+                    prefillBuildFormFromMigration(charData);
+                    delete window.migrationData; // Clear it after use
+                }
+            }, 100);
         });
     }
 

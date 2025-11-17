@@ -1,0 +1,41 @@
+{
+    "profile": {
+        "name": "Navia",
+        "splashart": "data\/splashart\/Character_Navia_Full_Wish.webp",
+        "element": "Geo",
+        "role": [
+            "Main DPS"
+        ],
+        "tracked_stats": [
+            "Atk",
+            "Crit Rate (%)",
+            "Crit Damage (%)"
+        ],
+        "ideal_stats": {
+            "Atk": 2000,
+            "Crit Rate (%)": 60,
+            "Crit Damage (%)": 300,
+            "Goblet Elementale": "Sì"
+        },
+        "acquisition_date": "2025-11-17",
+        "constellation": 4,
+        "signature_weapon": "Best in the slot",
+        "talents": "Perfetti",
+        "rarity": "5-star",
+        "nation": "Fontaine",
+        "faction": "X"
+    },
+    "builds": [
+        {
+            "date": "2025-11-17",
+            "stats": {
+                "Atk": "2586",
+                "Crit Rate (%)": "62.4",
+                "Crit Damage (%)": "242.3"
+            },
+            "constellation": 4,
+            "signature_weapon": "Best in the slot",
+            "talents": "Perfetti"
+        }
+    ]
+}

@@ -301,6 +301,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             rarityDisplay.innerHTML += '<i class="bi bi-star-fill text-warning"></i>';
                         }
                     }
+
+                    // Set Nation and Faction
+                    const nationInput = document.getElementById('nation');
+                    if (nationInput) {
+                        nationInput.value = characterFromLibrary.nazione || '';
+                    }
+                    const factionInput = document.getElementById('faction');
+                    if (factionInput) {
+                        factionInput.value = characterFromLibrary.fazione || '';
+                    }
                 }
             } else {
                 if (nameInput) nameInput.value = '';

@@ -107,6 +107,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (hash.startsWith('#inventory-character/')) {
             const avatarId = decodeURIComponent(hash.substring(21));
             if(typeof loadInventoryCharacterPage === 'function') loadInventoryCharacterPage(avatarId);
+        } else if (hash.startsWith('#log-build/')) {
+            const charName = decodeURIComponent(hash.substring(11));
+            showView('build-logger-view', () => {
+                if (typeof loadCharactersForBuildLogger === 'function') {
+                    loadCharactersForBuildLogger();
+                }
+                const charSelect = document.getElementById('char-select');
+                if (charSelect) {
+                    charSelect.value = charName;
+                    charSelect.dispatchEvent(new Event('change'));
+                }
+            });
         } else if (hash.startsWith('#submit-ticket/')) {
             const charName = decodeURIComponent(hash.substring(15));
             showView('ticket-submission-view');

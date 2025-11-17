@@ -431,7 +431,14 @@
         "nome": "Navia",
         "immagine": "splashart\/Character_Navia_Full_Wish.webp",
         "icon": "library\/Navia_Icon.webp",
-        "banner": "library\/Navia_Card.webp"
+        "banner": "library\/Navia_Card.webp",
+        "titolo": "",
+        "elemento": "Geo",
+        "arma": "Claymore",
+        "rarita": "5-star",
+        "nazione": "Fontaine",
+        "fazione": "",
+        "wip": false
     },
     {
         "nome": "Neuvillette",

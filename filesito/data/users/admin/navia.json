@@ -20,7 +20,9 @@
         "constellation": 4,
         "signature_weapon": "Sì",
         "talents": "Sì",
-        "rarity": "5-star"
+        "rarity": "5-star",
+        "weapon": "Claymore",
+        "title": ""
     },
     "builds": [
         {

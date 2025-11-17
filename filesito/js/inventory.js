@@ -31,6 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const initData = async () => {
         if (isDataInitialized) return;
         try {
+            // Ensure allCharacters is loaded for migration purposes
+            if (!window.allCharacters) {
+                const allCharsRes = await fetch('php/api.php?action=get_all_characters');
+                if (allCharsRes.ok) {
+                    window.allCharacters = await allCharsRes.json();
+                } else {
+                    console.error('Failed to load allCharacters for inventory migration.');
+                    window.allCharacters = []; // Set to empty array to prevent errors
+                }
+            }
+
             const [idMapRes, bgRes, enkaStatRes, settingsRes, invCharMapRes] = await Promise.all([
                 fetch('inventory/character_id_map.json'),
                 fetch('php/api.php?action=get_backgrounds'),
@@ -40,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
 
             if (!idMapRes.ok) throw new Error('Impossibile caricare character_id_map.json');
-            characterIdMap = (await idMapRes.json()).reduce((acc, item) => { acc[item.id] = item.name; return acc; }, {});
+            const enkaCharMapArray = await idMapRes.json();
+            characterIdMap = enkaCharMapArray.reduce((acc, char) => { acc[char.id] = char.name; return acc; }, {});
             
             if (bgRes.ok) backgrounds = (await bgRes.json()).backgrounds || [];
             if (enkaStatRes.ok) enkaStatMap = await enkaStatRes.json();
@@ -296,6 +308,60 @@ document.addEventListener('DOMContentLoaded', () => {
         return html;
     };
 
+    const showMigrationTargetSelection = (inventoryCharData) => {
+        const localCharName = inventoryCharacterMap ? inventoryCharacterMap[inventoryCharData.avatarId] : null;
+        
+        if (!localCharName) {
+            showErrorAlert("Questo personaggio dell'inventario non è associato a nessun personaggio della libreria. Associalo prima nelle impostazioni di gestione inventario.");
+            return;
+        }
+
+        const matchingGalleryChars = window.allCharacters.filter(galleryChar => galleryChar.profile.name === localCharName);
+
+        const targetContainer = document.getElementById('migration-target-view');
+        
+        let html = `
+            <div class="container">
+                <h2 class="mt-4 mb-3">Migra Build per ${localCharName}</h2>
+                <p>Seleziona un personaggio dalla tua galleria in cui migrare la build attuale dall'inventario.</p>
+        `;
+
+        if (matchingGalleryChars.length > 0) {
+            html += '<div class="list-group">';
+            matchingGalleryChars.forEach(galleryChar => {
+                const uniqueId = galleryChar.profile.name; // Using name as the identifier for now
+                html += `
+                    <button type="button" class="list-group-item list-group-item-action migration-target-select-btn" data-target-char-name="${encodeURIComponent(uniqueId)}">
+                        <strong>${galleryChar.profile.name}</strong>
+                        <small class="d-block text-muted">Data Acquisizione: ${galleryChar.profile.acquisition_date || 'N/A'} - Ruoli: ${(galleryChar.profile.role || []).join(', ') || 'N/A'}</small>
+                    </button>
+                `;
+            });
+            html += '</div>';
+        } else {
+            html += `<div class="alert alert-warning">Nessun personaggio con il nome "${localCharName}" trovato nella tua galleria. Aggiungi prima il personaggio alla galleria.</div>`;
+        }
+
+        html += `<button onclick="window.history.back()" class="btn btn-secondary mt-3">&larr; Annulla</button></div>`;
+
+        targetContainer.innerHTML = html;
+        showView('migration-target-view');
+
+        // Add event listeners
+        document.querySelectorAll('.migration-target-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetCharName = decodeURIComponent(e.currentTarget.dataset.targetCharName);
+                
+                window.migrationData = {
+                    inventoryCharData: inventoryCharData,
+                    targetCharName: targetCharName
+                };
+
+                location.hash = `#log-build/${targetCharName}`;
+            });
+        });
+    };
+
     const renderCharacterDetail = (charData) => {
         const localCharName = inventoryCharacterMap ? inventoryCharacterMap[charData.avatarId] : null;
         const libChar = localCharName ? window.characterLibrary.find(c => c.nome === localCharName) : null;
@@ -306,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const level = charData.propMap['4001']?.val || 'N/A';
         const friendship = charData.fetterInfo?.expLevel || 0;
+        const constellation = charData.talentIdList ? charData.talentIdList.length : 0;
 
         setInventoryBackground();
         let html = `
@@ -319,14 +386,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="d-flex align-items-center mb-2">
                             <h1 class="mb-0 me-3 inventory-detail-header-text">${name}</h1>
                             <span class="badge bg-primary fs-5 inventory-detail-header-text">Lv. ${level}</span>
+                            <button id="migrate-build-btn" class="btn btn-sm btn-info ms-3" data-avatar-id="${charData.avatarId}">Migra Build</button>
                         </div>
-                        <p class="inventory-detail-header-text">Livello Amicizia: ${friendship}</p>
+                        <p class="inventory-detail-header-text">Livello Amicizia: ${friendship} | Costellazione: C${constellation}</p>
                         <div class="card bg-dark text-white mb-3"><div class="card-header"><h4>Statistiche</h4></div><div class="card-body">${renderStats(charData.fightPropMap)}</div></div>
                         <div class="card bg-dark text-white"><div class="card-header"><h4>Equipaggiamento</h4></div><div class="card-body">${renderEquip(charData.equipList)}</div></div>
                     </div>
                 </div>
             </div>`;
         characterDetailContainer.innerHTML = html;
+
+        const migrateBtn = document.getElementById('migrate-build-btn');
+        if (migrateBtn) {
+            migrateBtn.addEventListener('click', () => {
+                const avatarId = migrateBtn.dataset.avatarId;
+                const charData = fullInventoryData.avatarInfoList.find(c => c.avatarId == avatarId);
+                showMigrationTargetSelection(charData);
+            });
+        }
     };
 
     const loadInventoryCharacterPage = async (avatarId) => {

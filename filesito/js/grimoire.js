@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 
                                 <div class="row border-top pt-3">
                                     <div class="col-6 col-md-4 mb-3">
-                                        <h5>Elemento</h5>
+                                        <h5>Vision/Gnosis</h5>
                                         <p class="d-flex align-items-center"><img src="${elementIconUrl}" style="width: 24px; height: 24px;" class="me-2">${char.elemento || 'N/D'}</p>
                                     </div>
                                     <div class="col-6 col-md-4 mb-3">
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <p>${char.nazione || 'N/D'}</p>
                                     </div>
                                     <div class="col-6 col-md-4 mb-3">
-                                        <h5>Fazione/Tribe</h5>
+                                        <h5>Affiliazione</h5>
                                         <p>${char.fazione || 'N/D'}</p>
                                     </div>
                                 </div>
