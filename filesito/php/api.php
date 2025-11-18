@@ -561,8 +561,8 @@ function upload_background() {
 }
 
 function delete_background() {
-    global $json_input;
-    $filename = $json_input['filename'] ?? '';
+    $data = json_decode(file_get_contents('php://input'), true);
+    $filename = $data['filename'] ?? '';
 
     if (empty($filename)) {
         echo json_encode(['status' => 'error', 'message' => 'Nome file non fornito.']);
@@ -630,8 +630,8 @@ function get_user_schema() {
 }
 
 function save_user_schema() {
-    global $json_input;
-    $schema = $json_input['schema'] ?? null;
+    $data = json_decode(file_get_contents('php://input'), true);
+    $schema = $data['schema'] ?? null;
 
     if ($schema === null) {
         echo json_encode(['status' => 'error', 'message' => 'Nessun dato dello schema ricevuto.']);
@@ -1629,9 +1629,9 @@ function get_keyword_settings() {
 }
 
 function save_keyword_settings() {
-    global $json_input;
-    $colors = $json_input['colors'] ?? null;
-    $tooltips = $json_input['tooltips'] ?? null;
+    $data = json_decode(file_get_contents('php://input'), true);
+    $colors = $data['colors'] ?? null;
+    $tooltips = $data['tooltips'] ?? null;
 
     if ($colors === null || $tooltips === null) {
         echo json_encode(['status' => 'error', 'message' => 'Dati mancanti.']);
@@ -1937,9 +1937,9 @@ function update_nation_visibility() {
         return;
     }
 
-    global $json_input;
-    $name = $json_input['name'] ?? '';
-    $hidden = $json_input['hidden'] ?? false;
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = $data['name'] ?? '';
+    $hidden = $data['hidden'] ?? false;
 
     if (empty($name)) {
         echo json_encode(['status' => 'error', 'message' => 'Il nome della nazione è obbligatorio.']);
@@ -1978,8 +1978,7 @@ function update_nations_order() {
         return;
     }
 
-    global $json_input;
-    $ordered_names = $json_input['order'] ?? null;
+    $ordered_names = json_decode(file_get_contents('php://input'), true)['order'] ?? null;
 
     if ($ordered_names === null) {
         echo json_encode(['status' => 'error', 'message' => 'Nessun ordine fornito.']);
@@ -2195,7 +2194,6 @@ function save_inventory_settings() {
         return;
     }
 
-    global $json_input;
     $settings_file = get_settings_file();
     $settings = [];
     if (file_exists($settings_file)) {
@@ -2205,7 +2203,8 @@ function save_inventory_settings() {
         }
     }
 
-    $inventory_background = $json_input['inventory_background'] ?? '';
+    $data = json_decode(file_get_contents('php://input'), true);
+    $inventory_background = $data['inventory_background'] ?? '';
     $settings['inventory_background'] = $inventory_background;
 
     if (file_put_contents($settings_file, json_encode($settings, JSON_PRETTY_PRINT))) {
@@ -2257,15 +2256,12 @@ function getInventory() {
 
 // --- ROUTER ---
 $action = '';
-$json_input = null;
-
 if (isset($_REQUEST['action'])) {
     $action = $_REQUEST['action'];
 } else {
-    $raw_input = file_get_contents('php://input');
-    $json_input = json_decode($raw_input, true);
-    if (isset($json_input['action'])) {
-        $action = $json_input['action'];
+    $json_data = json_decode(file_get_contents('php://input'), true);
+    if (isset($json_data['action'])) {
+        $action = $json_data['action'];
     }
 }
 
