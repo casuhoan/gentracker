@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('php/api.php?action=get_backgrounds'),
                 fetch('inventory/en_stat_map.json'),
                 fetch('php/api.php?action=get_settings'),
-                fetch('inventory/inventory_character_map.json')
+                fetch('data/inventory_character_map.json?v=' + new Date().getTime()),
             ]);
 
             if (!idMapRes.ok) throw new Error('Impossibile caricare character_id_map.json');

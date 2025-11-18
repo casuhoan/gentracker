@@ -319,8 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </table>
                 </div>
                 <div class="text-end mt-3">
-                    <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati</button>
-                    <button class="btn btn-success" id="save-inventory-char-map-btn">Salva Associazioni</button>
+                    <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati con il Sito</button>
                 </div>
                 <div class="mt-4 p-3 border rounded form-section-box">
                     <h5 class="mb-3">Aggiungi Nuova Associazione Manuale</h5>
@@ -347,7 +346,17 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = backgroundSettingsHtml + characterMappingHtml;
 
         } catch (error) {
-            container.innerHTML = '<div class="alert alert-danger">Impossibile caricare le impostazioni di gestione dell\'inventario.</div>';
+            container.innerHTML = `
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">File non Trovato</h4>
+                    <p>Impossibile caricare il file <code>data/inventory_character_map.json</code>. Potrebbe non essere stato ancora creato.</p>
+                    <hr>
+                    <p class="mb-0">Usa il pulsante qui sotto per creare il file copiando la configurazione di base da <code>/inventory/</code>.</p>
+                </div>
+                <div class="text-end mt-3">
+                    <button class="btn btn-info" id="sync-inventory-data-btn">Crea/Ripristina Dati da Template</button>
+                </div>
+            `;
             console.error('Error loading inventory management tab:', error);
         }
     };
@@ -627,6 +636,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (e.target.id === 'sync-inventory-data-btn') {
+            e.target.disabled = true;
+            e.target.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sincronizzazione...';
+            
             try {
                 const response = await fetch('php/api.php', {
                     method: 'POST',
@@ -635,12 +647,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const result = await response.json();
                 if (result.status === 'success') {
-                    showToast('Dati sincronizzati con successo!');
+                    showToast(result.message || 'Dati sincronizzati con successo!');
                 } else {
                     showErrorAlert(result.message || 'Errore durante la sincronizzazione.');
                 }
             } catch (error) {
                 showErrorAlert('Errore di comunicazione con il server.');
+            } finally {
+                e.target.disabled = false;
+                e.target.innerHTML = 'Sincronizza Dati';
             }
         }
 
@@ -686,37 +701,64 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('manual-avatar-id').value = '';
             document.getElementById('manual-char-select').value = '';
             
-            showToast('Associazione aggiunta alla tabella. Clicca "Salva Associazioni" per renderla permanente.');
+            showToast('Associazione aggiunta. La modifica verrà salvata automaticamente.');
+            // Trigger the change event to auto-save
+            newRow.querySelector('select').dispatchEvent(new Event('change', { bubbles: true }));
         }
+    });
 
-        if (e.target.id === 'save-inventory-char-map-btn') {
-            const map = {};
-            document.querySelectorAll('.inventory-char-map-select').forEach(select => {
-                const avatarId = select.dataset.avatarId;
-                const selectedValue = select.value;
-                if (avatarId && selectedValue) {
-                    map[avatarId] = selectedValue;
-                }
-            });
+    // --- DEBOUNCER AND AUTOSAVE FOR INVENTORY MAP ---
+    let debounceTimer;
+    const debounce = (func, delay) => {
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => func.apply(context, args), delay);
+        }
+    };
 
-            try {
-                const response = await fetch('php/api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'save_inventory_character_map', map: map })
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showToast('Associazioni personaggi salvate!');
-                    // Invalidate and reload the map
-                    window.inventoryCharacterMap = null; 
-                    await loadInventoryData(); // from app.js
-                } else {
-                    showErrorAlert(result.message || 'Errore nel salvataggio della mappa.');
-                }
-            } catch (error) {
-                showErrorAlert('Errore di comunicazione con il server.');
+    const saveMap = async () => {
+        const map = {};
+        document.querySelectorAll('.inventory-char-map-select').forEach(select => {
+            const avatarId = select.dataset.avatarId;
+            const selectedValue = select.value;
+            if (avatarId && selectedValue) {
+                map[avatarId] = selectedValue;
             }
+        });
+
+        try {
+            const response = await fetch('php/api.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'save_inventory_character_map', map: map })
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                showToast('Associazioni salvate automaticamente!', 'success', 1500);
+                window.inventoryCharacterMap = null; 
+                await loadInventoryData();
+            } else {
+                showErrorAlert(result.message || 'Errore nel salvataggio della mappa.');
+            }
+        } catch (error) {
+            showErrorAlert('Errore di comunicazione con il server durante il salvataggio.');
+        }
+    };
+    
+    const debouncedSaveMap = debounce(saveMap, 800);
+
+    document.getElementById('v-pills-tabContent')?.addEventListener('change', (e) => {
+        if (e.target.classList.contains('inventory-char-map-select')) {
+            const select = e.target;
+            const selectedName = select.value;
+            const badge = select.closest('tr').querySelector('span.badge');
+            if (badge) {
+                badge.textContent = selectedName || 'Nessuno';
+                badge.className = `badge ${selectedName ? 'bg-info text-dark' : 'bg-secondary'}`;
+            }
+            debouncedSaveMap();
         }
     });
 

@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
-
 // Custom error handler to ensure JSON responses even on PHP errors
 set_error_handler(function($severity, $message, $file, $line) {
     if (!(error_reporting() & $severity)) {
@@ -135,8 +132,8 @@ function get_weapon_icons_dir() {
 }
 
 function get_inventory_character_map_file() {
-    // This now points to the non-synced, master file
-    return __DIR__ . '/../inventory/inventory_character_map.json';
+    // This now points to the LIVE file, which is the single source of truth.
+    return __DIR__ . '/../data/inventory_character_map.json';
 }
 
 function get_data_dir() {
@@ -2294,3 +2291,4 @@ if (in_array($action, $public_actions)) {
     http_response_code(400);
     echo json_encode(['status'=>'error','message'=>'Azione non valida.']);
 }
+
