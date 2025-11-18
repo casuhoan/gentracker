@@ -2079,9 +2079,16 @@ function get_inventory_character_map() {
 function save_inventory_character_map() {
     if (!is_admin()) { http_response_code(403); echo json_encode(['status' => 'error', 'message' => 'Accesso negato.']); return; }
     $map_file = get_inventory_character_map_file();
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (isset($data['map'])) {
-        if (file_put_contents($map_file, json_encode($data['map'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+    
+    if (isset($_POST['map'])) {
+        $map_data = json_decode($_POST['map'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Dati mappa JSON non validi.']);
+            return;
+        }
+
+        if (file_put_contents($map_file, json_encode($map_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
             echo json_encode(['status' => 'success', 'message' => 'Mappa personaggi inventario salvata.']);
         } else {
             http_response_code(500);

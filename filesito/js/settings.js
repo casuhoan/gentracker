@@ -222,6 +222,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const saveInventoryMap = async () => {
+        const map = {};
+        const selects = document.querySelectorAll('.inventory-char-map-select');
+        if (selects.length === 0) return; // No map to save
+
+        selects.forEach(select => {
+            const avatarId = select.dataset.avatarId;
+            const selectedValue = select.value;
+            if (avatarId) { // Save even if the value is empty (to allow un-association)
+                map[avatarId] = selectedValue;
+            }
+        });
+
+        try {
+            const formData = new FormData();
+            formData.append('action', 'save_inventory_character_map');
+            formData.append('map', JSON.stringify(map));
+
+            const response = await fetch('php/api.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            if (result.status === 'success') {
+                showToast('Associazione salvata!');
+                window.inventoryCharacterMap = map; // Update global map immediately
+                
+                // Update the 'Currently Associated' badges without a full reload
+                selects.forEach(select => {
+                    const row = select.closest('tr');
+                    if (row) {
+                        const badge = row.querySelector('td:nth-child(3) .badge');
+                        if (badge) {
+                            badge.textContent = select.value || 'Nessuno';
+                            badge.className = select.value ? 'badge bg-success' : 'badge bg-info text-dark';
+                        }
+                    }
+                });
+
+            } else {
+                showErrorAlert(result.message || 'Errore nel salvataggio della mappa.');
+            }
+        } catch (error) {
+            showErrorAlert('Errore di comunicazione con il server.');
+            console.error("Save inventory map error:", error);
+        }
+    };
+
     const loadInventoryManagementTab = async () => {
         const container = document.getElementById('v-pills-inventory-management');
         if (!container) return;
@@ -302,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const characterMappingHtml = `
                 <h4>Associazione Personaggi Inventario</h4>
-                <p class="text-muted small">Associa ogni personaggio dell'inventario (da Enka.Network) a un personaggio della tua libreria locale. Questo permette di usare le immagini e i dati corretti (banner, splash, ecc.) nella visualizzazione dell'inventario.</p>
+                <p class="text-muted small">Associa ogni personaggio dell'inventario (da Enka.Network) a un personaggio della tua libreria locale. Ogni modifica viene salvata automaticamente.</p>
                 <div class="table-responsive" style="max-height: 60vh; overflow-y: auto;">
                     <table class="table table-striped table-sm">
                         <thead class="table-dark" style="position: sticky; top: 0;">
@@ -313,14 +362,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <th>Nuova Associazione (Libreria)</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="inventory-char-map-table-body">
                             ${tableRowsHtml}
                         </tbody>
                     </table>
                 </div>
                 <div class="text-end mt-3">
                     <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati</button>
-                    <button class="btn btn-success" id="save-inventory-char-map-btn">Salva Associazioni</button>
                 </div>
                 <div class="mt-4 p-3 border rounded form-section-box">
                     <h5 class="mb-3">Aggiungi Nuova Associazione Manuale</h5>
@@ -345,6 +393,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             container.innerHTML = backgroundSettingsHtml + characterMappingHtml;
+
+            // Add event listener for auto-saving
+            const tableBody = container.querySelector('#inventory-char-map-table-body');
+            if (tableBody) {
+                tableBody.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('inventory-char-map-select')) {
+                        saveInventoryMap();
+                    }
+                });
+            }
 
         } catch (error) {
             container.innerHTML = '<div class="alert alert-danger">Impossibile caricare le impostazioni di gestione dell\'inventario.</div>';
@@ -661,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Create a new row and add it to the table
-            const tableBody = document.querySelector('#v-pills-inventory-management tbody');
+            const tableBody = document.querySelector('#inventory-char-map-table-body');
             const newRow = document.createElement('tr');
             
             const selectOptions = characterLibrary.map(c => {
@@ -686,37 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('manual-avatar-id').value = '';
             document.getElementById('manual-char-select').value = '';
             
-            showToast('Associazione aggiunta alla tabella. Clicca "Salva Associazioni" per renderla permanente.');
-        }
-
-        if (e.target.id === 'save-inventory-char-map-btn') {
-            const map = {};
-            document.querySelectorAll('.inventory-char-map-select').forEach(select => {
-                const avatarId = select.dataset.avatarId;
-                const selectedValue = select.value;
-                if (avatarId && selectedValue) {
-                    map[avatarId] = selectedValue;
-                }
-            });
-
-            try {
-                const response = await fetch('php/api.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'save_inventory_character_map', map: map })
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    showToast('Associazioni personaggi salvate!');
-                    // Invalidate and reload the map
-                    window.inventoryCharacterMap = null; 
-                    await loadInventoryData(); // from app.js
-                } else {
-                    showErrorAlert(result.message || 'Errore nel salvataggio della mappa.');
-                }
-            } catch (error) {
-                showErrorAlert('Errore di comunicazione con il server.');
-            }
+            saveInventoryMap();
         }
     });
 
