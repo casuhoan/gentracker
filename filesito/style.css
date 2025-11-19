@@ -30,8 +30,8 @@ body.body-has-background {
 
 /* Force dark text and no shadow for inventory detail header */
 .inventory-detail-header-text {
-    text-shadow: none !important;
-    color: #212529 !important;
+    text-shadow: none; /* White glow for readability */
+    color: #ffffff !important;
 }
 
 /* Styles for Stat Rows on Character Detail Page */
@@ -84,6 +84,19 @@ body.dark-mode .equip-item-card {
 }
 body.dark-mode .equip-item-card .text-muted {
     color: #adb5bd !important;
+}
+
+/* New class for theme-aware cards */
+.card.theme-card-bg {
+    background-color: var(--light-card-bg); /* Default to light card background */
+    color: var(--light-color); /* Default to light text color */
+    border-color: var(--light-card-border);
+}
+
+body.dark-mode .card.theme-card-bg {
+    background-color: var(--dark-card-bg); /* Dark card background in dark mode */
+    color: var(--dark-color); /* Dark text color in dark mode */
+    border-color: var(--dark-card-border);
 }
 
 /* Remove backlight from inventory view titles */

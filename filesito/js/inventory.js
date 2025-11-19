@@ -386,11 +386,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="d-flex align-items-center mb-2">
                             <h1 class="mb-0 me-3 inventory-detail-header-text">${name}</h1>
                             <span class="badge bg-primary fs-5 inventory-detail-header-text">Lv. ${level}</span>
-                            <button id="migrate-build-btn" class="btn btn-sm btn-info ms-3" data-avatar-id="${charData.avatarId}">Migra Build</button>
+                            <button id="migrate-build-btn" class="btn btn-sm btn-info ms-3" data-avatar-id="${charData.avatarId}">Registra questa build</button>
                         </div>
                         <p class="inventory-detail-header-text">Livello Amicizia: ${friendship} | Costellazione: C${constellation}</p>
-                        <div class="card bg-dark text-white mb-3"><div class="card-header"><h4>Statistiche</h4></div><div class="card-body">${renderStats(charData.fightPropMap)}</div></div>
-                        <div class="card bg-dark text-white"><div class="card-header"><h4>Equipaggiamento</h4></div><div class="card-body">${renderEquip(charData.equipList)}</div></div>
+                        <div class="card theme-card-bg mb-3"><div class="card-header"><h4>Statistiche</h4></div><div class="card-body">${renderStats(charData.fightPropMap)}</div></div>
+                        <div class="card theme-card-bg"><div class="card-header"><h4>Equipaggiamento</h4></div><div class="card-body">${renderEquip(charData.equipList)}</div></div>
                     </div>
                 </div>
             </div>`;

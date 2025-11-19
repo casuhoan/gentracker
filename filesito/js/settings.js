@@ -318,9 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </tbody>
                     </table>
                 </div>
-                <div class="text-end mt-3">
-                    <button class="btn btn-info" id="sync-inventory-data-btn">Sincronizza Dati con il Sito</button>
-                </div>
                 <div class="mt-4 p-3 border rounded form-section-box">
                     <h5 class="mb-3">Aggiungi Nuova Associazione Manuale</h5>
                     <p class="small text-muted">Usa questa sezione per mappare manualmente un Avatar ID che non compare nell'elenco sopra a un personaggio della tua libreria.</p>
