@@ -1629,3 +1629,10 @@ body.dark-mode #keyword-tooltips-accordion .accordion-body {
     right: -15%;
     bottom: -10%;
 }
+/* Stili per le card informative di Abisso/Teatro */
+.info-card {
+    margin-bottom: 1.5rem;
+}
+.info-card .card-header h3 {
+    margin-bottom: 0;
+}

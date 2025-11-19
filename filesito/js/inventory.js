@@ -210,8 +210,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         html += `</div>`;
+
+        // --- Aggiunta Dati Abisso e Teatro ---
+        html += renderAbyssInfo(playerInfo);
+        html += renderTheaterInfo(playerInfo);
+        // Stygian/Stygian Abyss non è un campo separato comune, di solito fa parte dei dati dell'Abisso.
+        // Per ora, creo un placeholder. Se ci sono dati specifici, andranno qui.
+        html += renderStygianInfo(playerInfo);
+
+
         inventoryContainer.innerHTML = html;
         document.getElementById('change-uid-btn').addEventListener('click', () => displayUidForm());
+    };
+
+    const renderAbyssInfo = (playerInfo) => {
+        if (!playerInfo || playerInfo.towerFloorIndex === undefined) {
+            return '';
+        }
+        const floor = playerInfo.towerFloorIndex || 'N/A';
+        const chamber = playerInfo.towerLevelIndex || 'N/A';
+        const stars = playerInfo.towerStarIndex || '0'; // Campo corretto: towerStarIndex
+
+        return `
+            <div class="card theme-card-bg info-card mt-4">
+                <div class="card-header"><h3>Risultati Abisso a Spirale</h3></div>
+                <div class="card-body">
+                    <p class="fs-4"><strong>Progresso:</strong> Piano ${floor}-${chamber} | <strong>Stelle:</strong> ${stars}★</p>
+                </div>
+            </div>
+        `;
+    };
+
+    const renderTheaterInfo = (playerInfo) => {
+        const act = playerInfo.theaterActIndex || null; // Campo corretto: theaterActIndex
+        
+        let content;
+        if (act) {
+            content = `<p class="fs-4"><strong>Atto Corrente:</strong> Atto ${act}</p>`;
+        } else {
+            content = `<p class="text-muted">Dati del Teatro Immaginario non disponibili.</p>`;
+        }
+
+        return `
+            <div class="card theme-card-bg info-card mt-4">
+                <div class="card-header"><h3>Risultati Teatro Immaginario</h3></div>
+                <div class="card-body">
+                    ${content}
+                </div>
+            </div>
+        `;
+    };
+
+    const renderStygianInfo = (playerInfo) => {
+        const tier = playerInfo.stygianIndex || null; // Campo corretto: stygianIndex
+        const time = playerInfo.stygianSeconds || null; // Campo corretto: stygianSeconds
+
+        let content;
+        if (tier && time) {
+            content = `<p class="fs-4"><strong>Risultato:</strong> Tier ${tier} completato in <strong>${time}s</strong></p>`;
+        } else {
+            content = `<p class="text-muted">Dati dello Stygian Onslaught non disponibili.</p>`;
+        }
+
+        return `
+            <div class="card theme-card-bg info-card mt-4">
+                <div class="card-header"><h3>Stygian Onslaught</h3></div>
+                <div class="card-body">
+                    ${content}
+                </div>
+            </div>
+        `;
     };
 
     const getStatName = (statKey) => {
